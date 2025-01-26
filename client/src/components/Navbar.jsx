@@ -1,66 +1,117 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu visibility
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (isMenuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [isMenuOpen]);
 
   return (
-    <div className="bg-[#ebf8ef] flex justify-between items-center px-8 sm:px-16 md:px-32 pt-4 fixed top-0 left-0 w-full z-50 ">
+    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 py-4 fixed top-0 left-0 w-full z-50 pt-8">
       {/* Logo */}
-      <div className="text-5xl font-bold text-green-700">
+      <div className="text-3xl sm:text-4xl font-bold text-green-700">
         HealCare
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden md:flex space-x-16 justify-center items-center text-lg font-semibold">
-        <ul className="flex space-x-16">
+      <div className="hidden sm:flex space-x-8 lg:space-x-16 justify-center items-center text-base lg:text-lg font-semibold">
+        <ul className="flex space-x-6 lg:space-x-12">
           <li className="hover:text-green-800 transition duration-300">
-            <a href="#home">Home</a>
+            <Link to="/">Home</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
-            <a href="#services">Services</a>
+            <Link to="/services">Services</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
-            <a href="#about">About</a>
+            <Link to="/about">About</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
-            <a href="#contact">Contact</a>
+            <Link to="/contact">Contact</Link>
           </li>
         </ul>
-        <button className="bg-green-500 text-white p-2 rounded-full">
-          Login/SignUp
-        </button>
+        <Link to="/login">
+          <button className="bg-green-500 text-white py-2 px-4 rounded-full">
+            Login/SignUp
+          </button>
+        </Link>
       </div>
 
       {/* Mobile Menu Button */}
-      <div className="md:hidden flex items-center">
+      <div className="flex sm:hidden items-center">
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="text-green-700 text-3xl"
+          onClick={() => setIsMenuOpen(true)}
+          className="text-green-700 text-3xl menu-toggle"
+          aria-label="Open Menu"
         >
-          {isMenuOpen ? 'X' : '☰'} {/* Toggle between menu icon and close icon */}
+          ☰ {/* Menu icon */}
         </button>
       </div>
 
       {/* Mobile Menu */}
       <div
-        className={`${
-          isMenuOpen ? 'block' : 'hidden'
-        } md:hidden absolute top-0 right-0 bg-white w-64 h-full shadow-lg flex flex-col items-center space-y-8 pt-12`}
+        ref={menuRef}
+        className={`fixed top-0 right-0 h-full bg-[#ebf8ef] shadow-lg transform ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        } transition-transform duration-300 ease-in-out w-64 z-50`}
       >
-        <a href="#home" className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300">
-          Home
-        </a>
-        <a href="#services" className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300">
-          Services
-        </a>
-        <a href="#about" className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300">
-          About
-        </a>
-        <a href="#contact" className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300">
-          Contact
-        </a>
-        <button className="bg-green-500 text-white p-2 rounded-full mt-4">Login/SignUp</button>
+        {/* Close Button */}
+        <button
+          onClick={() => setIsMenuOpen(false)}
+          className="text-green-700 text-3xl absolute top-4 right-4"
+          aria-label="Close Menu"
+        >
+          ✕ {/* Close icon */}
+        </button>
+
+        {/* Menu Items */}
+        <div className="flex flex-col items-center space-y-8 pt-12">
+          <Link
+            to="/"
+            className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <Link
+            to="/services"
+            className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Services
+          </Link>
+          <Link
+            to="/about"
+            className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            About
+          </Link>
+          <Link
+            to="/contact"
+            className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Contact
+          </Link>
+          <Link to="/login">
+            <button
+              className="bg-green-500 text-white py-2 px-4 rounded-full mt-4"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Login/SignUp
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
