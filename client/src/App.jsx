@@ -1,11 +1,11 @@
 import Navbar from './components/Navbar'
-import Home from './pages/Home'
+import Home from './pages/doctor-panel/Home'
 
 function App() {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <Home />
       {/* <Footer  /> */}
     </div>
