@@ -1,14 +1,15 @@
-const cloudinary = require('../config/cloudinaryConfig');
+import cloudinary from '../config/cloudinary.js';
 
 const uploadImage = async (filePath) => {
     try {
+        console.log('uploading ......')
         const result = await cloudinary.uploader.upload(filePath, {
-            folder: 'user_uploads', // Optional: Specify a folder in Cloudinary
         });
+        console.log(result)
         return result;
     } catch (error) {
         throw new Error('Image upload failed: ' + error.message);
     }
 };
 
-module.exports = uploadImage;
+export default uploadImage;

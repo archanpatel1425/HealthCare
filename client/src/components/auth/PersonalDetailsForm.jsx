@@ -3,13 +3,7 @@ import React, { useEffect, useState } from 'react';
 const PersonalDetailsForm = ({ register, errors }) => {
   const [photo, setPhoto] = useState(null);
 
-  useEffect(() => {
-   console.log('photo')
-   console.log(photo)
-  }, [photo])
-  
   const handleFileChange = (e) => {
-    console.log('changed')
     if (e.target.files && e.target.files.length > 0) {
       setPhoto(e.target.files[0]);
     }
@@ -55,8 +49,8 @@ const PersonalDetailsForm = ({ register, errors }) => {
           <label className="block text-sm font-medium text-gray-700">Phone</label>
           <input
             type="tel"
-            {...register('phone', {
-              required: 'Phone is required',
+            {...register('phone_no', {
+              required: 'Phone no. is required',
               pattern: {
                 value: /^[0-9]{10}$/,
                 message: 'Phone number must be exactly 10 digits',
@@ -84,8 +78,10 @@ const PersonalDetailsForm = ({ register, errors }) => {
           <label className="block text-sm font-medium text-gray-700">Photos URL</label>
           <input
             type="file"
-            onChange={handleFileChange}
-            {...register('profilepic', { required: 'Profile photo is required' })}
+            {...register('profilepic', {
+              required: 'Profile photo is required',
+              onChange: handleFileChange,
+            })}
             className="mt-1 block w-full border rounded-md px-3 py-2"
           />
           {errors.photos && <p className="text-red-500 text-sm">{errors.photos.message}</p>}

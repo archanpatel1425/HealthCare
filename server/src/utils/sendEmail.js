@@ -1,7 +1,7 @@
 // /utils/sendEmail.js
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-const sendEmail = async (reciver_email, mailData) => {
+export const sendEmail = async (reciver_email, mailData) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail', // or your email service provider
     auth: {
@@ -16,7 +16,7 @@ const sendEmail = async (reciver_email, mailData) => {
     subject: mailData.subject,
     text: mailData.text,
   };
-  
+
   try {
     await transporter.sendMail(mailOptions);
 
@@ -24,5 +24,3 @@ const sendEmail = async (reciver_email, mailData) => {
     throw new Error('Error sending email: ' + error.message);
   }
 };
-
-module.exports = sendEmail;
