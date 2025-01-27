@@ -2,8 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import PersonalDetailsForm from '../components/auth/PersonalDetailsForm';
 import EmailPasswordForm from '../components/auth/EmailPasswordForm';
+import PersonalDetailsForm from '../components/auth/PersonalDetailsForm';
 import QualificationsForm from '../components/auth/QualificationForm';
 
 const DoctorSignUp_Form = () => {
@@ -12,17 +12,17 @@ const DoctorSignUp_Form = () => {
   const navigate = useNavigate();
   const [loading, setloading] = useState(false);
   const [isCustomAvailability, setIsCustomAvailability] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    phone: '',
-    gender: '',
-    dob: '',
-    address: '',
+    phone_no: '',
     profilepic: '',
+    file: '',
+    gender: '',
     email: '',
     password: '',
+    confirmPassword: '',
     specialization: '',
     experience: '',
     qualifications: '',
@@ -65,7 +65,7 @@ const DoctorSignUp_Form = () => {
       customDays: isCustomAvailability ? data.customDays || [] : [],
     };
     console.log(finalData);
-    
+
     setloading(true);
     formData['userType'] = 'Doctor'
     axios.post(`${VITE_API_URL}/auth/doctor-signup`, finalData, { withCredentials: true })
@@ -110,15 +110,13 @@ const DoctorSignUp_Form = () => {
           <div className="flex items-center justify-between">
             {[1, 2, 3].map((stepNumber) => (
               <React.Fragment key={stepNumber}>
-                <div className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                  step >= stepNumber ? 'bg-green-500 text-white' : 'bg-gray-300'
-                }`}>
+                <div className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= stepNumber ? 'bg-green-500 text-white' : 'bg-gray-300'
+                  }`}>
                   {stepNumber}
                 </div>
                 {stepNumber < 3 && (
-                  <div className={`flex-1 h-1 mx-2 ${
-                    step > stepNumber ? 'bg-green-500' : 'bg-gray-300'
-                  }`} />
+                  <div className={`flex-1 h-1 mx-2 ${step > stepNumber ? 'bg-green-500' : 'bg-gray-300'
+                    }`} />
                 )}
               </React.Fragment>
             ))}

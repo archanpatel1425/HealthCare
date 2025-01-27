@@ -14,10 +14,8 @@ const PatientSignUp_Form = () => {
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
-        phone: '',
+        phone_no: '',
         gender: '',
-        dob: '',
-        address: '',
         profilepic: '',
         email: '',
         password: ''
@@ -49,16 +47,32 @@ const PatientSignUp_Form = () => {
         setStep(prev => Math.max(prev - 1, 1));
     };
 
-    const onSubmit = (data) => {
-        const finalData = { ...formData, ...data };
-        formData['userType'] = 'Patient'
+    const handleUpload = async (image) => {
+        const formData = new FormData();
+        formData.append('image', image);
+        try {
+            const response = await axios.post(`${VITE_API_URL}/uploads`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data.url
+        } catch (error) {
+            console.log("Failed not axios")
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image');
+        }
+    };
+
+    const onSubmit = async (finalData) => {
+        console.log(finalData)
+        const profilepic = await handleUpload(finalData.profilepic[0])
+        finalData.profilepic = profilepic
         console.log(finalData)
         setloading(true);
         axios.post(`${VITE_API_URL}/auth/patient-signup`, finalData, { withCredentials: true })
             .then((response) => {
                 setloading(false);
                 console.log('Patient SignUp successful !!');
-                navigate('/about');
+                navigate('/login');
             })
             .catch((error) => console.error(error));
     };

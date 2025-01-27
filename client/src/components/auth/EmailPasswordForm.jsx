@@ -1,11 +1,9 @@
-// EmailPasswordForm.jsx
 import React from 'react';
 
 const EmailPasswordForm = ({ register, errors, password }) => {
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold text-center text-gray-700">Email & Password</h2>
-
       <div>
         <label className="block text-sm font-medium text-gray-700">Email</label>
         <input
