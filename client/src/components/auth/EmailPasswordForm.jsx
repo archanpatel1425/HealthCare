@@ -1,6 +1,24 @@
 import React from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
-const EmailPasswordForm = ({ register, errors, password }) => {
+const EmailPasswordForm = ({ register, password }) => {
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+  const validateEmail = async (email) => {
+    try {
+      const response = await axios.post(`${VITE_API_URL}/auth/check-email`, { email });
+      if (response.data.exists) {
+        toast.error('Email already registered');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      toast.error('Error checking email');
+      return false;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold text-center text-gray-700">Email & Password</h2>
@@ -9,15 +27,14 @@ const EmailPasswordForm = ({ register, errors, password }) => {
         <input
           type="email"
           {...register('email', {
-            required: 'Email is required',
+            required: true,
             pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: 'Invalid email address'
-            }
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            },
+            validate: validateEmail
           })}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         />
-        {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
       </div>
 
       <div>
@@ -25,19 +42,12 @@ const EmailPasswordForm = ({ register, errors, password }) => {
         <input
           type="password"
           {...register('password', {
-            required: 'Password is required',
-            minLength: {
-              value: 8,
-              message: 'Password must be at least 8 characters'
-            },
-            pattern: {
-              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-              message: 'Password must contain uppercase, lowercase, number and special character'
-            }
+            required: true,
+            minLength: 8,
+            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
           })}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         />
-        {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
       </div>
 
       <div>
@@ -45,12 +55,11 @@ const EmailPasswordForm = ({ register, errors, password }) => {
         <input
           type="password"
           {...register('confirmPassword', {
-            required: 'Please confirm your password',
-            validate: value => value === password || 'Passwords do not match'
+            required: true,
+            validate: value => value === password
           })}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         />
-        {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword.message}</p>}
       </div>
     </div>
   );
