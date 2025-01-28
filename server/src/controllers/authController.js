@@ -1,4 +1,4 @@
-import { createUserInDB } from '../services/authServices.js';
+import { createUserInDB, loginUser, checkEmailExists, checkPhoneExists } from '../services/authServices.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils.js';
 export const doctorSignUp = async (req, res) => {
     try {
@@ -20,6 +20,12 @@ export const doctorSignUp = async (req, res) => {
         } else if (userData.availability === 'Weekends') {
             days = ['Saturday', 'Sunday'];
         } else {
+            if (!userData.customDays?.length) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please select at least one availability day'
+                });
+            }
             days = userData.customDays;
         }
 
@@ -37,41 +43,71 @@ export const doctorSignUp = async (req, res) => {
         delete userData.timeTo;
         delete userData.customDays;
 
-        // Convert DOB string to Date
-        const [day, month, year] = userData.dob.split('-');
-        userData['dob'] = new Date(year, month - 1, day);
-
-        console.log('Processed User Data:', userData);
         // Save to database using the service
         const user = await createUserInDB(userData, 'doctor');
-        const accessToken = generateAccessToken(user.doctorId);
-        const refreshToken = generateRefreshToken(user.doctorId);
-        console.log('------------------------------------------------')
-        console.log(accessToken)
-        console.log(refreshToken)
-        console.log('------------------------------------------------')
-        await authService.saveRefreshToken(user.doctorId, refreshToken, 'doctor');
-
-        res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-
-        res.status(201).json({ success: true, message: 'User created successfully !', user, accessToken });
+        
+        res.status(201).json({ 
+            success: true, 
+            message: 'Registration successful! Welcome aboard.',
+            user
+        });
 
     } catch (error) {
         console.error('Error creating user:', error);
+        
+        res.status(400).json({
+            success: false,
+            message: error.message || 'Failed to create user'
+        });
+    }
+};
 
-        // Check for duplicate email error
-        if (error.message === 'Email already registered as a doctor or patient') {
-            return res.status(409).json({
+export const checkEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({
                 success: false,
-                message: 'Email already registered as a doctor or patient',
+                message: 'Email is required'
             });
         }
 
+        const exists = await checkEmailExists(email);
+        
+        res.status(200).json({
+            success: true,
+            exists
+        });
+    } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Failed to create user',
-            error: error.message,
+            message: 'Error checking email availability'
+        });
+    }
+};
+
+export const checkPhone = async (req, res) => {
+    try {
+        const { phone_no } = req.body;
+        
+        if (!phone_no) {
+            return res.status(400).json({
+                success: false,
+                message: 'Phone number is required'
+            });
+        }
+
+        const exists = await checkPhoneExists(phone_no);
+        
+        res.status(200).json({
+            success: true,
+            exists
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error checking phone number availability'
         });
     }
 };
@@ -101,26 +137,27 @@ export const patientSignUp = async (req, res) => {
         });
     }
 }
-export const login = async (req, res) => {
-    const { email, password } = req.body;
-    console.log('here')
-    console.log(email, password)
-    try {
-        const response = await authService.loginUser(email, password);
-        const doctorId = response.doctorId
-        const accessToken = generateAccessToken(doctorId);
-        const refreshToken = generateRefreshToken(doctorId);
-        console.log('------------------------------------------------')
-        console.log(accessToken)
-        console.log(refreshToken)
-        console.log('------------------------------------------------')
-        await authService.saveRefreshToken(doctorId, refreshToken);
 
-        res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-        console.log('controllers : ', response)
-        return res.status(200).json(response);
+export const login = async (req, res) => {
+    const { identifier, password } = req.body;
+    const email = identifier;
+
+    try {
+        const response = await loginUser(email, password);
+
+        if (!response.success) {
+            return res.status(200).json({ success: false, message: response.message });
+        }
+
+        res.cookie("token", response.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        res.status(200).json(response);
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        res.status(500).json({ message: "Something went wrong" });
     }
 };
+

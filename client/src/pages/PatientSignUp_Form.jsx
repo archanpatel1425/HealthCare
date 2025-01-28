@@ -41,6 +41,9 @@ const PatientSignUp_Form = () => {
         if (isValid) {
             setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
         }
+        else{
+            setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
+        }
     };
 
     const handlePrev = () => {

@@ -22,15 +22,12 @@ CREATE TABLE "Doctor" (
     "first_name" TEXT NOT NULL,
     "last_name" TEXT NOT NULL,
     "gender" TEXT NOT NULL,
-    "dob" TIMESTAMP(3) NOT NULL,
-    "address" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
+    "phone_no" TEXT NOT NULL,
+    "profilepic" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "profilepic" TEXT NOT NULL,
     "accountStatus" TEXT,
     "specialization" TEXT NOT NULL,
-    "degree" TEXT NOT NULL,
     "experience" TEXT NOT NULL,
     "qualifications" TEXT NOT NULL,
     "availability" JSONB NOT NULL,
@@ -49,12 +46,10 @@ CREATE TABLE "Patient" (
     "first_name" TEXT NOT NULL,
     "last_name" TEXT NOT NULL,
     "gender" TEXT NOT NULL,
-    "dob" TIMESTAMP(3) NOT NULL,
-    "address" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
+    "phone_no" TEXT NOT NULL,
+    "profilepic" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "profilepic" TEXT NOT NULL,
     "accountStatus" TEXT,
     "googleId" TEXT,
     "resetToken" TEXT,
@@ -189,10 +184,16 @@ CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
 CREATE UNIQUE INDEX "Admin_googleId_key" ON "Admin"("googleId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Doctor_phone_no_key" ON "Doctor"("phone_no");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Doctor_email_key" ON "Doctor"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Doctor_googleId_key" ON "Doctor"("googleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Patient_phone_no_key" ON "Patient"("phone_no");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Patient_email_key" ON "Patient"("email");
