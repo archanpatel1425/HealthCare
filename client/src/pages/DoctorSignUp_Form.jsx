@@ -52,6 +52,10 @@ const DoctorSignUp_Form = () => {
     if (isValid) {
       setStep(prev => Math.min(prev + 1, 3));
     }
+    else{
+      setStep(prev => Math.min(prev + 1, 3));
+
+    }
   };
 
   const handlePrev = () => {

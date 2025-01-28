@@ -1,10 +1,10 @@
 import React from "react";
-import { Home, Calendar, Stethoscope, Heart, FileText, Clipboard, Cross, LogOut } from "lucide-react";
+import { Home, Calendar, Stethoscope, Heart, FileText, Clipboard,Cross,  LogOut } from "lucide-react";
 
 const PatientSidebar = ({ sidebarOpen }) => {
   const links = [
-    { name: "Patient Dashboard", icon: <Home />, path: "#" },
-    { name: "Appointment Management", icon: <Calendar />, path: "#" },
+    { name: "Dashboard", icon: <Home />, path: "#" },
+    { name: "Appointment", icon: <Calendar />, path: "#" },
     { name: "Symptom Checker", icon: <Stethoscope />, path: "#" },
     { name: "Skin Disease Prediction", icon: <Heart />, path: "#" },
     { name: "Electronic Health Records (EHR)", icon: <FileText />, path: "#" },

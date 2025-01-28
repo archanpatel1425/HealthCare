@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import Chatbot from "./Bot";  // Import the chatbot component
 
-export default function DoctorPanel() {
+export default function PatientPanel() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 relative">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} />
       {/* Main Content */}
@@ -17,10 +18,12 @@ export default function DoctorPanel() {
         <Navbar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         {/* Content */}
         <div className="p-6 bg-gray-50 flex-1">
-          <h2 className="text-2xl font-bold text-gray-700">Welcome, Doctor!</h2>
-          <p className="mt-2 text-gray-600">Here's your panel overview.</p>
+          {/* Add your main content here */}
         </div>
       </div>
+
+      {/* Chatbot Component at Bottom Right Corner */}
+      <Chatbot />
     </div>
   );
-} 
+}

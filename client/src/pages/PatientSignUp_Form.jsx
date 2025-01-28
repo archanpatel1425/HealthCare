@@ -40,6 +40,9 @@ const PatientSignUp_Form = () => {
         const isValid = await trigger();
         if (isValid) {
             setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
+        }else{
+            setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
+
         }
     };
 
