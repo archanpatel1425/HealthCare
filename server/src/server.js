@@ -4,6 +4,7 @@ import app from './app.js';
 import { PORT } from './config/envConfig.js';
 dotenv.config();
 
+
 // const prisma = new PrismaClient();
 async function startServer() {
     try {

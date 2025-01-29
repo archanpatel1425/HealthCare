@@ -26,50 +26,9 @@ const QualificationsForm = ({ register, watch, isCustomAvailability, setIsCustom
     }
   };
 
-  // Function to validate time range
   const validateTimeRange = (timeFrom, timeTo) => {
     if (!timeFrom || !timeTo) return true;
     return timeFrom < timeTo;
-  };
-
-  // Function to validate all fields
-  const validateFields = () => {
-    const values = watch();
-    const errors = [];
-
-    if (!values.specialization) {
-      errors.push('Please select a specialization');
-    }
-
-    if (!values.experience) {
-      errors.push('Please enter your years of experience');
-    } else if (values.experience < 0) {
-      errors.push('Experience cannot be negative');
-    }
-
-    if (!values.qualifications || values.qualifications.length === 0) {
-      errors.push('Please upload your qualifications document');
-    }
-
-    if (!values.availability) {
-      errors.push('Please select your availability');
-    }
-
-    if (isCustomAvailability && (!values.customDays || values.customDays.length === 0)) {
-      errors.push('Please select at least one day for custom availability');
-    }
-
-    if (!values.timeFrom) {
-      errors.push('Please select start time');
-    }
-
-    if (!values.timeTo) {
-      errors.push('Please select end time');
-    } else if (!validateTimeRange(values.timeFrom, values.timeTo)) {
-      errors.push('End time must be after start time');
-    }
-
-    return errors;
   };
 
   return (

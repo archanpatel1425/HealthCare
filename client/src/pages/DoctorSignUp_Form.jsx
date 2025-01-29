@@ -28,6 +28,11 @@ const DoctorSignUp_Form = () => {
     reValidateMode: "onChange"
   });
 
+
+  const validateTimeRange = (timeFrom, timeTo) => {
+    if (!timeFrom || !timeTo) return true;
+    return timeFrom < timeTo;
+  };
   const password = watch('password');
 
   const validateStep1 = (fields) => {
@@ -62,42 +67,43 @@ const DoctorSignUp_Form = () => {
     
     return errors;
   };
-  const validateStep3 = (fields) => {
-    const errors = [];
-    if (!values.specialization) {
-      errors.push('Please select a specialization');
-    }
+  
+const validateStep3 = (values) => {
 
-    if (!values.experience) {
-      errors.push('Please enter your years of experience');
-    } else if (values.experience < 0) {
-      errors.push('Experience cannot be negative');
-    }
+  
+  const errors = [];
+  
+  if (!values.specialization) {
+    errors.push('Please select a specialization');
+  }
+  if (!values.experience) {
+    errors.push('Please enter your years of experience');
+  } else if (values.experience < 0) {
+    errors.push('Experience cannot be negative');
+  }
+  if (!values.qualifications || values.qualifications.length === 0) {
+    errors.push('Please upload your qualifications document');
+  }
+  if (!values.availability) {
+    errors.push('Please select your availability');
+  }
+  if (isCustomAvailability && (!values.customDays || values.customDays.length === 0)) {
+    errors.push('Please select at least one day for custom availability');
+  }
+  if (!values.timeFrom) {
+    errors.push('Please select start time');
+  }
+  console.log("Validation values: ", values);
+  if (!values.timeTo) {
+    errors.push('Please select end time');
+  } else if (values.timeFrom && values.timeTo && !validateTimeRange(values.timeFrom, values.timeTo)) {
+    errors.push('End time must be after start time');
+  }
 
-    if (!values.qualifications || values.qualifications.length === 0) {
-      errors.push('Please upload your qualifications document');
-    }
+  console.log("Errors in validation: ", errors);
+  return errors;
+};
 
-    if (!values.availability) {
-      errors.push('Please select your availability');
-    }
-
-    if (isCustomAvailability && (!values.customDays || values.customDays.length === 0)) {
-      errors.push('Please select at least one day for custom availability');
-    }
-
-    if (!values.timeFrom) {
-      errors.push('Please select start time');
-    }
-
-    if (!values.timeTo) {
-      errors.push('Please select end time');
-    } else if (values.timeFrom && values.timeTo && !validateTimeRange(values.timeFrom, values.timeTo)) {
-      errors.push('End time must be after start time');
-    }
- 
-    return errors;
-  };
 
   const handleNext = async () => {
     const currentFields = getValues();
@@ -160,8 +166,10 @@ const DoctorSignUp_Form = () => {
     return errors;
   };
   const onSubmit = async (data) => {
+    console.log("validation");
+    
     try {
-    let validationErrors = [];
+      let validationErrors = [];
       console.log("final data is : ," ,data)
       setValidateQualifications(true); // Trigger validation
       validationErrors=validateStep3(data)
@@ -191,7 +199,9 @@ const DoctorSignUp_Form = () => {
         qualifications,
         customDays: isCustomAvailability ? data.customDays || [] : [],
       };
-  
+
+      console.log("hello");
+      
       const response = await axios.post(
         `${VITE_API_URL}/auth/doctor-signup`,
         finalData,
@@ -285,6 +295,7 @@ const DoctorSignUp_Form = () => {
               ) : (
                 <button
                   type="submit"
+                  onClick={onSubmit}
                   className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-auto"
                 >
                   Submit
