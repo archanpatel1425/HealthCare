@@ -1,7 +1,8 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 import EmailPasswordForm from '../components/auth/EmailPasswordForm';
 import PersonalDetailsForm from '../components/auth/PersonalDetailsForm';
 
@@ -11,6 +12,7 @@ const PatientSignUp_Form = () => {
     const navigate = useNavigate();
     const [loading, setloading] = useState(false);
 
+    
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -20,13 +22,15 @@ const PatientSignUp_Form = () => {
         email: '',
         password: ''
     });
-
+    
+   
     const {
         register,
         handleSubmit,
         formState: { errors, touchedFields },
         watch,
-        trigger
+        trigger,
+        getValues
     } = useForm({
         defaultValues: formData,
         mode: "onChange",
@@ -36,15 +40,56 @@ const PatientSignUp_Form = () => {
 
     const password = watch('password');
 
-    const handleNext = async () => {
-        const isValid = await trigger();
-        if (isValid) {
-            setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
-        }
-        else{
-            setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
-        }
+
+    const validateStep1 = (fields) => {
+        const errors = [];
+        if (!fields.first_name) errors.push('First name is required');
+        else if (!/^[A-Za-z]+$/.test(fields.first_name)) errors.push('First name should only contain alphabets');
+
+        if (!fields.last_name) errors.push('Last name is required');
+        else if (!/^[A-Za-z]+$/.test(fields.last_name)) errors.push('Last name should only contain alphabets');
+
+        if (!fields.phone_no) errors.push('Phone number is required');
+        else if (!/^[0-9]{10}$/.test(fields.phone_no)) errors.push('Phone number must be exactly 10 digits');
+
+        if (!fields.gender) errors.push('Gender is required');
+        if (!fields.profilepic?.[0]) errors.push('Profile photo is required');
+        return errors;
     };
+
+    const validateStep2 = (fields) => {
+        
+        const errors = [];
+        if (!fields.email) errors.push('Email is required');
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errors.push('Invalid email format');
+        
+        if (!fields.password) errors.push('Password is required');
+        else if (fields.password.length < 8) errors.push('Password must be at least 8 characters');
+        else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(fields.password)) {
+          errors.push('Password must contain uppercase, lowercase, number and special character');
+        }
+        
+        if (!fields.confirmPassword) errors.push('Please confirm your password');
+        else if (fields.password !== fields.confirmPassword) errors.push('Passwords do not match');
+        
+        return errors;
+      };
+
+
+
+      const handleNext = async (formdata) => {
+        const currentFields = getValues();
+        let validationErrors = step === 1 ? validateStep1(currentFields) : validateStep2(currentFields);
+    
+        if (validationErrors.length > 0) {
+            validationErrors.forEach(error => toast.error(error, { position: "top-right" }));
+            return;
+        }
+    
+        const isValid = await trigger();
+        if (isValid) setStep(prev => Math.min(prev + 1, 2));
+    };
+    
 
     const handlePrev = () => {
         setStep(prev => Math.max(prev - 1, 1));
@@ -65,20 +110,32 @@ const PatientSignUp_Form = () => {
         }
     };
 
-    const onSubmit = async (finalData) => {
-        console.log(finalData)
-        const profilepic = await handleUpload(finalData.profilepic[0])
-        finalData.profilepic = profilepic
-        console.log(finalData)
-        setloading(true);
-        axios.post(`${VITE_API_URL}/auth/patient-signup`, finalData, { withCredentials: true })
-            .then((response) => {
-                setloading(false);
-                console.log('Patient SignUp successful !!');
-                navigate('/login');
-            })
-            .catch((error) => console.error(error));
+    const onSubmit = async (e) => {
+        e.preventDefault()
+        const finalData =getValues()
+        let validationErrors = validateStep2(finalData);
+        if (validationErrors.length > 0) {
+            validationErrors.forEach(error => toast.error(error, { position: "top-right" }));
+            return;
+        }else{
+            setloading(true);
+        try {
+            const profilepic = await handleUpload(finalData.profilepic[0]);
+            finalData.profilepic = profilepic;
+    
+            await axios.post(`${VITE_API_URL}/auth/patient-signup`, finalData, { withCredentials: true });
+            toast.success("Signup successful!", { position: "top-right" });
+            navigate('/login');
+        } catch (error) {
+            toast.error("Signup failed. Please try again.");
+        } finally {
+            setloading(false);
+        }
+        }
+    
+        
     };
+    
 
     if (loading) {
         return <div>Loading...</div>;
@@ -97,6 +154,8 @@ const PatientSignUp_Form = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <ToastContainer position="top-right" autoClose={3000} />
+
             <div className="max-w-3xl mx-auto">
                 {/* Progress Bar */}
                 <div className="mb-8">
@@ -118,7 +177,7 @@ const PatientSignUp_Form = () => {
 
                 {/* Form */}
                 <div className="bg-white shadow rounded-lg p-6 mb-6">
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <form onSubmit={onSubmit}>
                         {renderCurrentStep()}
 
                         <div className="mt-6 flex justify-between">
