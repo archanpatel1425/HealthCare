@@ -122,12 +122,19 @@ const PatientSignUp_Form = () => {
         try {
             const profilepic = await handleUpload(finalData.profilepic[0]);
             finalData.profilepic = profilepic;
-    
-            await axios.post(`${VITE_API_URL}/auth/patient-signup`, finalData, { withCredentials: true });
-            toast.success("Signup successful!", { position: "top-right" });
-            navigate('/login');
+            const email=finalData.email
+            const response = await axios.post(`${VITE_API_URL}/auth/check-email`, {email});
+            if (response.data.exists) {
+                  alert('Email already registered');
+                  return
+                }
+                const response1=  await axios.post(`${VITE_API_URL}/auth/patient-signup`, finalData, { withCredentials: true });
+                if (response1.data.success) {
+                    toast.success('Registration successful!');
+                    setTimeout(() => navigate('/login'), 2000);
+                }
         } catch (error) {
-            toast.error("Signup failed. Please try again.");
+            toast.error(error);
         } finally {
             setloading(false);
         }

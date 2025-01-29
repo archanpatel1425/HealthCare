@@ -27,9 +27,9 @@ export const createUserInDB = async (userData, userRole) => {
 
         // Check existing email and phone
         const emailExists = await checkEmailExists(userData.email);
-        if (emailExists) {
-            throw new Error('This email is already registered');
-        }
+        // if (emailExists) {
+        //     throw new Error('This email is already registered');
+        // }
 
         const phoneExists = await checkPhoneExists(userData.phone_no);
         if (phoneExists) {
