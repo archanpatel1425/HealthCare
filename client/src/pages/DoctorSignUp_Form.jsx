@@ -15,6 +15,24 @@ const DoctorSignUp_Form = () => {
   const [loading, setloading] = useState(false);
   const [isCustomAvailability, setIsCustomAvailability] = useState(false);
   const [validateQualifications, setValidateQualifications] = useState(false);
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    phone_no: '',
+    profilepic: '',
+    gender: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    specialization: '',
+    experience: '',
+    qualifications: '',
+    availability: 'Weekdays',
+    customDays: [],
+    timeFrom: '',
+    timeTo: ''
+  });
+
   const {
     register,
     handleSubmit,
