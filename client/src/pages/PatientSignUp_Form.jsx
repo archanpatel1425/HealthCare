@@ -39,8 +39,8 @@ const PatientSignUp_Form = () => {
     const handleNext = async () => {
         const isValid = await trigger();
         if (isValid) {
-            setStep(prev => Math.min(prev + 1, 2)); // Adjusted for two steps
-        }
+            setStep(prev => Math.min(prev + 1, 2));
+        }   
     };
 
     const handlePrev = () => {
@@ -90,7 +90,7 @@ const PatientSignUp_Form = () => {
             default:
                 return null;
         }
-    };
+    };  
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

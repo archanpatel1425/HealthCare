@@ -18,7 +18,6 @@ const DoctorSignUp_Form = () => {
     last_name: '',
     phone_no: '',
     profilepic: '',
-    file: '',
     gender: '',
     email: '',
     password: '',
