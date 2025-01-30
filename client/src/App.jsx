@@ -4,6 +4,7 @@ import DoctorSignUp_Form from './pages/DoctorSignUp_Form';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
+import PatientPanel from './pages/patient-panel/Home.jsx';
 
 function App() {
   const location = useLocation();
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup/doctor" element={<DoctorSignUp_Form />} />
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
+        <Route path="/patient_panel" element={<PatientPanel />} />
       </Routes>
     </div>
   );

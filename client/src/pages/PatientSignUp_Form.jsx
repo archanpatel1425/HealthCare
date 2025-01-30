@@ -5,14 +5,18 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import EmailPasswordForm from '../components/auth/EmailPasswordForm';
 import PersonalDetailsForm from '../components/auth/PersonalDetailsForm';
+import { checkEmailExists, uploadProfilePic, PatientSignup } from '../Store/patient/authslice'
+import { useSelector, useDispatch } from 'react-redux';
+
 
 const PatientSignUp_Form = () => {
     const [step, setStep] = useState(1);
     const VITE_API_URL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const [loading, setloading] = useState(false);
 
-    
+
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -22,8 +26,8 @@ const PatientSignUp_Form = () => {
         email: '',
         password: ''
     });
-    
-   
+
+
     const {
         register,
         handleSubmit,
@@ -58,38 +62,38 @@ const PatientSignUp_Form = () => {
     };
 
     const validateStep2 = (fields) => {
-        
+
         const errors = [];
         if (!fields.email) errors.push('Email is required');
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errors.push('Invalid email format');
-        
+
         if (!fields.password) errors.push('Password is required');
         else if (fields.password.length < 8) errors.push('Password must be at least 8 characters');
         else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(fields.password)) {
-          errors.push('Password must contain uppercase, lowercase, number and special character');
+            errors.push('Password must contain uppercase, lowercase, number and special character');
         }
-        
+
         if (!fields.confirmPassword) errors.push('Please confirm your password');
         else if (fields.password !== fields.confirmPassword) errors.push('Passwords do not match');
-        
+
         return errors;
-      };
+    };
 
 
 
-      const handleNext = async (formdata) => {
+    const handleNext = async (formdata) => {
         const currentFields = getValues();
         let validationErrors = step === 1 ? validateStep1(currentFields) : validateStep2(currentFields);
-    
+
         if (validationErrors.length > 0) {
             validationErrors.forEach(error => toast.error(error, { position: "top-right" }));
             return;
         }
-    
+
         const isValid = await trigger();
         if (isValid) setStep(prev => Math.min(prev + 1, 2));
     };
-    
+
 
     const handlePrev = () => {
         setStep(prev => Math.max(prev - 1, 1));
@@ -112,37 +116,45 @@ const PatientSignUp_Form = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault()
-        const finalData =getValues()
+        const finalData = getValues()
         let validationErrors = validateStep2(finalData);
         if (validationErrors.length > 0) {
             validationErrors.forEach(error => toast.error(error, { position: "top-right" }));
             return;
-        }else{
+        } else {
             setloading(true);
-        try {
-            const profilepic = await handleUpload(finalData.profilepic[0]);
-            finalData.profilepic = profilepic;
-            const email=finalData.email
-            const response = await axios.post(`${VITE_API_URL}/auth/check-email`, {email});
-            if (response.data.exists) {
-                  alert('Email already registered');
-                  return
+            try {
+                const profilepicResponse = await dispatch(uploadProfilePic(finalData.profilepic[0]));
+
+                if (uploadProfilePic.fulfilled.match(profilepicResponse)) {
+                    finalData.profilepic = profilepicResponse.payload; // Get uploaded image URL
+                } else {
+                    toast.error("Failed to upload profile picture");
+                    setloading(false);
+                    return;
                 }
-                const response1=  await axios.post(`${VITE_API_URL}/auth/patient-signup`, finalData, { withCredentials: true });
-                if (response1.data.success) {
+                const email = finalData.email
+                const response = await axios.post(`${VITE_API_URL}/auth/check-email`, { email });
+                if (response.data.exists) {
+                    alert('Email already registered');
+                    return
+                }
+                const response1 = await dispatch(PatientSignup(finalData));
+
+                if (response1.payload?.success) {  // ✅ Use payload.success instead of data.success
                     toast.success('Registration successful!');
-                    setTimeout(() => navigate('/login'), 2000);
+                    setTimeout(() => navigate('/patient_panel'), 2000);
                 }
-        } catch (error) {
-            toast.error(error);
-        } finally {
-            setloading(false);
+            } catch (error) {
+                toast.error(error);
+            } finally {
+                setloading(false);
+            }
         }
-        }
-    
-        
+
+
     };
-    
+
 
     if (loading) {
         return <div>Loading...</div>;
