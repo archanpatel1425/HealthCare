@@ -197,9 +197,12 @@ export const loginUser = async (email, password) => {
                 user: {
                     user_id: user.user_id,
                     email: user.email,
-                    username: user.username,
                     userType,
-
+                    first_name:user.first_name,
+                    last_name: user.last_name,
+                    phone_no: user.phone_no,
+                    gender: user.gender,
+                    profilepic: user.profilepic,
                 },
             };
         } else {
