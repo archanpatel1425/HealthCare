@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const Navbar = () => {
+const Navbar = ({ isPatientPanel }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -17,8 +17,11 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   return (
-    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 py-4 fixed top-0 left-0 w-full z-50 pt-8">
-      {/* Logo */}
+    <div 
+      className={`bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 
+      ${isPatientPanel ? "lg:px-8 w-[calc(100%-256px)] ml-64" : "lg:px-24 w-full"} 
+      py-4 fixed top-0 left-0 z-50 pt-8 transition-all duration-300`}
+    >     {/* Logo */}
       <div className="text-3xl sm:text-4xl font-bold text-green-700">
         HealCare
       </div>

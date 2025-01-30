@@ -33,7 +33,6 @@ model Doctor {
   password       String
   accountStatus  String?
   specialization String
-  degree         String
   experience     String
   qualifications String
   availability   Json

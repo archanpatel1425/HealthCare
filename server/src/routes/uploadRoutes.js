@@ -16,8 +16,6 @@ router.post('/', upload.single('image'), async (req, res) => {
         }
         console.log(req.file.path)
         const result = await uploadImage(req.file.path);
-        console.log("imag url : ", result.secure_url)
-
         // Delete the local file after uploading to Cloudinary
         fs.unlinkSync(req.file.path);
 
