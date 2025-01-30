@@ -4,22 +4,23 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {useSelector,useDispatch} from 'react-redux'
+import {loginUser} from '../Store/patient/authslice'
 
 const Login = () => {
   const navigate = useNavigate();
-  const VITE_API_URL = import.meta.env.VITE_API_URL;
-
+  const dispatch=useDispatch()
   const handleSubmit = async (values) => {
     try {
-      const response = await axios.post(`${VITE_API_URL}/auth/login`, values, {
-        withCredentials: true,
-      });
-      if (response.data.success) {
-        toast.success(response.data.message);
+      const response = await dispatch(loginUser(values))
+      console.log(response);
+      
+      if (response.payload.success) {
+        toast.success(response.payload.message);
         setTimeout(()=>navigate("/"),2000)
         
       } else {
-        toast.error(response.data.message);
+        toast.error(response.payload.message);
       }
     } catch (error) {
       toast.error("An unexpected error occurred. Please try again.");

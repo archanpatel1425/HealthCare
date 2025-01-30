@@ -54,12 +54,12 @@ export const createUserInDB = async (userData, userRole) => {
 
         // Create user based on role
         if (userRole === 'doctor') {
-            const newUser = await prisma.doctor.create({ 
+            const newUser = await prisma.doctor.create({
                 data: userData
             });
             return newUser;
         } else {
-            const newUser = await prisma.patient.create({ 
+            const newUser = await prisma.patient.create({
                 data: userData
             });
             return newUser;
@@ -188,17 +188,39 @@ export const loginUser = async (email, password) => {
             { expiresIn: "7d" }
         );
 
-        return {
-            success: true,
-            message: "Login Successful",
-            token,
-            user: {
-                user_id: user.user_id,
-                email: user.email,
-                username: user.username,
-                userType,
-            },
-        };
+        if (userType == "doctor") {
+
+            return {
+                success: true,
+                message: "Login Successful",
+                token,
+                user: {
+                    user_id: user.user_id,
+                    email: user.email,
+                    username: user.username,
+                    userType,
+
+                },
+            };
+        } else {
+            return {
+                success: true,
+                message: "Login Successful",
+                token,
+                user: {
+                    user_id: user.user_id,
+                    email: user.email,
+                    userType,
+                    first_name:user.first_name,
+                    last_name: user.last_name,
+                    phone_no: user.phone_no,
+                    gender: user.gender,
+                    profilepic: user.profilepic,
+
+                },
+            };
+        }
+
     } catch (error) {
         return { success: false, message: "Internal server error" };
     }
