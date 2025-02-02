@@ -1,0 +1,18 @@
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #1a1a1a;
+  }
+  
+  video {
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+  }
+  
+  @media (max-width: 768px) {
+    .video-container {
+      flex-direction: column;
+    }
+  }

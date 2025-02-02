@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  adminId      String   @id @default(uuid())
+  name         String?
+  email        String?  @unique
+  password     String?
+  phone        String?
+  role         String?
+  authority    String?
+  googleId     String?  @unique
+  resetToken   String?
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Doctor {
+  doctorId       String  @id @default(uuid())
+  first_name     String
+  last_name      String
+  gender         String
+  phone_no       String  @unique
+  profilepic     String
+  email          String  @unique
+  password       String
+  accountStatus  String?
+  specialization String
+  experience     String
+  qualifications String
+  availability   Json
+
+  googleId     String? @unique
+  resetToken   String?
+  refreshToken String?
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  appointment   Appointment[]
+  prescription  Prescription[]
+  medicalRecord MedicalRecord[]
+  feedback      Feedback[]
+}
+
+model Patient {
+  patientId     String  @id @default(uuid())
+  first_name    String
+  last_name     String
+  gender        String
+  phone_no      String  @unique
+  profilepic    String
+  email         String  @unique
+  password      String
+  accountStatus String?
+
+  googleId     String? @unique
+  resetToken   String?
+  refreshToken String?
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  appointment   Appointment[]
+  prescription  Prescription[]
+  medicalRecord MedicalRecord[]
+  feedback      Feedback[]
+  billing       Billing[]
+}
+
+model Appointment {
+  appointmentId String    @id @default(uuid())
+  patient_Id    String
+  doctor_Id     String
+  date          DateTime?
+  time          String?
+  status        String?
+  reason        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  doctor  Doctor  @relation(fields: [doctor_Id], references: [doctorId])
+  patient Patient @relation(fields: [patient_Id], references: [patientId])
+
+  prescription Prescription[]
+  billing      Billing[]
+}
+
+model Prescription {
+  prescriptionId String   @id @default(uuid())
+  appointment_Id String
+  doctor_Id      String
+  patient_Id     String
+  medicines      String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  doctor      Doctor      @relation(fields: [doctor_Id], references: [doctorId])
+  patient     Patient     @relation(fields: [patient_Id], references: [patientId])
+  appointment Appointment @relation(fields: [appointment_Id], references: [appointmentId])
+}
+
+model MedicalRecord {
+  recordId      String    @id @default(uuid())
+  patient_Id    String
+  doctor_Id     String
+  diagnosis     String?
+  tests         String?
+  treatmentPlan String?
+  followUpDate  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  doctor        Doctor    @relation(fields: [doctor_Id], references: [doctorId])
+  patient       Patient   @relation(fields: [patient_Id], references: [patientId])
+}
+
+model Billing {
+  billId         String   @id @default(uuid())
+  appointment_Id String
+  patient_Id     String
+  amount         Float
+  status         String
+  paymentMethod  String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appointment Appointment @relation(fields: [appointment_Id], references: [appointmentId])
+  patient     Patient     @relation(fields: [patient_Id], references: [patientId])
+}
+
+model Feedback {
+  feedbackId String   @id @default(uuid())
+  patient_Id String
+  doctor_Id  String
+  rating     String
+  comments   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  doctor     Doctor   @relation(fields: [doctor_Id], references: [doctorId])
+  patient    Patient  @relation(fields: [patient_Id], references: [patientId])
+}
+
+model Chat {
+  chatId      String   @id @default(uuid())
+  senderId    String
+  receiverId  String
+  message     String
+  messageType String
+  timestamp   DateTime @default(now())
+  status      String
+  chatRoomID  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Chatbot {
+  interactionID String   @id @default(uuid())
+  userID        String
+  query         String
+  response      String
+  feedback      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Meeting {
+  meetingID      String   @id @default(uuid())
+  organizerID    String
+  participantIDs String
+  meetingLink    String
+  startTime      DateTime
+  endTime        DateTime
+  status         String
+  agenda         String?
+  recordingLink  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
