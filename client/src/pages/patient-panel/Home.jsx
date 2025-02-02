@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Chatbot from "./Bot"; 
 import Navbar from '../../components/Navbar';
+import Dashboard from "./Dashboard";
+import Appointment from "./Appointment";
+import {  Outlet } from "react-router-dom";
 
 export default function PatientPanel() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -18,8 +21,9 @@ export default function PatientPanel() {
         <Navbar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} isPatientPanel={true} />
         
         {/* Content */}
-        <div className="p-6 bg-gray-50 flex-1">
+        <div  className={`p-6 bg-gray-50 flex-1 transition-all duration-300 ml-50 mt-20 w-[calc(100%)] }`}>
           {/* Add your main content here */}
+          <Outlet />
         </div>
       </div>
 
@@ -28,3 +32,4 @@ export default function PatientPanel() {
     </div>
   );
 }
+ 

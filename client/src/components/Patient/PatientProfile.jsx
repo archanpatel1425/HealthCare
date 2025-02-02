@@ -1,55 +1,53 @@
-import React from 'react'
+import React from 'react';
+import {useSelector} from 'react-redux'
 
 const PatientProfile = () => {
-    const patient = {
-        name: "John Doe",
-        age: 30,
-        gender: "Male",
-        email: "johndoe@example.com",
-        contact: "+1 123-456-7890",
-        image: "https://randomuser.me/api/portraits/men/75.jpg",
-    };
+
+    const {first_name,last_name,phone_no,profilepic,email,gender}=useSelector((state)=>state.auth.patientData)
+    console.log(profilepic);
+    
 
     return (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 min-h-screen flex justify-center items-center">
-            <div className="bg-white shadow-xl rounded-2xl p-6 max-w-md w-full">
-                {/* Profile Picture */}
-                <div className="flex flex-col items-center">
-                    <img
-                        src={patient.image}
-                        alt="Profile"
-                        className="w-24 h-24 rounded-full border-4 border-blue-500 shadow-md"
-                    />
-                    <h2 className="text-2xl font-semibold text-blue-700 mt-3">
-                        {patient.name}
-                    </h2>
-                    <p className="text-gray-500">{patient.email}</p>
-                </div>
+        <div className="bg-white shadow-xl rounded-2xl p-12 max-w-5xl w-full">
+            <div className="flex justify-between items-start gap-16">
+                {/* Left Side - Patient Information */}
+                <div className="flex-1 space-y-8">
+                    <div>
+                        <h2 className="text-4xl font-semibold text-blue-700">
+                            {first_name} {last_name}
+                        </h2>
+                        <p className="text-gray-500 mt-2 text-xl">{email}</p>
+                    </div>
 
-                {/* Patient Details */}
-                <div className="mt-6 space-y-3">
-                    <p className="text-gray-700 flex items-center">
-                        <strong className="w-24 text-blue-600">Age:</strong> {patient.age}
-                    </p>
-                    <p className="text-gray-700 flex items-center">
-                        <strong className="w-24 text-blue-600">Gender:</strong> {patient.gender}
-                    </p>
-                    <p className="text-gray-700 flex items-center">
-                        <strong className="w-24 text-blue-600">Contact:</strong> {patient.contact}
-                    </p>
-                </div>
+                    <div className="space-y-6">
+                        <div className="flex items-center">
+                            <span className="w-32 text-blue-600 font-medium text-xl">Gender</span>
+                            <span className="text-gray-700 text-xl">{gender}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <span className="w-32 text-blue-600 font-medium text-xl">Contact</span>
+                            <span className="text-gray-700 text-xl">{phone_no}</span>
+                        </div>
+                    </div>
 
-                {/* Edit Profile Button */}
-                <div className="mt-6 text-center">
-                    <button
-                        className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition"
-                    >
+                    <button className="mt-8 px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-lg shadow-lg hover:bg-blue-700 transition">
                         Edit Profile
                     </button>
+                </div>
+
+                {/* Right Side - Profile Picture */}
+                <div className="flex flex-col items-center">
+                    <div className="w-64 h-64 rounded-full border-6 border-blue-500 shadow-xl overflow-hidden">
+                        <img
+                            src={profilepic}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-export default PatientProfile
+export default PatientProfile;

@@ -58,7 +58,7 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(`${VITE_API_URL}/auth/login`, values, {
         withCredentials: true,
       });
-      console.log("response : ",response.data)
+
       if (!response.data.success) {
         return rejectWithValue(response.data.message);
       }
@@ -147,6 +147,7 @@ const patientAuthSlice = createSlice({
           profilepic: action.payload.user.profilepic,
           email: action.payload.user.email,
           gender: action.payload.user.gender,
+          userType:action.payload.user.userType
         };
         state.loginSuccess = true;
       })
