@@ -181,21 +181,13 @@ export const loginUser = async (email, password) => {
         if (password !== user.password) {
             return { success: false, message: "Invalid Password" };
         }
-
-        const token = jwt.sign(
-            { userId: user.user_id, email: user.email, userType },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-
         if (userType == "doctor") {
 
             return {
                 success: true,
                 message: "Login Successful",
-                token,
                 user: {
-                    user_id: user.user_id,
+                    user_id: user.doctorId,
                     email: user.email,
                     userType,
                     first_name:user.first_name,
@@ -209,9 +201,8 @@ export const loginUser = async (email, password) => {
             return {
                 success: true,
                 message: "Login Successful",
-                token,
                 user: {
-                    user_id: user.user_id,
+                    user_id: user.patientId,
                     email: user.email,
                     userType,
                     first_name:user.first_name,
@@ -229,3 +220,19 @@ export const loginUser = async (email, password) => {
     }
 };
 
+export const findUserById = async (user_id) => {
+    try {
+        const doctor = await prisma.doctor.findUnique({
+            where: { doctorId: user_id },
+        });
+
+        const patient = await prisma.patient.findUnique({
+            where: { patientId: user_id },
+        });
+
+        return doctor || patient;
+    } catch (error) {
+        console.error("Error finding user:", error);
+        throw new Error("Error finding user by ID");
+    }
+};
