@@ -26,7 +26,7 @@ function App() {
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
         <Route path="/patient_panel" element={<PatientPanel />} />
 
-        {/* doctor routes */}
+        {/* doctor routes creaetd */}
         <Route path="/doctor-panel/*" element={<DoctorHome />} />
       </Routes>
     </div>
