@@ -1,7 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import crypto from 'crypto';
-import { sendEmail } from '../utils/sendEmail.js';
-import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 export const createUserInDB = async (userData, userRole) => {
     try {
@@ -190,7 +187,7 @@ export const loginUser = async (email, password) => {
                     user_id: user.doctorId,
                     email: user.email,
                     userType,
-                    first_name:user.first_name,
+                    first_name: user.first_name,
                     last_name: user.last_name,
                     phone_no: user.phone_no,
                     gender: user.gender,
@@ -205,7 +202,7 @@ export const loginUser = async (email, password) => {
                     user_id: user.patientId,
                     email: user.email,
                     userType,
-                    first_name:user.first_name,
+                    first_name: user.first_name,
                     last_name: user.last_name,
                     phone_no: user.phone_no,
                     gender: user.gender,
@@ -236,3 +233,27 @@ export const findUserById = async (user_id) => {
         throw new Error("Error finding user by ID");
     }
 };
+
+export const fetchuserlist = async (user_id) => {
+    try {
+        const doctor = await prisma.doctor.findUnique({
+            where: { doctorId: user_id }
+        });
+
+        const patient = await prisma.patient.findUnique({
+            where: { patientId: user_id }
+        });
+        if (doctor) {
+            const patientList = await prisma.patient.findMany();
+            return patientList;
+        } else if (patient) {
+            const doctorsList = await prisma.doctor.findMany();
+            return doctorsList;
+        } else {
+            return { message: "User not found in both doctor and patient models." };
+        }
+    } catch (error) {
+        console.error(error);
+        throw new Error("Failed to fetch user list.");
+    }
+}

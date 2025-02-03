@@ -1,4 +1,4 @@
-import { checkEmailExists, checkPhoneExists, createUserInDB, findUserById, loginUser } from '../services/authServices.js';
+import { checkEmailExists, checkPhoneExists, createUserInDB, fetchuserlist, findUserById, loginUser } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/tokenUtils.js';
 export const doctorSignUp = async (req, res) => {
     try {
@@ -150,10 +150,10 @@ export const login = async (req, res) => {
         }
         let token;
         if (response.user.userType === "doctor") {
-            token = generateAccessToken(response.user.user_id);
+            token = generateAccessToken(response.user.user_id, "DOCTOR");
         }
         else {
-            token = generateAccessToken(response.user.user_id);
+            token = generateAccessToken(response.user.user_id, "PATIENT");
         }
         res.cookie('token', token, {
             httpOnly: true,
@@ -171,7 +171,6 @@ export const login = async (req, res) => {
 export const getUserData = async (req, res) => {
     try {
         const user_id = req.userId
-        console.log("id from user data is : ",user_id)
         if (!user_id) {
             return res.status(400).json({
                 success: false,
@@ -199,4 +198,32 @@ export const getUserData = async (req, res) => {
             message: "Error fetching user data",
         });
     }
+}
+
+export const fetchUserList = async (req, res) => {
+    try {
+        const user_id = req.userId
+        if (!user_id) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required",
+            });
+        }
+        const userlist = await fetchuserlist(user_id)
+        if (userlist) {
+            return res.status(200).json({
+                success: true,
+                userlist,
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: "no users found",
+            });
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+
 }

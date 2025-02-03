@@ -41,8 +41,6 @@ export const PatientSignup = createAsyncThunk(
       const response = await axios.post(`${VITE_API_URL}/auth/patient-signup`, formData, {
         withCredentials: true,
       });
-      console.log(response.data);
-
       return response.data;
     } catch (error) {
       return rejectWithValue("Signup failed. Try again.");
@@ -58,12 +56,10 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(`${VITE_API_URL}/auth/login`, values, {
         withCredentials: true,
       });
-      console.log("response : ", response.data.user)
       if (!response.data.success) {
         return rejectWithValue(response.data.message);
       }
-
-      return response.data; // Return user data including token & patient info
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "An unexpected error occurred."
@@ -82,6 +78,15 @@ export const fetchUserData = createAsyncThunk("auth/fetchUserData", async () => 
     return rejectWithValue(error.response.data);
   }
 });
+
+export const fetchUserList=createAsyncThunk("/auth/fetchUserList",async()=>{
+  try {
+    const response=await axios.post(`${VITE_API_URL}/auth/fetchuserlist`,{},{withCredentials:true})
+    return response.data.userlist
+  } catch (error) {
+    console.log("error is : ",error)
+  }
+})
 
 const patientAuthSlice = createSlice({
   name: "patientAuth",
