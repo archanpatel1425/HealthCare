@@ -1,5 +1,6 @@
 import React from "react";
 import { Home, Calendar, Stethoscope, Heart, FileText, Clipboard,Cross,  LogOut } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const PatientSidebar = ({ sidebarOpen }) => {
   const links = [
@@ -11,7 +12,11 @@ const PatientSidebar = ({ sidebarOpen }) => {
     { name: "Prescription Management", icon: <Clipboard />, path: "#" },
     { name: "Pharmacy Integration", icon: <Cross />, path: "#" },
   ];
-
+  const { patientData, loading, error } = useSelector((state) => ({
+    patientData: state.auth?.patientData || null,
+    loading: state.auth?.loading || false,
+    error: state.auth?.error || null
+  }));
   return (
     <div
       className={`${
@@ -41,6 +46,9 @@ const PatientSidebar = ({ sidebarOpen }) => {
           <LogOut />
           <span className="ml-3">Logout</span>
         </a>
+        {
+        patientData?.first_name ||"jappa "
+      }
       </div>
     </div>
   );

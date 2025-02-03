@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useDispatch} from 'react-redux';
+import {fetchUserData} from '../Store/patient/authslice'
 const Navbar = ({ isPatientPanel }) => {
+  const dispatch=useDispatch()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
+    dispatch(fetchUserData())
     const handleOutsideClick = (e) => {
       if (isMenuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
         setIsMenuOpen(false);
@@ -17,7 +20,7 @@ const Navbar = ({ isPatientPanel }) => {
   }, [isMenuOpen]);
 
   return (
-    <div 
+    <div  
       className={`bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 
       ${isPatientPanel ? "lg:px-8 w-[calc(100%-256px)] ml-64" : "lg:px-24 w-full"} 
       py-4 fixed top-0 left-0 z-50 pt-8 transition-all duration-300`}
@@ -27,7 +30,7 @@ const Navbar = ({ isPatientPanel }) => {
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden sm:flex space-x-8 lg:space-x-16 justify-center items-center text-base lg:text-lg font-semibold">
+      <div className="hidden m:flex space-x-8 lg:space-x-16 justify-center items-center text-base lg:text-lg font-semibold">
         <ul className="flex space-x-6 lg:space-x-12">
           <li className="hover:text-green-800 transition duration-300">
             <Link to="/">Home</Link>

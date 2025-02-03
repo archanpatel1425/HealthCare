@@ -7,6 +7,7 @@ import Meeting from './pages/Meeting.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import PatientPanel from './pages/patient-panel/Home.jsx';
 
+import ChatPanel from './pages/ChatPanel.jsx'
 
 import DoctorHome from './pages/doctor-panel/Home';
 
@@ -26,8 +27,12 @@ function App() {
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
         <Route path="/patient_panel" element={<PatientPanel />} />
 
+        <Route path="/chat" element={<ChatPanel />} />
+
+
         {/* doctor routes creaetd */}
         <Route path="/doctor-panel/*" element={<DoctorHome />} />
+
       </Routes>
     </div>
   );
