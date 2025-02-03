@@ -23,6 +23,7 @@ function App() {
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
         <Route path="/patient_panel" element={<PatientPanel />} />
         <Route path="/chat" element={<ChatPanel />} />
+        {/* hello badgujar */}
       </Routes>
     </div>
   );
