@@ -13,7 +13,10 @@ const Login = () => {
   const handleSubmit = async (values) => {
     try {
       const response = await dispatch(loginUser(values))
-      console.log(response);
+      if(response.payload.user.userType == "doctor"){
+        setTimeout(()=>navigate("/doctor-panel"),2000)
+        return
+      }
       
       if (response.payload.success) {
         toast.success(response.payload.message);

@@ -7,6 +7,9 @@ import Meeting from './pages/Meeting.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import PatientPanel from './pages/patient-panel/Home.jsx';
 
+
+import DoctorHome from './pages/doctor-panel/Home';
+
 function App() {
   const location = useLocation();
 
@@ -22,6 +25,9 @@ function App() {
         <Route path="/signup/doctor" element={<DoctorSignUp_Form />} />
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
         <Route path="/patient_panel" element={<PatientPanel />} />
+
+        {/* doctor routes */}
+        <Route path="/doctor-panel/*" element={<DoctorHome />} />
       </Routes>
     </div>
   );
