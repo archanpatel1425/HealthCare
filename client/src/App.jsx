@@ -24,6 +24,7 @@ function App() {
         <Route path="/patient_panel" element={<PatientPanel />} />
         <Route path="/chat" element={<ChatPanel />} />
         {/* hello badgujar */}
+        {/* hello badgujar */}
       </Routes>
     </div>
   );
