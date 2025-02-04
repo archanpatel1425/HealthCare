@@ -144,6 +144,7 @@ const PatientSignUp_Form = () => {
                 if (response1.payload?.success) {  // ✅ Use payload.success instead of data.success
                     toast.success('Registration successful!');
                     setTimeout(() => navigate('/patient_panel'), 2000);
+                    navigate('/patient-panel')
                 }
             } catch (error) {
                 toast.error(error);

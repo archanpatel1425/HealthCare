@@ -106,19 +106,27 @@ model Prescription {
   appointment Appointment @relation(fields: [appointment_Id], references: [appointmentId])
 }
 
-model MedicalRecord {
-  recordId      String    @id @default(uuid())
-  patient_Id    String
-  doctor_Id     String
-  diagnosis     String?
-  tests         String?
-  treatmentPlan String?
-  followUpDate  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  doctor        Doctor    @relation(fields: [doctor_Id], references: [doctorId])
-  patient       Patient   @relation(fields: [patient_Id], references: [patientId])
+
+model MedicalReport {
+  reportId       String    @id @default(uuid())
+  patient_Id     String
+  doctor_Id      String
+  appointment_Id String?
+  type           String    // Lab, Imaging, Surgery, Discharge, Follow-up, etc.
+  details        String?   // Test results, prescription, treatment summary, etc.
+  fileUrl        String?   // Link to PDF or image file (if stored externally)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  patient        Patient    @relation(fields: [patient_Id], references: [patientId])
+  doctor         Doctor     @relation(fields: [doctor_Id], references: [doctorId])
+  appointment    Appointment? @relation(fields: [appointment_Id], references: [appointmentId])
 }
+
+
+
+
+
 
 model Billing {
   billId         String   @id @default(uuid())

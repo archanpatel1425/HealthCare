@@ -3,9 +3,10 @@ import Navbar from './components/Navbar';
 import DoctorSignUp_Form from './pages/DoctorSignUp_Form';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Meeting from './pages/Meeting.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import PatientPanel from './pages/patient-panel/Home.jsx';
+import Dashboard from "./pages/patient-panel/Dashboard";
+import Appointment from "./pages/patient-panel/Appointment";
 
 function App() {
   const location = useLocation();
@@ -18,10 +19,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/meet/:meetId" element={<Meeting />} />
         <Route path="/signup/doctor" element={<DoctorSignUp_Form />} />
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
-        <Route path="/patient_panel" element={<PatientPanel />} />
+        <Route path="/patient-panel/" element={<PatientPanel />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="appointments" element={<Appointment />} />
+          <Route path="*" element={<Dashboard />} /> {/* Default route */}
+        </Route>
       </Routes>
     </div>
   );

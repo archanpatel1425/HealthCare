@@ -17,7 +17,7 @@ const Login = () => {
       
       if (response.payload.success) {
         toast.success(response.payload.message);
-        setTimeout(()=>navigate("/"),2000)
+        setTimeout(()=>navigate("/patient-panel"),2000)
         
       } else {
         toast.error(response.payload.message);
