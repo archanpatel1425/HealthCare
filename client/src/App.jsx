@@ -10,6 +10,8 @@ import PatientPanel from './pages/patient-panel/Home.jsx';
 
 
 import DoctorHome from './pages/doctor-panel/Home';
+import SkinCancer from './SkinCancer.jsx';
+import SkinChecker from './SkinChecker.jsx';
 
 function App() {
   const location = useLocation();
@@ -29,6 +31,8 @@ function App() {
 
         <Route path="/chat" element={<ChatPanel />} />
         <Route path="/doctor-panel/*" element={<DoctorHome />} />
+        <Route path="/sc" element={<SkinCancer />} />
+        <Route path="/sk" element={<SkinChecker />} />
       </Routes>
     </div>
   );
