@@ -1,7 +1,7 @@
 import React from 'react';
 import {useSelector} from 'react-redux'
 
-const PatientProfile = () => {
+const Profile = () => {
 
     const {first_name,last_name,phone_no,profilepic,email,gender}=useSelector((state)=>state.auth.patientData)
     console.log(profilepic);
@@ -9,7 +9,6 @@ const PatientProfile = () => {
     return (
         <div className="bg-white shadow-xl rounded-2xl p-12 max-w-5xl w-full">
             <div className="flex justify-between items-start gap-16">
-                {/* Left Side - Patient Information */}
                 <div className="flex-1 space-y-8">
                     <div>
                         <h2 className="text-4xl font-semibold text-blue-700">
@@ -34,7 +33,6 @@ const PatientProfile = () => {
                     </button>
                 </div>
 
-                {/* Right Side - Profile Picture */}
                 <div className="flex flex-col items-center">
                     <div className="w-64 h-64 rounded-full border-6 border-blue-500 shadow-xl overflow-hidden">
                         <img
@@ -49,4 +47,4 @@ const PatientProfile = () => {
     );
 }
 
-export default PatientProfile;
+export default Profile;

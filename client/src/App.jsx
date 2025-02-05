@@ -10,7 +10,7 @@ import PatientPanel from './pages/patient-panel/Home.jsx';
 function App() {
   const location = useLocation();
 
-  const pathsWithNavbar = ['/', '/about', '/contactus'];
+  const pathsWithNavbar = ['/', '/about', '/contactus','/patient_panel'];
 
   return (
     <div>

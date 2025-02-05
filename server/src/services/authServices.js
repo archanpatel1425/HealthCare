@@ -173,7 +173,6 @@ export const loginUser = async (email, password) => {
             });
             userType = "doctor";
         }
-
         if (!user) {
             return { success: false, message: "User Not Found" };
         }
@@ -189,6 +188,7 @@ export const loginUser = async (email, password) => {
         );
 
         if (userType == "doctor") {
+            console.log('here2')
 
             return {
                 success: true,
@@ -206,6 +206,23 @@ export const loginUser = async (email, password) => {
                 },
             };
         } else {
+            console.log('here')
+            console.log({
+                success: true,
+                message: "Login Successful",
+                token,
+                user: {
+                    user_id: user.user_id,
+                    email: user.email,
+                    userType,
+                    first_name:user.first_name,
+                    last_name: user.last_name,
+                    phone_no: user.phone_no,
+                    gender: user.gender,
+                    profilepic: user.profilepic,
+
+                },
+            })
             return {
                 success: true,
                 message: "Login Successful",

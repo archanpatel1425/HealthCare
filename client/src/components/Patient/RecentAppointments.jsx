@@ -1,8 +1,7 @@
+import { Calendar, Clock, FileText, User } from 'lucide-react';
 import React from 'react';
-import { Calendar, Clock, User, FileText } from 'lucide-react';
 
 const RecentAppointments = () => {
-    // Static data mimicking the schema
     const appointments = [
         {
             appointmentId: "1",
@@ -54,6 +53,23 @@ const RecentAppointments = () => {
                 first_name: "Alice",
                 last_name: "Johnson"
             }
+        },
+        {
+            appointmentId: "4",
+            patient_Id: "p3",
+            doctor_Id: "d3",
+            date: new Date("2025-02-13"),
+            time: "11:15 AM",
+            status: "Cancelled",
+            reason: "Consultation",
+            doctor: {
+                name: "Dr. James Brown",
+                specialization: "Dermatologist"
+            },
+            patient: {
+                first_name: "Alice",
+                last_name: "Johnson"
+            }
         }
     ];
 
@@ -79,17 +95,15 @@ const RecentAppointments = () => {
     };
 
     return (
-        <div className="bg-white  shadow-lg p-6 max-w-4xl mt-10 w-full">
+        <div className="bg-white shadow-lg p-6 w-full">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Recent Appointments</h2>
-                <button className="text-blue-600 hover:text-blue-700 font-medium">
-                    View All
-                </button>
+               
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
                 {appointments.map((appointment) => (
-                    <div 
+                    <div
                         key={appointment.appointmentId}
                         className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
@@ -101,7 +115,7 @@ const RecentAppointments = () => {
                                         {appointment.patient.first_name} {appointment.patient.last_name}
                                     </span>
                                 </div>
-                                
+
                                 <div className="flex items-center space-x-3">
                                     <Calendar className="w-5 h-5 text-gray-500" />
                                     <span className="text-gray-600">

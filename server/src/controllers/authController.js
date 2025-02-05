@@ -141,10 +141,9 @@ export const patientSignUp = async (req, res) => {
 export const login = async (req, res) => {
     const { identifier, password } = req.body;
     const email = identifier;
-
     try {
         const response = await loginUser(email, password);
-
+        console.log(response)
         if (!response.success) {
             return res.status(200).json({ success: false, message: response.message });
         }
@@ -152,7 +151,7 @@ export const login = async (req, res) => {
         res.cookie("token", response.token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "strict", 
         });
 
         res.status(200).json(response);
