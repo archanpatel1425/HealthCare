@@ -40,6 +40,27 @@ export const initializeSocket = (server) => {
         activeUsers.set(socket.user.id, socket.id);
         io.emit('activeUsers', Array.from(activeUsers.keys()));
 
+        socket.on("join-room", (meetId) => {
+            socket.join(meetId);
+            socket.to(meetId).emit("user-connected", socket.id);
+          });
+      
+          socket.on("send-offer", ({ meetId, offer }) => {
+            socket.to(meetId).emit("receive-offer", { offer, senderId: socket.id });
+          });
+      
+          socket.on("send-answer", ({ meetId, answer, senderId }) => {
+            io.to(senderId).emit("receive-answer", { answer });
+          });
+      
+          socket.on("send-ice-candidate", ({ meetId, candidate }) => {
+            socket.to(meetId).emit("receive-ice-candidate", { candidate });
+          });
+      
+          socket.on("leave-room", (meetId) => {
+            socket.leave(meetId);
+            socket.to(meetId).emit("user-disconnected", socket.id);
+          });
         socket.on('sendMessage', async (data) => {
             try {
                 const { receiverId, messageType, message } = data;
