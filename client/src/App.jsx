@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Meeting from './pages/Meeting.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import PatientPanel from './pages/patient-panel/Home.jsx';
+import DoctorHome from './pages/doctor-panel/Home';
 function App() {
   const location = useLocation();
 
