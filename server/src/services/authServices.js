@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
-import bcrypt from 'bcrypt'
 export const createUserInDB = async (userData, userRole) => {
     try {
         // Validate required fields
@@ -52,15 +52,15 @@ export const createUserInDB = async (userData, userRole) => {
 
         // Create user based on role
         if (userRole === 'doctor') {
-            const hashedpassword=await bcrypt.hash(userData.password,10)
-            userData.password=hashedpassword
+            const hashedpassword = await bcrypt.hash(userData.password, 10)
+            userData.password = hashedpassword
             const newUser = await prisma.doctor.create({
                 data: userData
             });
             return newUser;
         } else {
-            const hashedpassword=await bcrypt.hash(userData.password,10)
-            userData.password=hashedpassword
+            const hashedpassword = await bcrypt.hash(userData.password, 10)
+            userData.password = hashedpassword
             const newUser = await prisma.patient.create({
                 data: userData
             });
@@ -138,12 +138,11 @@ export const loginUser = async (email, password) => {
         if (!user) {
             return { success: false, message: "User Not Found" };
         }
-        const ispassword=bcrypt.compare(password,user.password)
+        const ispassword = bcrypt.compare(password, user.password)
         if (!ispassword) {
             return { success: false, message: "Invalid Password" };
         }
         if (userType == "doctor") {
-            console.log('here2')
 
             return {
                 success: true,
@@ -160,23 +159,6 @@ export const loginUser = async (email, password) => {
                 },
             };
         } else {
-            console.log('here')
-            console.log({
-                success: true,
-                message: "Login Successful",
-                token,
-                user: {
-                    user_id: user.user_id,
-                    email: user.email,
-                    userType,
-                    first_name:user.first_name,
-                    last_name: user.last_name,
-                    phone_no: user.phone_no,
-                    gender: user.gender,
-                    profilepic: user.profilepic,
-
-                },
-            })
             return {
                 success: true,
                 message: "Login Successful",
@@ -193,7 +175,6 @@ export const loginUser = async (email, password) => {
                 },
             };
         }
-
     } catch (error) {
         return { success: false, message: "Internal server error" };
     }

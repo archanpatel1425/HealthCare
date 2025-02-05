@@ -5,12 +5,17 @@ const prisma = new PrismaClient();
 
 const verifySocketToken = (socket, next) => {
     try {
+        console.log('socket.handshake')
+        console.log(socket.handshake)
+        console.log('-----------------------------------------------------------')
         const token = socket.handshake.headers.cookie
             ? socket.handshake.headers.cookie.split('=')[1]
             : null;
         if (!token) {
             return next(new Error('Authentication error: Token missing'));
         }
+        console.log(token)
+        console.log(process.env.JWT_SECRET)
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         socket.user = decoded;
         next();
@@ -43,24 +48,24 @@ export const initializeSocket = (server) => {
         socket.on("join-room", (meetId) => {
             socket.join(meetId);
             socket.to(meetId).emit("user-connected", socket.id);
-          });
-      
-          socket.on("send-offer", ({ meetId, offer }) => {
+        });
+
+        socket.on("send-offer", ({ meetId, offer }) => {
             socket.to(meetId).emit("receive-offer", { offer, senderId: socket.id });
-          });
-      
-          socket.on("send-answer", ({ meetId, answer, senderId }) => {
+        });
+
+        socket.on("send-answer", ({ meetId, answer, senderId }) => {
             io.to(senderId).emit("receive-answer", { answer });
-          });
-      
-          socket.on("send-ice-candidate", ({ meetId, candidate }) => {
+        });
+
+        socket.on("send-ice-candidate", ({ meetId, candidate }) => {
             socket.to(meetId).emit("receive-ice-candidate", { candidate });
-          });
-      
-          socket.on("leave-room", (meetId) => {
+        });
+
+        socket.on("leave-room", (meetId) => {
             socket.leave(meetId);
             socket.to(meetId).emit("user-disconnected", socket.id);
-          });
+        });
         socket.on('sendMessage', async (data) => {
             try {
                 const { receiverId, messageType, message } = data;

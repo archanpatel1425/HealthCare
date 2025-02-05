@@ -18,7 +18,7 @@ const Login = () => {
         return
       }
       
-      if (response.payload.success) {
+      if (response.payload.success) { 
         toast.success(response.payload.message);
         setTimeout(()=>navigate("/"),2000)
         
