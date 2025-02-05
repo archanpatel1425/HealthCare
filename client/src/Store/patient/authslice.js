@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -41,8 +41,6 @@ export const PatientSignup = createAsyncThunk(
       const response = await axios.post(`${VITE_API_URL}/auth/patient-signup`, formData, {
         withCredentials: true,
       });
-      console.log(response.data);
-      
       return response.data;
     } catch (error) {
       return rejectWithValue("Signup failed. Try again.");
@@ -58,12 +56,10 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(`${VITE_API_URL}/auth/login`, values, {
         withCredentials: true,
       });
-
       if (!response.data.success) {
         return rejectWithValue(response.data.message);
       }
-
-      return response.data; // Return user data including token & patient info
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "An unexpected error occurred."
@@ -73,13 +69,32 @@ export const loginUser = createAsyncThunk(
 );
 
 
+export const fetchUserData = createAsyncThunk("auth/fetchUserData", async () => {
+  try {
+    const response = await axios.post(`${VITE_API_URL}/auth/getdata`, {}, { withCredentials: true });
+    return response.data.userData;
+  } catch (error) {
+    console.log("error is  : ", error)
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const fetchUserList=createAsyncThunk("/auth/fetchUserList",async()=>{
+  try {
+    const response=await axios.post(`${VITE_API_URL}/auth/fetchuserlist`,{},{withCredentials:true})
+    return response.data.userlist
+  } catch (error) {
+    console.log("error is : ",error)
+  }
+})
+
 const patientAuthSlice = createSlice({
   name: "patientAuth",
   initialState: {
     loading: false,
     error: null,
     profilePicUrl: null,
-    patientData:null,
+    patientData: null,
     signupSuccess: false,
   },
   reducers: {},
@@ -118,15 +133,6 @@ const patientAuthSlice = createSlice({
       })
       .addCase(PatientSignup.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientData = {
-          patientId: action.payload.user.patientId,
-          first_name: action.payload.user.first_name,
-          last_name: action.payload.user.last_name,
-          phone_no: action.payload.user.phone_no,
-          profilepic: action.payload.user.profilepic,
-          email: action.payload.user.email,
-          gender:action.payload.user.gender
-      };
         state.signupSuccess = true;
       })
       .addCase(PatientSignup.rejected, (state, action) => {
@@ -139,21 +145,20 @@ const patientAuthSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientData = {
-          patientId: action.payload.user.patientId,
-          first_name: action.payload.user.first_name,
-          last_name: action.payload.user.last_name,
-          phone_no: action.payload.user.phone_no,
-          profilepic: action.payload.user.profilepic,
-          email: action.payload.user.email,
-          gender: action.payload.user.gender,
-          userType:action.payload.user.userType
-        };
+        state.patientData=action.payload.user
         state.loginSuccess = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchUserData.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientData=action.payload
       })
   },
 });

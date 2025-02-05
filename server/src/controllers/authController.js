@@ -1,5 +1,5 @@
-import { createUserInDB, loginUser, checkEmailExists, checkPhoneExists } from '../services/authServices.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils.js';
+import { checkEmailExists, checkPhoneExists, createUserInDB, fetchuserlist, findUserById, loginUser } from '../services/authServices.js';
+import { generateAccessToken } from '../utils/tokenUtils.js';
 export const doctorSignUp = async (req, res) => {
     try {
         console.log(req.body);
@@ -45,16 +45,16 @@ export const doctorSignUp = async (req, res) => {
 
         // Save to database using the service
         const user = await createUserInDB(userData, 'doctor');
-        
-        res.status(201).json({ 
-            success: true, 
+
+        res.status(201).json({
+            success: true,
             message: 'Registration successful! Welcome aboard.',
             user
         });
 
     } catch (error) {
         console.error('Error creating user:', error);
-        
+
         res.status(400).json({
             success: false,
             message: error.message || 'Failed to create user'
@@ -65,7 +65,7 @@ export const doctorSignUp = async (req, res) => {
 export const checkEmail = async (req, res) => {
     try {
         const { email } = req.body;
-        
+
         if (!email) {
             return res.status(400).json({
                 success: false,
@@ -74,7 +74,7 @@ export const checkEmail = async (req, res) => {
         }
 
         const exists = await checkEmailExists(email);
-        
+
         res.status(200).json({
             success: true,
             exists
@@ -90,7 +90,7 @@ export const checkEmail = async (req, res) => {
 export const checkPhone = async (req, res) => {
     try {
         const { phone_no } = req.body;
-        
+
         if (!phone_no) {
             return res.status(400).json({
                 success: false,
@@ -99,7 +99,7 @@ export const checkPhone = async (req, res) => {
         }
 
         const exists = await checkPhoneExists(phone_no);
-        
+
         res.status(200).json({
             success: true,
             exists
@@ -117,12 +117,12 @@ export const patientSignUp = async (req, res) => {
     try {
         let userData = req.body;
         delete userData.confirmPassword;
-
-        const user = await createUserInDB(userData,'Patient');
+        
+        const user = await createUserInDB(userData, 'Patient');
         res.status(201).json({ success: true, message: 'User created successfully !', user });
 
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error creating user:', error)
         if (error.message === 'Email already registered as a doctor or patient') {
             return res.status(409).json({
                 success: false,
@@ -148,11 +148,18 @@ export const login = async (req, res) => {
         if (!response.success) {
             return res.status(200).json({ success: false, message: response.message });
         }
-
-        res.cookie("token", response.token, {
+        let token;
+        if (response.user.userType === "doctor") {
+            token = generateAccessToken(response.user.user_id, "DOCTOR");
+        }
+        else {
+            token = generateAccessToken(response.user.user_id, "PATIENT");
+        }
+        res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: false,
+            sameSite: 'Lax',
+            expires: new Date(Date.now() + 60 * 50000)
         });
 
         res.status(200).json(response);
@@ -161,3 +168,62 @@ export const login = async (req, res) => {
     }
 };
 
+export const getUserData = async (req, res) => {
+    try {
+        const user_id = req.userId
+        if (!user_id) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required",
+            });
+        }
+
+        const userData = await findUserById(user_id);
+
+        if (userData) {
+            return res.status(200).json({
+                success: true,
+                userData,
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching user data",
+        });
+    }
+}
+
+export const fetchUserList = async (req, res) => {
+    try {
+        const user_id = req.userId
+        if (!user_id) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required",
+            });
+        }
+        const userlist = await fetchuserlist(user_id)
+        if (userlist) {
+            return res.status(200).json({
+                success: true,
+                userlist,
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: "no users found",
+            });
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+
+}
