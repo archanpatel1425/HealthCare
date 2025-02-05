@@ -117,7 +117,7 @@ export const patientSignUp = async (req, res) => {
     try {
         let userData = req.body;
         delete userData.confirmPassword;
-
+        
         const user = await createUserInDB(userData, 'Patient');
         res.status(201).json({ success: true, message: 'User created successfully !', user });
 

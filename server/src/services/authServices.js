@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+import bcrypt from 'bcrypt'
 export const createUserInDB = async (userData, userRole) => {
     try {
         // Validate required fields
@@ -51,11 +52,15 @@ export const createUserInDB = async (userData, userRole) => {
 
         // Create user based on role
         if (userRole === 'doctor') {
+            const hashedpassword=await bcrypt.hash(userData.password,10)
+            userData.password=hashedpassword
             const newUser = await prisma.doctor.create({
                 data: userData
             });
             return newUser;
         } else {
+            const hashedpassword=await bcrypt.hash(userData.password,10)
+            userData.password=hashedpassword
             const newUser = await prisma.patient.create({
                 data: userData
             });
@@ -101,46 +106,6 @@ export const checkPhoneExists = async (phone_no) => {
     }
 };
 
-// middleware/validation.middleware.js
-export const validateSignupData = (req, res, next) => {
-    const { first_name, last_name, email, phone_no, password } = req.body;
-
-    // Basic validation
-    if (!first_name || !last_name || !email || !phone_no || !password) {
-        return res.status(400).json({
-            success: false,
-            message: 'All fields are required'
-        });
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Invalid email format'
-        });
-    }
-
-    // Phone number validation
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone_no)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Phone number must be exactly 10 digits'
-        });
-    }
-
-    // Password validation
-    if (password.length < 8) {
-        return res.status(400).json({
-            success: false,
-            message: 'Password must be at least 8 characters long'
-        });
-    }
-
-    next();
-};
 export const saveRefreshToken = async (userId, refreshToken, userType) => {
     if (userType == 'doctor') {
         return prisma.doctor.update({
@@ -174,8 +139,8 @@ export const loginUser = async (email, password) => {
         if (!user) {
             return { success: false, message: "User Not Found" };
         }
-
-        if (password !== user.password) {
+        const ispassword=bcrypt.compare(password,user.password)
+        if (!ispassword) {
             return { success: false, message: "Invalid Password" };
         }
         if (userType == "doctor") {

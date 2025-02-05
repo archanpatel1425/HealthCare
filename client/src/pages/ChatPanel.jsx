@@ -1,12 +1,12 @@
-// Frontend: ChatPanel.jsx
-import React, { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserData, fetchUserList } from '../Store/patient/authslice';
 import { io } from 'socket.io-client';
+import { fetchUserData, fetchUserList } from '../Store/patient/authslice';
 
 const ChatPanel = () => {
     const dispatch = useDispatch();
-    const { patientData, error } = useSelector((state) => state.auth);
+    const { patientData } = useSelector((state) => state.auth);
     const [socket, setSocket] = useState(null);
     const [userlist, setUserList] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
@@ -15,8 +15,14 @@ const ChatPanel = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImagePreview, setSelectedImagePreview] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState(new Set());
     const messagesEndRef = useRef(null);
-
+    const [isopen, setisopen] = useState(false)
+    const [msgStatus, setMsgStatus] = useState("")
+    const [typingUsers, setTypingUsers] = useState(new Set());
+    const typingTimeoutRef = useRef(null);
     useEffect(() => {
         dispatch(fetchUserData())
         const newSocket = io('http://localhost:5000', {
@@ -25,12 +31,72 @@ const ChatPanel = () => {
         });
 
         newSocket.on('connect', () => {
-            // console.log('Socket connected');
+            // console.log('Connected to socket');
         });
 
-        newSocket.on('previousMessages', (newMessage) => {
-            setMessages(prev => [...prev, newMessage]);
+        newSocket.on('activeUsers', (activeUserIds) => {
+            setOnlineUsers(new Set(activeUserIds));
+        });
+
+        newSocket.on('userConnected', (userId) => {
+            setOnlineUsers(prev => new Set([...prev, userId]));
+            // Update message status to delivered for all undelivered messages to this user
+            setMessages(prev => prev.map(msg =>
+                msg.receiverId === userId && msg.status === 'SENT'
+                    ? { ...msg, status: 'DELIVERED' }
+                    : msg
+            ));
+        });
+
+        newSocket.on('userDisconnected', (userId) => {
+            setOnlineUsers(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(userId);
+                return newSet;
+            });
+        });
+
+        newSocket.on('previousMessages', (previousMessages) => {
+            const messagesArray = Array.isArray(previousMessages)
+                ? previousMessages
+                : [previousMessages];
+            setMessages(messagesArray);
             scrollToBottom();
+        });
+
+        newSocket.on('newMessage', (newMessage) => {
+            setMessages(prev => {
+                const isDuplicate = prev.some(msg => msg.id === newMessage.id);
+                if (!isDuplicate) {
+                    // Automatically mark as delivered if receiving
+                    if (newMessage.receiverId === (patientData?.patientId || patientData?.doctorId)) {
+                        newSocket.emit('markAsDelivered', newMessage.id);
+                        newMessage.status = 'DELIVERED';
+                    }
+                    return [...prev, newMessage];
+                }
+                return prev;
+            });
+            scrollToBottom();
+        });
+
+        newSocket.on('messageStatusUpdated', ({ messageId, status }) => {
+            setMessages(prev => prev.map(msg =>
+                msg.id === messageId ? { ...msg, status } : { ...msg, status }
+            ));
+
+        });
+        newSocket.on('userTyping', ({ userId, isTyping }) => {
+            console.log("in typing")
+            setTypingUsers(prev => {
+                const newUsers = new Set(prev);
+                if (isTyping) {
+                    newUsers.add(userId);
+                } else {
+                    newUsers.delete(userId);
+                }
+                return newUsers;
+            });
         });
 
         setSocket(newSocket);
@@ -62,29 +128,154 @@ const ChatPanel = () => {
         setFilteredUsers(filtered);
     }, [search, userlist]);
 
+    useEffect(() => {
+        if (selectedUser && messages.length > 0) {
+            messages.forEach(msg => {
+                if (msg.status !== 'READ' &&
+                    msg.receiverId === (patientData?.patientId || patientData?.doctorId)) {
+                    socket?.emit('markAsRead', msg.id);
+                }
+            });
+        }
+    }, [selectedUser, messages]);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const handleImageSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(file);
+            setSelectedImagePreview(URL.createObjectURL(file));
+        }
+    };
+
     const sendMessage = () => {
         if (!messageInput.trim() || !selectedUser || !socket) return;
+        const initialStatus = onlineUsers.has(selectedUser?.doctorId || selectedUser?.patientId)
+            ? 'DELIVERED'
+            : 'SENT';
+        console.log("in send : ", initialStatus)
 
         const messageData = {
             receiverId: selectedUser?.doctorId || selectedUser?.patientId || '',
             message: messageInput.trim(),
-            messageType:"text",
-            status: 'SENT'
+            messageType: "text",
+            status: initialStatus,
+            senderId: patientData?.patientId || patientData?.doctorId,
+            senderType: patientData?.role
         };
 
+        const tempMessage = {
+            ...messageData,
+            id: `temp-${Date.now()}`,
+            createdAt: new Date().toISOString()
+        };
+
+        setMessages(prev => [...prev, tempMessage]);
         socket.emit('sendMessage', messageData);
-        setMessages(prev => [...prev, messageData]);
         setMessageInput('');
         scrollToBottom();
+    };
+
+    const handleUpload = async () => {
+        if (!selectedImage) return;
+
+        const formData = new FormData();
+        formData.append('image', selectedImage);
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            if (response.data.url) {
+                const initialStatus = onlineUsers.has(selectedUser?.doctorId || selectedUser?.patientId)
+                    ? 'DELIVERED'
+                    : 'SENT';
+
+                const messageData = {
+                    receiverId: selectedUser?.doctorId || selectedUser?.patientId || '',
+                    message: response.data.url,
+                    messageType: "image",
+                    status: initialStatus,
+                    senderId: patientData?.patientId || patientData?.doctorId,
+                    senderType: patientData?.role
+                };
+
+                const tempMessage = {
+                    ...messageData,
+                    id: `temp-${Date.now()}`,
+                    createdAt: new Date().toISOString()
+                };
+
+                setMessages(prev => [...prev, tempMessage]);
+                socket.emit('sendMessage', messageData);
+                setSelectedImage(null);
+                setSelectedImagePreview(null);
+                scrollToBottom();
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image');
+        }
     };
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             sendMessage();
+        }
+    };
+
+    const isMessageFromCurrentUser = (message) => {
+        const currentUserId = patientData?.patientId || patientData?.doctorId;
+        return message.senderId === currentUserId;
+    };
+
+    const getMessageStatus = (message) => {
+        switch (message.status) {
+            case 'READ':
+                return '✓✓ Done';
+            case 'DELIVERED':
+                return '✓✓';
+            case 'SENT':
+                return '✓';
+            default:
+                return '';
+        }
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'READ':
+                return 'text-blue-400';
+            case 'DELIVERED':
+                return 'text-gray-400';
+            case 'SENT':
+                return 'text-gray-400';
+            default:
+                return '';
+        }
+    };
+    const handleTyping = (e) => {
+        setMessageInput(e.target.value);
+
+        // Emit typing event
+        if (socket && selectedUser) {
+            const receiverId = selectedUser?.doctorId || selectedUser?.patientId;
+
+            // Clear previous timeout
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+
+            // Emit typing start
+            socket.emit('startTyping', { receiverId });
+
+            // Set timeout to stop typing
+            typingTimeoutRef.current = setTimeout(() => {
+                socket.emit('stopTyping', { receiverId });
+            }, 1000);
         }
     };
 
@@ -103,94 +294,186 @@ const ChatPanel = () => {
                     <p className="text-center text-gray-500">Loading...</p>
                 ) : (
                     <div className="space-y-3">
-                        {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user,index) => (
-                                <div
-                                    key={index}
-                                    className={`flex items-center p-2 rounded-lg cursor-pointer transition ${
-                                        selectedUser?.id === user.id ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100'
+                        {filteredUsers.map((user, index) => (
+                            <div
+                                key={index}
+                                className={`flex items-center p-2 rounded-lg cursor-pointer transition ${selectedUser?.id === user.id ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100'
                                     }`}
-                                    onClick={() => {
-                                        setSelectedUser(user);
-                                        socket?.emit('fetchPreviousMessages', { 
-                                            receiverId: user?.doctorId ||user?.patientId
-                                        });
-                                    }}
-                                >
+                                onClick={() => {
+                                    setSelectedUser(user);
+                                    setMessages([]);
+                                    socket?.emit('fetchPreviousMessages', {
+                                        receiverId: user?.doctorId || user?.patientId
+                                    });
+                                }}
+                            >
+                                <div className="relative">
                                     <img
                                         src={user.profilepic || 'https://via.placeholder.com/40'}
                                         alt="Profile"
                                         className="w-10 h-10 rounded-full mr-3"
                                     />
+                                    <span
+                                        className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(user.doctorId || user.patientId)
+                                            ? 'bg-green-500'
+                                            : 'bg-gray-500'
+                                            }`}
+                                    />
+                                </div>
+                                <div className="flex flex-col">
                                     <span className="font-medium">
                                         {user.first_name} {user.last_name}
                                     </span>
+                                    <span className="text-sm text-gray-500">
+                                        {onlineUsers.has(user.doctorId || user.patientId)
+                                            ? 'Online'
+                                            : 'Offline'}
+                                    </span>
                                 </div>
-                            ))
-                        ) : (
-                            <p className="text-center text-gray-500">No users found.</p>
-                        )}
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
-
             <div className="w-2/3 flex flex-col bg-white shadow-lg p-4">
                 {selectedUser ? (
                     <>
                         <div className="flex items-center mb-4 border-b pb-2">
-                            <img
-                                src={selectedUser.profilepic || 'https://via.placeholder.com/40'}
-                                alt="Profile"
-                                className="w-12 h-12 rounded-full mr-3"
-                            />
-                            <h2 className="text-lg font-semibold">
-                                {selectedUser.first_name} {selectedUser.last_name}
-                            </h2>
-                        </div>
-                        <div className="flex-1 overflow-y-auto bg-gray-50 p-3 rounded-lg space-y-2">
-                            {messages.length > 0 ? (
-                                messages.map((msg, idx) => (
-                                    <div
-                                        key={idx}
-                                        className={`flex ${
-                                            msg.senderId === patientData?.patientId||patientData?.doctorId
-                                                ? 'justify-end' 
-                                                : 'justify-start'
+                            <div className="relative">
+                                <img
+                                    src={selectedUser.profilepic || 'https://via.placeholder.com/40'}
+                                    alt="Profile"
+                                    className="w-12 h-12 rounded-full mr-3"
+                                />
+                                <span
+                                    className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(selectedUser.doctorId || selectedUser.patientId)
+                                        ? 'bg-green-500'
+                                        : 'bg-gray-500'
                                         }`}
-                                    >
-                                        <div 
-                                            className={`max-w-xs p-2 rounded-lg ${
-                                                msg.senderId === patientData?.patientId||patientData?.doctorId
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-200 text-black'
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <h2 className="text-lg font-semibold">
+                                    {selectedUser.first_name} {selectedUser.last_name}
+                                </h2>
+                                <span className="text-sm text-gray-500">
+                                    {onlineUsers.has(selectedUser.doctorId || selectedUser.patientId)
+                                        ? 'Online'
+                                        : 'Offline'}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto bg-gray-50 p-3 rounded-lg space-y-4">
+                            {messages.map((msg, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`flex ${isMessageFromCurrentUser(msg) ? 'justify-end' : 'justify-start'}`}
+                                >
+                                    <div
+                                        className={`max-w-sm rounded-lg ${isMessageFromCurrentUser(msg)
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-200 text-black'
                                             }`}
-                                        >
-                                            {msg.message}
+                                    >
+                                        {msg.messageType === "image" ? (
+                                            <div className="p-1">
+                                                <img
+                                                    src={msg.message}
+                                                    alt="Shared image"
+                                                    className="max-w-xs rounded-lg"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="p-2">
+                                                {msg.message}
+                                            </div>
+                                        )}
+                                        <div className="text-xs opacity-70 p-1 text-right flex items-center justify-end gap-1">
+                                            <span>
+                                                {new Date(msg.createdAt).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </span>
+                                            {isMessageFromCurrentUser(msg) && (
+                                                <span className={getStatusColor(msg.status)}>
+                                                    {getMessageStatus(msg)}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-center text-gray-500">
-                                    Start chatting with {selectedUser.first_name}!
-                                </p>
+                                    <div ref={messagesEndRef} />
+                                </div>
+                            ))}
+                            {typingUsers.size > 0 && (
+                                <div className="text-sm text-gray-500 italic">
+                                    {Array.from(typingUsers).map(userId => {
+                                        const typingUser = filteredUsers.find(
+                                            user => user.doctorId === userId || user.patientId === userId
+                                        );
+                                        return typingUser
+                                            ? `${typingUser.first_name} is typing...`
+                                            : 'Someone is typing...'
+                                    }).join(', ')}
+                                </div>
                             )}
                             <div ref={messagesEndRef} />
                         </div>
-                        <div className="mt-4 flex">
-                            <input
-                                type="text"
-                                placeholder="Type a message..."
-                                className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                            />
-                            <button
-                                className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                onClick={sendMessage}
-                            >
-                                Send
-                            </button>
+                        <div className="mt-4">
+                            {selectedImagePreview && (
+                                <div className="mb-2 relative">
+                                    <img
+                                        src={selectedImagePreview}
+                                        alt="Selected"
+                                        className="max-h-32 rounded"
+                                    />
+                                    <button
+                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                                        onClick={() => {
+                                            setSelectedImage(null);
+                                            setSelectedImagePreview(null);
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Type a message..."
+                                    className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={messageInput}
+                                    onChange={handleTyping}
+                                    onKeyPress={handleKeyPress}
+                                />
+                                <label className="cursor-pointer">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageSelect}
+                                    />
+                                    <span className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                                        Image
+                                    </span>
+                                </label>
+                                {selectedImage ? (
+                                    <button
+                                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                                        onClick={handleUpload}
+                                    >
+                                        Send Image
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                        onClick={sendMessage}
+                                    >
+                                        Send
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </>
                 ) : (

@@ -1,11 +1,12 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import ChatPanel from './pages/ChatPanel.jsx';
 import DoctorSignUp_Form from './pages/DoctorSignUp_Form';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Meeting from './pages/Meeting.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
-import PatientPanel from './pages/patient-panel/Home.jsx';
+import PatientPanel from './pages/patient-panel/Home.js;
 
 import ChatPanel from './pages/ChatPanel.jsx'
 
@@ -28,11 +29,7 @@ function App() {
         <Route path="/patient_panel" element={<PatientPanel />} />
 
         <Route path="/chat" element={<ChatPanel />} />
-
-
-        {/* doctor routes creaetd */}
         <Route path="/doctor-panel/*" element={<DoctorHome />} />
-
       </Routes>
     </div>
   );
