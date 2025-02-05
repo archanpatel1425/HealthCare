@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const Navbar = () => {
+import { useDispatch} from 'react-redux';
+import {fetchUserData} from '../Store/patient/authslice'
+const Navbar = ({ isPatientPanel }) => {
+  const dispatch=useDispatch()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
+    dispatch(fetchUserData())
     const handleOutsideClick = (e) => {
       if (isMenuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
         setIsMenuOpen(false);
@@ -17,18 +20,18 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   return (
-    <div 
-      className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full 
-      h-20 fixed top-0 left-0 z-50 transition-all duration-300"
-    >    
-      {/* Logo */}
-      <div className="text-2xl sm:text-3xl font-bold text-green-700">
+    <div  
+      className={`bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 
+      ${isPatientPanel ? "lg:px-8 w-[calc(100%-256px)] ml-64" : "lg:px-24 w-full"} 
+      py-4 fixed top-0 left-0 z-50 pt-8 transition-all duration-300`}
+    >     {/* Logo */}
+      <div className="text-3xl sm:text-4xl font-bold text-green-700">
         HealCare
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden md:flex space-x-6 lg:space-x-12 items-center text-base font-semibold">
-        <ul className="flex space-x-4 lg:space-x-8">
+      <div className="hidden m:flex space-x-8 lg:space-x-16 justify-center items-center text-base lg:text-lg font-semibold">
+        <ul className="flex space-x-6 lg:space-x-12">
           <li className="hover:text-green-800 transition duration-300">
             <Link to="/">Home</Link>
           </li>
@@ -49,11 +52,11 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* Mobile Menu Button - Visible on md & smaller */}
-      <div className="flex md:hidden items-center">
+      {/* Mobile Menu Button */}
+      <div className="flex sm:hidden items-center">
         <button
           onClick={() => setIsMenuOpen(true)}
-          className="text-green-700 text-3xl"
+          className="text-green-700 text-3xl menu-toggle"
           aria-label="Open Menu"
         >
           ☰ {/* Menu icon */}
@@ -77,7 +80,7 @@ const Navbar = () => {
         </button>
 
         {/* Menu Items */}
-        <div className="flex flex-col items-center space-y-6 pt-16">
+        <div className="flex flex-col items-center space-y-8 pt-12">
           <Link
             to="/"
             className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300"

@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import crypto from 'crypto';
-import { sendEmail } from '../utils/sendEmail.js';
-import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
+import bcrypt from 'bcrypt'
 export const createUserInDB = async (userData, userRole) => {
     try {
         // Validate required fields
@@ -54,11 +52,15 @@ export const createUserInDB = async (userData, userRole) => {
 
         // Create user based on role
         if (userRole === 'doctor') {
+            const hashedpassword=await bcrypt.hash(userData.password,10)
+            userData.password=hashedpassword
             const newUser = await prisma.doctor.create({
                 data: userData
             });
             return newUser;
         } else {
+            const hashedpassword=await bcrypt.hash(userData.password,10)
+            userData.password=hashedpassword
             const newUser = await prisma.patient.create({
                 data: userData
             });
@@ -104,46 +106,6 @@ export const checkPhoneExists = async (phone_no) => {
     }
 };
 
-// middleware/validation.middleware.js
-export const validateSignupData = (req, res, next) => {
-    const { first_name, last_name, email, phone_no, password } = req.body;
-
-    // Basic validation
-    if (!first_name || !last_name || !email || !phone_no || !password) {
-        return res.status(400).json({
-            success: false,
-            message: 'All fields are required'
-        });
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Invalid email format'
-        });
-    }
-
-    // Phone number validation
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone_no)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Phone number must be exactly 10 digits'
-        });
-    }
-
-    // Password validation
-    if (password.length < 8) {
-        return res.status(400).json({
-            success: false,
-            message: 'Password must be at least 8 characters long'
-        });
-    }
-
-    next();
-};
 export const saveRefreshToken = async (userId, refreshToken, userType) => {
     if (userType == 'doctor') {
         return prisma.doctor.update({
@@ -176,29 +138,21 @@ export const loginUser = async (email, password) => {
         if (!user) {
             return { success: false, message: "User Not Found" };
         }
-
-        if (password !== user.password) {
+        const ispassword=bcrypt.compare(password,user.password)
+        if (!ispassword) {
             return { success: false, message: "Invalid Password" };
         }
-
-        const token = jwt.sign(
-            { userId: user.user_id, email: user.email, userType },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-
         if (userType == "doctor") {
             console.log('here2')
 
             return {
                 success: true,
                 message: "Login Successful",
-                token,
                 user: {
-                    user_id: user.user_id,
+                    user_id: user.doctorId,
                     email: user.email,
                     userType,
-                    first_name:user.first_name,
+                    first_name: user.first_name,
                     last_name: user.last_name,
                     phone_no: user.phone_no,
                     gender: user.gender,
@@ -226,12 +180,11 @@ export const loginUser = async (email, password) => {
             return {
                 success: true,
                 message: "Login Successful",
-                token,
                 user: {
-                    user_id: user.user_id,
+                    user_id: user.patientId,
                     email: user.email,
                     userType,
-                    first_name:user.first_name,
+                    first_name: user.first_name,
                     last_name: user.last_name,
                     phone_no: user.phone_no,
                     gender: user.gender,
@@ -246,3 +199,43 @@ export const loginUser = async (email, password) => {
     }
 };
 
+export const findUserById = async (user_id) => {
+    try {
+        const doctor = await prisma.doctor.findUnique({
+            where: { doctorId: user_id },
+        });
+
+        const patient = await prisma.patient.findUnique({
+            where: { patientId: user_id },
+        });
+
+        return doctor || patient;
+    } catch (error) {
+        console.error("Error finding user:", error);
+        throw new Error("Error finding user by ID");
+    }
+};
+
+export const fetchuserlist = async (user_id) => {
+    try {
+        const doctor = await prisma.doctor.findUnique({
+            where: { doctorId: user_id }
+        });
+
+        const patient = await prisma.patient.findUnique({
+            where: { patientId: user_id }
+        });
+        if (doctor) {
+            const patientList = await prisma.patient.findMany();
+            return patientList;
+        } else if (patient) {
+            const doctorsList = await prisma.doctor.findMany();
+            return doctorsList;
+        } else {
+            return { message: "User not found in both doctor and patient models." };
+        }
+    } catch (error) {
+        console.error(error);
+        throw new Error("Failed to fetch user list.");
+    }
+}

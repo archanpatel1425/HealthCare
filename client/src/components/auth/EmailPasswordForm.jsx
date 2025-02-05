@@ -44,7 +44,8 @@ const EmailPasswordForm = ({ register, password }) => {
           {...register('password', {
             required: true,
             minLength: 8,
-            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+            pattern:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=[^@$!%*?&]*[@$!%*?&][^@$!%*?&]*$)[A-Za-z\d@$!%*?&]{8,}$/
+
           })}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         />

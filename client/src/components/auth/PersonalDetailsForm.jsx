@@ -75,12 +75,6 @@ const PersonalDetailsForm = ({ register }) => {
             type="text"
             {...register('first_name', {
               required: true,
-              validate: value => validateName(value, 'First name'),
-              onChange: (e) => {
-                if (e.target.value && !/^[A-Za-z\s]+$/.test(e.target.value)) {
-                  toast.error('First name should only contain alphabets');
-                }
-              }
             })}
             className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-green-500 focus:border-green-500"
             placeholder="Enter your first name"
@@ -93,12 +87,6 @@ const PersonalDetailsForm = ({ register }) => {
             type="text"
             {...register('last_name', {
               required: true,
-              validate: value => validateName(value, 'Last name'),
-              onChange: (e) => {
-                if (e.target.value && !/^[A-Za-z\s]+$/.test(e.target.value)) {
-                  toast.error('Last name should only contain alphabets');
-                }
-              }
             })}
             className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-green-500 focus:border-green-500"
             placeholder="Enter your last name"
@@ -112,14 +100,6 @@ const PersonalDetailsForm = ({ register }) => {
             {...register('phone_no', {
               required: true,
               validate: validatePhoneNumber,
-              onChange: (e) => {
-                if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
-                  // toast.error('Phone number should only contain numbers');
-                }
-                if (e.target.value && e.target.value.length > 10) {
-                  // toast.error('Phone number should not exceed 10 digits');
-                }
-              }
             })}
             className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-green-500 focus:border-green-500"
             placeholder="Enter your 10-digit phone number"
