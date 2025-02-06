@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PatientSidebar from "../../components/PatientSidebar";
+import Profile from "../doctor-panel/Profile";
 import BookAppointment from "./BookApointment";
 import Dashboard from "./Dashboard";
 // import SymptomChecker from "./SymptomChecker";
@@ -30,6 +31,8 @@ export default function PatientPanel() {
       //   return <Prescriptions />;
       // case "Pharmacy":
       //   return <Pharmacy />;
+      case "Profile":
+        return <Profile />;
       default:
         return <Dashboard />;
     }

@@ -1,4 +1,4 @@
-import { Calendar, Clipboard, Cross, FileText, Heart, Home, Menu, Stethoscope, X } from "lucide-react";
+import { Calendar, Clipboard, Cross, FileText, Heart, Home, Menu, Stethoscope, X,User} from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const PatientSidebar = ({ selectedComponent, setSelectedComponent }) => {
@@ -29,6 +29,8 @@ const PatientSidebar = ({ selectedComponent, setSelectedComponent }) => {
     { name: "EHR", icon: <FileText size={22} />, component: "EHR" },
     { name: "Prescriptions", icon: <Clipboard size={22} />, component: "Prescriptions" },
     { name: "Pharmacy", icon: <Cross size={22} />, component: "Pharmacy" },
+    { name: "Profile", icon: <User size={22} />, component: "Profile" },
+
   ];
 
   return (
