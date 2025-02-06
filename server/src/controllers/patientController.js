@@ -130,4 +130,37 @@ export const getReportsByPatient = async (req, res) => {
 };
 
 
+export const getDoctorsBySpecialization = async (req, res) => {
+  try {
+    const { specialization } = req.params;
+
+    // Fetch doctors based on specialization
+    const doctors = await prisma.doctor.findMany({
+      where: {
+        specialization: specialization
+      },
+      select: {
+        doctorId: true,
+        first_name: true,
+        last_name: true,
+        profilepic: true,
+        experience: true,
+        qualifications: true,
+        availability: true
+      }
+    });
+
+    // If no doctors are found
+    if (doctors.length === 0) {
+      return res.status(404).json({ message: "No doctors found for this specialization." });
+    }
+
+    return res.status(200).json({ doctors });
+
+  } catch (error) {
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
