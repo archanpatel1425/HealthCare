@@ -5,6 +5,7 @@ import express from 'express'
 import { MY_IP } from './config/envConfig.js'
 import authRoutes from './routes/authRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
+import patientRoutes from './routes/patientRoutes.js'
 
 const app = express();
 const allowedOrigins = [
@@ -24,5 +25,6 @@ app.use(cookieParser());
 
 app.use('/uploads', uploadRoutes);
 app.use('/auth', authRoutes);
+app.use('/patient',patientRoutes)
 
 export default app

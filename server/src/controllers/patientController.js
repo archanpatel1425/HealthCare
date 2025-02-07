@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 const prisma = new PrismaClient();
 
 export const getAppointmentsByPatient = async (req, res) => {
@@ -82,6 +84,36 @@ export const updatePatientProfile = async (req, res) => {
 
 
 
+
+  
+  
+  
+
+  
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Initialize once
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const getMedicineLinks = async (medicines) => {
+  if (!medicines || medicines.length === 0) return [];
+
+  try {
+    const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicines.join(", ")}. The link should lead to a trusted medical or pharmaceutical website.`;
+
+    const result = await model.generateContent(prompt);
+    const text = await result.response.text(); // Fetch response text
+
+    const linkRegex = /(https?:\/\/[^\s]+)/g;
+        const links = text.match(linkRegex) || [];
+            return medicines.map((med, index) => ({
+      medicine: med,
+      link: links[index] || "No link found.",
+    }));
+  } catch (error) {
+    console.error("Error fetching medicine links:", error.message);
+    return medicines.map(med => ({ medicine: med, link: "Error fetching link." }));
+  }
+};
+
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
     const { patientId } = req.params;
@@ -98,14 +130,30 @@ export const getPrescriptionsByPatient = async (req, res) => {
       return res.status(404).json({ message: "No prescriptions found for this patient" });
     }
 
-    res.status(200).json(prescriptions);
+    
+    const prescriptionsWithLinks = await Promise.all(
+      prescriptions.map(async (prescription) => {
+        const medicines = prescription.medicines ? JSON.parse(prescription.medicines) : [];
+        const medicineLinks = await getMedicineLinks(medicines);
+
+        return {
+          ...prescription,
+          medicineLinks,
+        };
+      })
+    );
+
+    res.status(200).json(prescriptionsWithLinks);
   } catch (error) {
     console.error("Error fetching prescriptions:", error);
     res.status(500).json({ message: "Failed to fetch prescriptions", error: error.message });
   }
 };
+  
 
+  
 
+  
 
 
 
@@ -128,6 +176,43 @@ export const getReportsByPatient = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch reports", error: error.message });
   }
 };
+
+
+
+export const createAppointment = async (req, res) => {
+  try {
+    const { patient_Id, doctor_Id, date, time, reason, status } = req.body;
+
+   
+    if (!patient_Id || !doctor_Id || !date || !time) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+   
+    const appointment = await prisma.appointment.create({
+      data: {
+        patient_Id,
+        doctor_Id,
+        date: new Date(date), 
+        time,
+        reason: reason || null,
+        status: status || "pending", 
+      },
+    });
+
+    res.status(201).json({
+      message: "Appointment created successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error creating appointment:", error);
+    res.status(500).json({
+      message: "Failed to create appointment",
+      error: error.message,
+    });
+  }
+};
+
 
 
 export const getDoctorsBySpecialization = async (req, res) => {

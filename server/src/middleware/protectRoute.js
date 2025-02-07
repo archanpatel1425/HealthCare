@@ -1,4 +1,4 @@
-import { verifyAccessToken } from "../utils/tokenUtils";
+import { verifyAccessToken } from "../utils/tokenUtils.js";
 
 export const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;  
