@@ -14,6 +14,7 @@ const Login = () => {
     try {
       const response = await dispatch(loginUser(values))
       if(response.payload.user.userType == "doctor"){
+        toast.success(response.payload.message);
         setTimeout(()=>navigate("/doctor-panel"),2000)
         return
       }
@@ -92,6 +93,20 @@ const Login = () => {
             </Form>
           )}
         </Formik>
+        <div className="mt-4 flex flex-col gap-2">
+          <button
+            onClick={() => navigate("/signup/patient")}
+            className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          >
+            Create Account as Patient
+          </button>
+          <button
+            onClick={() => navigate("/signup/doctor")}
+            className="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
+            Create Account as Doctor
+          </button>
+        </div>
         <ToastContainer position="top-right" autoClose={3000} />
       </div>
     </div>

@@ -37,7 +37,7 @@ const Chatbot = () => {
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen ? (
         <div className="w-80 h-96 bg-white shadow-lg rounded-xl border border-gray-300 flex flex-col">
-          <div className="flex justify-between items-center bg-blue-600 text-white px-4 py-3 rounded-t-xl">
+          <div className="flex justify-between items-center bg-green-600 text-white px-4 py-3 rounded-t-xl">
             <h2 className="text-lg font-semibold">Chat with us</h2>
             <button onClick={() => setIsOpen(false)}>
               <X size={24} />
