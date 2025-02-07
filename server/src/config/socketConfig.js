@@ -152,7 +152,6 @@ export const initializeSocket = (server) => {
         });
 
         socket.on('markAsRead', async (messageId) => {
-            console.log("in read")
             try {
                 const message = await prisma.chat.update({
                     where: { id: messageId },

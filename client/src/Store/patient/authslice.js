@@ -87,9 +87,18 @@ export const fetchUserList=createAsyncThunk("/auth/fetchUserList",async()=>{
     console.log("error is : ",error)
   }
 })
+export const updateUserData = createAsyncThunk("auth/updateUserData", async (updatedData) => {
+  try {
+    const response = await axios.post(`${VITE_API_URL}/patient/updatePatientprofile`, updatedData,{ withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.log("the error is : ",error)
+  }
+});
+
 
 const patientAuthSlice = createSlice({
-  name: "patientAuth",
+  name: "auth",
   initialState: {
     loading: false,
     error: null,
@@ -157,6 +166,14 @@ const patientAuthSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientData=action.payload
+      })
+      .addCase(updateUserData.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserData.fulfilled, (state, action) => {
         state.loading = false;
         state.patientData=action.payload
       })
