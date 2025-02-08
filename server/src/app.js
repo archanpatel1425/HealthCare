@@ -3,6 +3,7 @@ import cors from 'cors'
 import express from 'express'
 import { MY_IP } from './config/envConfig.js'
 import authRoutes from './routes/authRoutes.js'
+import patientRoutes from './routes/patientRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
 
 import doctorRoutes from './routes/doctorRoutes.js'
@@ -24,5 +25,6 @@ app.use(cookieParser());
 app.use('/uploads', uploadRoutes);
 app.use('/auth', authRoutes);
 app.use('/doctor',doctorRoutes)
+app.use('/patient',patientRoutes)
 
 export default app

@@ -5,7 +5,6 @@ const PatientProfile = () => {
 
     const {first_name,last_name,phone_no,profilepic,email,gender}=useSelector((state)=>state.auth.patientData)
     console.log(profilepic);
-    
 
     return (
         <div className="bg-white shadow-xl rounded-2xl p-12 max-w-5xl w-full">

@@ -12,12 +12,13 @@ import PatientPanel from './pages/patient-panel/Home.jsx';
 import DoctorHome from './pages/doctor-panel/Home';
 import SkinCancer from './SkinCancer.jsx';
 import SkinChecker from './SkinChecker.jsx';
+
 import AppointmentForm from './pages/patient-panel/AppointmentForm.jsx';
 
 function App() {
   const location = useLocation();
 
-  const pathsWithNavbar = ['/', '/about', '/contactus'];
+  const pathsWithNavbar = ['/', '/about', '/contactus','/patient_panel'];
 
   return (
     <div>
