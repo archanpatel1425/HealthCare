@@ -48,31 +48,31 @@ const updateDoctorProfile = async (req, res) => {
       availability,
     } = req.body.formData;
 
-  const updatedDoctor = await prisma.doctor.update({
-    where: { doctorId },
-    data: {
-      first_name,
-      last_name,
-      gender,
-      phone_no,
-      profilepic,
-      email,
-      specialization,
-      experience,
-      qualifications,
-      availability:JSON.parse(availability),
-    },
-  });
+    const updatedDoctor = await prisma.doctor.update({
+      where: { doctorId },
+      data: {
+        first_name,
+        last_name,
+        gender,
+        phone_no,
+        profilepic,
+        email,
+        specialization,
+        experience,
+        qualifications,
+        availability: JSON.parse(availability),
+      },
+    });
 
-  res.json({
-    message: "Profile updated successfully",
-    doctor: updatedDoctor,
-  });
-} catch (error) {
-  res
-    .status(500)
-    .json({ message: "Error updating profile", error: error.message });
-}
+    res.json({
+      message: "Profile updated successfully",
+      doctor: updatedDoctor,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating profile", error: error.message });
+  }
 };
 
 const updateAppointmentStatus = async (req, res) => {
@@ -94,6 +94,40 @@ const updateAppointmentStatus = async (req, res) => {
   }
 };
 
+const submitPrescription = async (req, res) => {
+  try {
+    const { data, notes, appointmentId, patientId, doctorId } = req.body;
+    console.log(data, notes, appointmentId, patientId, doctorId)
+    if (!appointmentId || !patientId || !doctorId || !data) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Convert medicine array into JSON string
+    const medicines = JSON.stringify(data);
+
+    // Insert prescription into the database
+    const newPrescription = await prisma.prescription.create({
+      data: {
+        appointment_Id: appointmentId,
+        patient_Id: patientId,
+        doctor_Id: doctorId,
+        medicines: medicines,
+        notes: notes
+      }
+    });
+
+    res.status(201).json({
+      message: "Prescription created successfully",
+      prescription: newPrescription
+    });
+
+  } catch (error) {
+    console.log(error)
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: error.message });
+  }
+};
 
 const getPendingAppointments = async (req, res) => {
   try {
@@ -158,4 +192,4 @@ const getDoneAppointments = async (req, res) => {
   }
 };
 
-export { getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus };
+export { getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus, submitPrescription };
