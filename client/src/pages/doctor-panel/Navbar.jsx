@@ -1,8 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from '../../Store/patient/authslice';
 
 const Navbar = ({ sidebarOpen, toggleSidebar }) => {
+
+  const dispatch = useDispatch();
+
+  const { patientData } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchUserData())
+  }, []);
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -18,7 +29,7 @@ const Navbar = ({ sidebarOpen, toggleSidebar }) => {
       <div className="relative">
         <button onClick={toggleDropdown} className="focus:outline-none">
           <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtRs_rWILOMx5-v3aXwJu7LWUhnPceiKvvDg&s"
+            src={patientData?.profilepic}
             alt="Profile"
             className="w-10 h-10 rounded-full cursor-pointer"
           />
@@ -28,13 +39,13 @@ const Navbar = ({ sidebarOpen, toggleSidebar }) => {
             <Link
               to="/doctor-panel/profile"
               className="flex px-4 py-2 text-gray-700 hover:bg-gray-100"
-              onClick={()=>{setDropdownOpen(false)}}
+              onClick={() => { setDropdownOpen(false) }}
             >
               <span className="mx-4"><i class="fa-solid fa-user"></i></span><span>Profile</span>
             </Link>
             <button
               className="flex w-full text-left px-4 py-2 text-red-600 hover:bg-red-100"
-              onClick={()=>{setDropdownOpen(false)}}
+              onClick={() => { setDropdownOpen(false) }}
             >
               <span className="mx-4"><i class="fa-solid fa-right-from-bracket"></i></span><span>Logout</span>
             </button>
