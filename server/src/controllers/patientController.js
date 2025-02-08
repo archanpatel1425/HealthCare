@@ -1,6 +1,29 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+export const getDoctorList = async (req, res) => {
+  try {
+    const doctors = await prisma.doctor.findMany()
+    res.status(200).json(doctors)
+  } catch (error) {
+    console.log("error : ", error)
+  }
+}
+
+export const getDoctorInfo=async(req,res)=>{
+  try {
+    const doctorId=req.params.doctorId
+    const doctor=await prisma.doctor.findUnique({
+      where:{
+        doctorId:doctorId
+      }
+    })
+    res.status(200).json(doctor)
+  } catch (error) {
+    console.log("error is : ",error)
+  }
+}
+
 export const getAppointmentsByPatient = async (req, res) => {
   try {
     const { patientId } = req.body
@@ -93,7 +116,7 @@ export const updatePatientProfile = async (req, res) => {
 
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
-    const { patientId } = req.params;
+    const patientId  = req.userId;
 
     const prescriptions = await prisma.prescription.findMany({
       where: { patient_Id: patientId },
@@ -173,20 +196,20 @@ export const createAppointment = async (req, res) => {
   try {
     const { patient_Id, doctor_Id, date, time, reason, status } = req.body;
 
-   
+
     if (!patient_Id || !doctor_Id || !date || !time) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-   
+
     const appointment = await prisma.appointment.create({
       data: {
         patient_Id,
         doctor_Id,
-        date: new Date(date), 
+        date: new Date(date),
         time,
         reason: reason || null,
-        status: status || "pending", 
+        status: status || "pending",
       },
     });
 

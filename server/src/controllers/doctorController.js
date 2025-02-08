@@ -3,7 +3,9 @@ const prisma = new PrismaClient();
 
 const getDoctorProfile = async (req, res) => {
   try {
+
     const doctorId = req.body.doctorId; // Extract doctor ID from token
+
     const doctor = await prisma.doctor.findUnique({
       where: { doctorId: doctorId },
       select: {

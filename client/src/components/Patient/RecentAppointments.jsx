@@ -74,7 +74,7 @@ const RecentAppointments = () => {
 
     useEffect(() => {
         const fetchData = () => {
-            axios.get(`${VITE_API_URL}/patient/getAppointments`)
+            axios.get(`${VITE_API_URL}/patient/getAppointments`,{withCredentials:true})
                 .then((response) => {
                     console.log(response.data)
                     setAppointments(response.data)
