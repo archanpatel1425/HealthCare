@@ -7,6 +7,7 @@ import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import PatientPanel from './pages/patient-panel/Home.jsx';
 import Dashboard from "./pages/patient-panel/Dashboard";
 import Appointment from "./pages/patient-panel/Appointment";
+import ContactPage from './pages/ContactPage.jsx';
 
 function App() {
   const location = useLocation();
@@ -26,6 +27,7 @@ function App() {
           <Route path="appointments" element={<Appointment />} />
           <Route path="*" element={<Dashboard />} /> {/* Default route */}
         </Route>
+        <Route path='/contact' element={<ContactPage/>} />
       </Routes>
     </div>
   );
