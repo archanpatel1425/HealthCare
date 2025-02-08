@@ -1,5 +1,30 @@
 import { PrismaClient } from "@prisma/client";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 const prisma = new PrismaClient();
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Initialize once
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const getMedicineLinks = async (medicines) => {
+  if (!medicines || medicines.length === 0) return [];
+
+  try {
+    const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicines.join(", ")}. The link should lead to a trusted medical or pharmaceutical website.`;
+
+    const result = await model.generateContent(prompt);
+    const text = await result.response.text(); // Fetch response text
+
+    const linkRegex = /(https?:\/\/[^\s]+)/g;
+        const links = text.match(linkRegex) || [];
+            return medicines.map((med, index) => ({
+      medicine: med,
+      link: links[index] || "No link found.",
+    }));
+  } catch (error) {
+    console.error("Error fetching medicine links:", error.message);
+    return medicines.map(med => ({ medicine: med, link: "Error fetching link." }));
+  }
+};
 
 export const getDoctorList = async (req, res) => {
   try {

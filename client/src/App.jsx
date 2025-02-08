@@ -16,7 +16,7 @@ import { ToastContainer } from 'react-toastify';
 import DoctorList from './pages/patient-panel/DoctorList.jsx';
 import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';
 import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
-
+import ContactPage from  './pages/ContactPage.jsx'
 function App() {
   const location = useLocation();
 
@@ -41,6 +41,7 @@ function App() {
         <Route path="/dl" element={<DoctorList />} />
         <Route path="/doctor/:id" element={<DoctorDetails />} />
         <Route path="/pr" element={<Prescriptions />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
     </div>
   );
