@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios'
 import { showToast } from "./Alerts"; './Alerts'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from '../../Store/patient/authslice';
 
 const NewAppointments = () => {
+
+  const dispatch = useDispatch();
+
+  const { patientData } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchUserData())
+  }, []);
+
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
+  // fixed
   const [patients, setPatients] = useState([])
+  // not fixed
+  const [filterPatients, setFilterPatients] = useState([])
+
 
   const handleRowClick = (patient) => {
     setSelectedPatient(patient);
@@ -19,8 +34,9 @@ const NewAppointments = () => {
   };
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/pending`, { doctorId: "693b8e48-af4f-4077-863d-1ba36b98a9cb" }).then((res) => {
+    axios.post(`${import.meta.env.VITE_API_URL}/doctor/pending`, { doctorId: patientData?.doctorId }).then((res) => {
       setPatients(res.data)
+      setFilterPatients(res.data)
     })
   }, [])
 
@@ -35,19 +51,29 @@ const NewAppointments = () => {
 
   const AcceptRejectHandler = (appointmentId, status) => {
     axios.post(`${import.meta.env.VITE_API_URL}/doctor/status`, { appointmentId: appointmentId, status: status }).then((res) => {
-      console.log(res.data)
+      setPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
+      setFilterPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
+      setShowPopup(false);
+      setSelectedPatient(null);
+      showToast(status === "Accepted" ? "Appointment accepted successfully." : "Appointment rejected...", status === "Accepted" ? "success" : "error")
     })
-    showToast(status === "Accepted" ? "Appointment accepted successfully." : "Appointment rejected...", status === "Accepted" ? "success" : "error")
+  }
+
+  const filterBySearch = (name) => {
+    setFilterPatients(patients.filter(patient => patient.patient.first_name.toLowerCase().includes(name.toLowerCase())))
   }
 
   return (
     <div className="">
-      <h1 className="text-2xl font-bold text-gray-700 mb-4">New Appointments</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-700 mb-4">New Appointments</h1>
+        <input className="px-2 border-2 border-gray-400 rounded-lg focus:border-gray-800 py-1" type="text" placeholder="Search by Patient name" onChange={(e) => { filterBySearch(e.target.value) }} />
+      </div>
       <div className="bg-white rounded-lg shadow">
-        <div className="max-h-96 overflow-y-auto overflow-x-auto">
+        <div className="h-[72.5vh] overflow-y-auto overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead>
-              <tr className="bg-blue-100 text-gray-700 uppercase text-sm">
+              <tr className="bg-green-600 text-white uppercase sticky top-0">
                 <th className="px-6 py-3 text-left">Name</th>
                 <th className="px-6 py-3 text-left">Gender</th>
                 <th className="px-6 py-3 text-left">Reason</th>
@@ -55,10 +81,10 @@ const NewAppointments = () => {
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient, index) => (
+              {filterPatients.map((patient, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-blue-50 cursor-pointer"
+                  className="hover:bg-green-50 cursor-pointer"
                   onClick={() => handleRowClick(patient)}
                 >
                   <td className="px-6 py-3 border-b">{patient.patient.first_name} {patient.last_name}</td>
@@ -71,9 +97,6 @@ const NewAppointments = () => {
           </table>
         </div>
       </div>
-
-
-
 
       {
         showPopup && selectedPatient && (
