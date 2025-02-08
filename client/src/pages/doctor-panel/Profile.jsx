@@ -3,8 +3,17 @@ import axios from "axios";
 import './a.css'
 import { showToast } from './Alerts'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserData } from "../../Store/patient/authslice";
 
 const Profile = () => {
+
+    const dispatch = useDispatch();
+    const { patientData } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        dispatch(fetchUserData());
+    }, []);
 
     const navigate = useNavigate()
 
@@ -24,10 +33,9 @@ const Profile = () => {
     useEffect(() => {
         axios
             .post(`${import.meta.env.VITE_API_URL}/doctor/getprofile`, {
-                doctorId: "0fd339d8-8d82-4dde-bdcc-818328a3f84a",
+                doctorId: patientData?.doctorId,
             })
             .then((res) => {
-                console.log(res.data);
                 setFormData({
                     first_name: res.data.first_name,
                     last_name: res.data.last_name,
@@ -49,9 +57,8 @@ const Profile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
         axios
-            .post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, { doctorId: "0fd339d8-8d82-4dde-bdcc-818328a3f84a", formData: formData })
+            .post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, { doctorId: patientData?.doctorId, formData: formData })
             .then((res) => {
                 showToast("Profile updated...", "success")
                 navigate("/doctor-panel")

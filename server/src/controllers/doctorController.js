@@ -3,8 +3,9 @@ const prisma = new PrismaClient();
 
 const getDoctorProfile = async (req, res) => {
   try {
-    const doctorId = req.body.doctorId; 
-    console.log(doctorId);
+
+    const doctorId = req.body.doctorId; // Extract doctor ID from token
+
     const doctor = await prisma.doctor.findUnique({
       where: { doctorId: doctorId },
       select: {
@@ -21,7 +22,6 @@ const getDoctorProfile = async (req, res) => {
         availability: true,
       },
     });
-    console.log(doctor);
     if (!doctor) return res.status(404).json({ message: "Doctor not found" });
 
     res.json(doctor);
@@ -97,7 +97,6 @@ const updateAppointmentStatus = async (req, res) => {
 const submitPrescription = async (req, res) => {
   try {
     const { data, notes, appointmentId, patientId, doctorId } = req.body;
-    console.log(data, notes, appointmentId, patientId, doctorId)
     if (!appointmentId || !patientId || !doctorId || !data) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -139,6 +138,9 @@ const getPendingAppointments = async (req, res) => {
         status: "Scheduled",
       },
       include: { patient: true },
+      orderBy: {
+        date: "desc",
+      },
     });
 
     res.json(pendingAppointments);
@@ -150,6 +152,7 @@ const getPendingAppointments = async (req, res) => {
   }
 };
 
+
 const getAcceptedAppointments = async (req, res) => {
   try {
     const doctorId = req.body.doctorId;
@@ -160,6 +163,9 @@ const getAcceptedAppointments = async (req, res) => {
         status: "Accepted",
       },
       include: { patient: true },
+      orderBy: {
+        date: "desc",
+      },
     });
 
     res.json(acceptedAppointments);
@@ -179,6 +185,9 @@ const getDoneAppointments = async (req, res) => {
       where: {
         doctor_Id: doctorId,
         status: "Completed",
+      },
+      orderBy: {
+        date: "desc",
       },
       include: { patient: true },
     });

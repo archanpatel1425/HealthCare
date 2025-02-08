@@ -39,7 +39,6 @@ const PrescriptionForm = () => {
         e.preventDefault();
         let data = prescriptions.filter(p => p.drugName.trim() !== '');
         axios.post(`${import.meta.env.VITE_API_URL}/doctor/submit-prescription`, { data: data, note: note, appointmentId: "ab4be390-48b1-45b6-9fa9-828ea8ff5901", patientId: "02a43da6-d460-44f0-8f7f-a202c856d4af", doctorId: patientData?.doctorId }).then((res) => {
-            console.log(res.data);
         });
     };
 
