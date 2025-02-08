@@ -12,6 +12,9 @@ import PatientPanel from './pages/patient-panel/Home.jsx';
 import DoctorHome from './pages/doctor-panel/Home';
 import SkinCancer from './SkinCancer.jsx';
 import SkinChecker from './SkinChecker.jsx';
+
+import AppointmentForm from './pages/patient-panel/AppointmentForm.jsx';
+
 function App() {
   const location = useLocation();
 
@@ -27,6 +30,7 @@ function App() {
         <Route path="/signup/doctor" element={<DoctorSignUp_Form />} />
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
         <Route path="/patient_panel" element={<PatientPanel />} />
+        <Route path="/appointment-form" element={<AppointmentForm />} />
 
         <Route path="/chat" element={<ChatPanel />} />
         <Route path="/doctor-panel/*" element={<DoctorHome />} />

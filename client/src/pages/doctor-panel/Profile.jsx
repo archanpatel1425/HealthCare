@@ -24,7 +24,7 @@ const Profile = () => {
     useEffect(() => {
         axios
             .post(`${import.meta.env.VITE_API_URL}/doctor/getprofile`, {
-                doctorId: "693b8e48-af4f-4077-863d-1ba36b98a9cb",
+                doctorId: "0fd339d8-8d82-4dde-bdcc-818328a3f84a",
             })
             .then((res) => {
                 console.log(res.data);
@@ -51,7 +51,7 @@ const Profile = () => {
         e.preventDefault();
         console.log(formData);
         axios
-            .post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, { doctorId: "693b8e48-af4f-4077-863d-1ba36b98a9cb", formData: formData })
+            .post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, { doctorId: "0fd339d8-8d82-4dde-bdcc-818328a3f84a", formData: formData })
             .then((res) => {
                 showToast("Profile updated...", "success")
                 navigate("/doctor-panel")

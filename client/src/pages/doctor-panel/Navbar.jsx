@@ -1,43 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 const Navbar = ({ sidebarOpen, toggleSidebar }) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md md:py-3">
       <button onClick={toggleSidebar} className="md:hidden text-gray-700">
         {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
-      <h1 className="text-xl font-semibold text-blue-600">Dashboard</h1>
-      <div className="flex items-center space-x-4">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="hidden md:block border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
-        />
-        <div className="relative">
-          <Link to="/doctor-panel/profile">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtRs_rWILOMx5-v3aXwJu7LWUhnPceiKvvDg&s"
-              alt="Profile"
-              className="w-10 h-10 rounded-full cursor-pointer"
-            />
-          </Link>
-          <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg hidden">
-            <a
-              href="#profile"
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+      <h1 className="text-xl font-semibold text-green-600">Dashboard</h1>
+      <div className="relative">
+        <button onClick={toggleDropdown} className="focus:outline-none">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtRs_rWILOMx5-v3aXwJu7LWUhnPceiKvvDg&s"
+            alt="Profile"
+            className="w-10 h-10 rounded-full cursor-pointer"
+          />
+        </button>
+        {dropdownOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-green-500 shadow-md rounded-lg z-10">
+            <Link
+              to="/doctor-panel/profile"
+              className="flex px-4 py-2 text-gray-700 hover:bg-gray-100"
+              onClick={()=>{setDropdownOpen(false)}}
             >
-              Profile
-            </a>
-            <a
-              href="#logout"
-              className="block px-4 py-2 text-red-600 hover:bg-red-100"
+              <span className="mx-4"><i class="fa-solid fa-user"></i></span><span>Profile</span>
+            </Link>
+            <button
+              className="flex w-full text-left px-4 py-2 text-red-600 hover:bg-red-100"
+              onClick={()=>{setDropdownOpen(false)}}
             >
-              Logout
-            </a>
+              <span className="mx-4"><i class="fa-solid fa-right-from-bracket"></i></span><span>Logout</span>
+            </button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
