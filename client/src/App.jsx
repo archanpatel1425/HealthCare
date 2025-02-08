@@ -12,6 +12,10 @@ import PatientPanel from './pages/patient-panel/Home.jsx';
 import DoctorHome from './pages/doctor-panel/Home';
 import SkinCancer from './SkinCancer.jsx';
 import SkinChecker from './SkinChecker.jsx';
+import { ToastContainer } from 'react-toastify';
+import DoctorList from './pages/patient-panel/DoctorList.jsx';
+import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';
+import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
 
 function App() {
   const location = useLocation();
@@ -20,6 +24,7 @@ function App() {
 
   return (
     <div>
+        <ToastContainer position="top-right" autoClose={3000} />
       {pathsWithNavbar.includes(location.pathname) && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -33,6 +38,9 @@ function App() {
         <Route path="/doctor-panel/*" element={<DoctorHome />} />
         <Route path="/sc" element={<SkinCancer />} />
         <Route path="/sk" element={<SkinChecker />} />
+        <Route path="/dl" element={<DoctorList />} />
+        <Route path="/doctor/:id" element={<DoctorDetails />} />
+        <Route path="/pr" element={<Prescriptions />} />
       </Routes>
     </div>
   );

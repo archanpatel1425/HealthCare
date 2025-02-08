@@ -1,30 +1,22 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React from "react";
-import axios from "axios";
+import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {useSelector,useDispatch} from 'react-redux'
-import {loginUser} from '../Store/patient/authslice'
+import { loginUser } from '../Store/patient/authslice';
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
   const handleSubmit = async (values) => {
     try {
       const response = await dispatch(loginUser(values))
-      if(response.payload.user.userType == "doctor"){
-        toast.success(response.payload.message);
-        setTimeout(()=>navigate("/doctor-panel"),2000)
-        return
-      }
-      
       if (response.payload.success) {
         toast.success(response.payload.message);
-        setTimeout(()=>navigate("/"),2000)
-        
+        setTimeout(() => navigate("/"), 2000)
       } else {
-        toast.error(response.payload.message);
+        toast.error(response.payload);
       }
     } catch (error) {
       toast.error("An unexpected error occurred. Please try again.");

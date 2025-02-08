@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
-import bcrypt from 'bcrypt'
 export const createUserInDB = async (userData, userRole) => {
     try {
         // Validate required fields
@@ -52,15 +52,15 @@ export const createUserInDB = async (userData, userRole) => {
 
         // Create user based on role
         if (userRole === 'doctor') {
-            const hashedpassword=await bcrypt.hash(userData.password,10)
-            userData.password=hashedpassword
+            const hashedpassword = await bcrypt.hash(userData.password, 10)
+            userData.password = hashedpassword
             const newUser = await prisma.doctor.create({
                 data: userData
             });
             return newUser;
         } else {
-            const hashedpassword=await bcrypt.hash(userData.password,10)
-            userData.password=hashedpassword
+            const hashedpassword = await bcrypt.hash(userData.password, 10)
+            userData.password = hashedpassword
             const newUser = await prisma.patient.create({
                 data: userData
             });
@@ -139,12 +139,11 @@ export const loginUser = async (email, password) => {
         if (!user) {
             return { success: false, message: "User Not Found" };
         }
-        const ispassword=bcrypt.compare(password,user.password)
+        const ispassword = await bcrypt.compare(password, user.password)
         if (!ispassword) {
             return { success: false, message: "Invalid Password" };
         }
         if (userType == "doctor") {
-
             return {
                 success: true,
                 message: "Login Successful",
