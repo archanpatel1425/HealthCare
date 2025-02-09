@@ -46,10 +46,11 @@ const BookAppointment = () => {
         });
     }
     return (
-        <div className="p-6 w-[85vw] mx-auto bg-white shadow-lg rounded-lg">
+        <div className="p-6 w-full bg-white shadow-lg rounded-lg h-full">
             <h2 className="text-3xl font-bold mb-6 text-center text-green-600">Book an Appointment</h2>
 
-            <div className="flex gap-4 items-center mb-4">
+            {/* Search and Filter Section */}
+            <div className="flex gap-4 items-center mb-4 flex-wrap">
                 <input
                     type="text"
                     placeholder="Search by doctor name..."
@@ -86,21 +87,26 @@ const BookAppointment = () => {
                 </div>
             </div>
 
+            {/* Doctors List Section */}
             <div className="bg-gray-50 p-4 rounded-lg shadow-md">
                 <h3 className="font-semibold mb-3 text-gray-800">Available Doctors:</h3>
                 {filteredDoctors.length > 0 ? (
-                    <ul className="list-none">
+                    <ul className="list-none     overflow-y-auto">
                         {filteredDoctors.map((doctor, index) => (
-                            <li key={index} className="p-4 border-b border-gray-200 last:border-b-0 flex items-center justify-between">
+                            <li key={index} className="p-4 border-b border-gray-200 last:border-b-0 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center space-x-4">
                                     <img src={doctor.profilepic} alt={doctor.first_name} className="w-16 h-16 rounded-full border" />
                                     <div>
-                                        <p className="font-medium text-green-600 flex items-center gap-2"><FaUserMd /> {doctor.first_name} {doctor.last_name}</p>
+                                        <p className="font-medium text-green-600 flex items-center gap-2">
+                                            <FaUserMd /> {doctor.first_name} {doctor.last_name}
+                                        </p>
                                         <p className="text-gray-700 flex items-center gap-2"><FaBriefcaseMedical /> {doctor.specialization}</p>
                                         <p className="text-gray-700">Experience: {doctor.experience} years</p>
                                     </div>
                                 </div>
-                                <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={() => handleBookAppointment(doctor.doctorId)}>Book Appointment</button>
+                                <button className="mt-2 sm:mt-0 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={() => handleBookAppointment(doctor.doctorId)}>
+                                    Book Appointment
+                                </button>
                             </li>
                         ))}
                     </ul>
@@ -109,6 +115,7 @@ const BookAppointment = () => {
                 )}
             </div>
         </div>
+
     );
 };
 

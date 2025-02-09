@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Calendar, Clock, User,FileText } from 'lucide-react';
+import { Calendar, Clock, FileText, User } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 const RecentAppointments = () => {
     // const appointments = [
@@ -74,7 +74,7 @@ const RecentAppointments = () => {
 
     useEffect(() => {
         const fetchData = () => {
-            axios.get(`${VITE_API_URL}/patient/getAppointments`,{withCredentials:true})
+            axios.get(`${VITE_API_URL}/patient/getAppointments`, { withCredentials: true })
                 .then((response) => {
                     console.log(response.data)
                     setAppointments(response.data)
@@ -102,18 +102,17 @@ const RecentAppointments = () => {
         return date?.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'  
+            day: 'numeric'
         });
     };
 
     return (
         <div className="bg-white shadow-lg p-6 w-full">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-800">Recent Appointments</h2>
-
+                <h2 className="text-2xl font-semibold text-gray-800 ml-16 md:ml-16 lg:ml-0">Recent Appointments</h2>
             </div>
             {appointments &&
-                <div className="space-y-4 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+                <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
                     {appointments.map((appointment) => (
                         <div
                             key={appointment.appointmentId}
@@ -142,11 +141,11 @@ const RecentAppointments = () => {
                                         </span>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                    <FileText className="w-5 h-5 text-gray-500" />
-                                    <span className="text-gray-600">
-                                        {appointment.reason}
-                                    </span>
-                                </div>
+                                        <FileText className="w-5 h-5 text-gray-500" />
+                                        <span className="text-gray-600">
+                                            {appointment.reason}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-3 text-right">
