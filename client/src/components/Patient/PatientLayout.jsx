@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import PatientSidebar from "./PatientSidebar";
+import PatientSidebar from "../PatientSidebar";
 
 const Layout = ({ children }) => {
     const location = useLocation();
