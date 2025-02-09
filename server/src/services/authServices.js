@@ -211,7 +211,7 @@ export const fetchuserlist = async (user_id) => {
         if (doctor) {
             // Fetch patients who have an appointment with this doctor
             const patientList = await prisma.appointment.findMany({
-                where: { doctor_Id: user_id },
+                where: { doctor_Id: user_id,status:"Scheduled" },
                 include: { patient: true }
             });
 
@@ -222,7 +222,7 @@ export const fetchuserlist = async (user_id) => {
         } else if (patient) {
             // Fetch doctors who have consulted this patient
             const doctorsList = await prisma.appointment.findMany({
-                where: { patient_Id: user_id },
+                where: { patient_Id: user_id ,status:"Scheduled"},
                 include: { doctor: true }
             });
 

@@ -5,7 +5,7 @@ import { checkUser } from '../Store/patient/authslice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
+  const isloggedIN = useSelector((state) => state.auth.isauthenticated); // Ensure your reducer stores this correctly
   useEffect(() => {
     dispatch(checkUser());
   }, [dispatch]);
