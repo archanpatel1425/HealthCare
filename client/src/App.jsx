@@ -5,26 +5,29 @@ import DoctorSignUp_Form from './pages/DoctorSignUp_Form';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Meeting from './pages/Meeting.jsx';
-import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import PatientPanel from './pages/patient-panel/Home.jsx';
+import PatientSignUp_Form from './pages/PatientSignUp_Form';
 
 
+import { ToastContainer } from 'react-toastify';
+import ContactPage from './pages/ContactPage.jsx';
 import DoctorHome from './pages/doctor-panel/Home';
+import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';
+import DoctorList from './pages/patient-panel/DoctorList.jsx';
+import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
 import SkinCancer from './SkinCancer.jsx';
 import SkinChecker from './SkinChecker.jsx';
-import { ToastContainer } from 'react-toastify';
-import DoctorList from './pages/patient-panel/DoctorList.jsx';
-import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';
-import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
-import ContactPage from  './pages/ContactPage.jsx'
+import Dashboard from './pages/patient-panel/Dashboard.jsx';
+import BookAppointment from './pages/patient-panel/BookAppointment.jsx';
+import ScheduleAppointment from './components/Patient/ScheduleAppointment.jsx'
 function App() {
   const location = useLocation();
 
-  const pathsWithNavbar = ['/', '/about', '/contactus','/patient_panel'];
+  const pathsWithNavbar = ['/', '/about', '/contactus', '/patient_panel'];
 
   return (
     <div>
-        <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
       {pathsWithNavbar.includes(location.pathname) && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -42,6 +45,9 @@ function App() {
         <Route path="/doctor/:id" element={<DoctorDetails />} />
         <Route path="/pr" element={<Prescriptions />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/patient-panel" element={<Dashboard />} />
+        <Route path="/patient-panel/book-appointment" element={<BookAppointment />} />
+        <Route path="/patient-panel/book-slot" element={<ScheduleAppointment />} /> 
       </Routes>
     </div>
   );
