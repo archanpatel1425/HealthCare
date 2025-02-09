@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Initialize once
@@ -15,8 +15,8 @@ const getMedicineLinks = async (medicines) => {
     const text = await result.response.text(); // Fetch response text
 
     const linkRegex = /(https?:\/\/[^\s]+)/g;
-        const links = text.match(linkRegex) || [];
-            return medicines.map((med, index) => ({
+    const links = text.match(linkRegex) || [];
+    return medicines.map((med, index) => ({
       medicine: med,
       link: links[index] || "No link found.",
     }));
@@ -35,17 +35,17 @@ export const getDoctorList = async (req, res) => {
   }
 }
 
-export const getDoctorInfo=async(req,res)=>{
+export const getDoctorInfo = async (req, res) => {
   try {
-    const doctorId=req.params.doctorId
-    const doctor=await prisma.doctor.findUnique({
-      where:{
-        doctorId:doctorId
+    const doctorId = req.params.doctorId
+    const doctor = await prisma.doctor.findUnique({
+      where: {
+        doctorId: doctorId
       }
     })
     res.status(200).json(doctor)
   } catch (error) {
-    console.log("error is : ",error)
+    console.log("error is : ", error)
   }
 }
 
@@ -141,7 +141,7 @@ export const updatePatientProfile = async (req, res) => {
 
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
-    const patientId  = req.userId;
+    const patientId = req.userId;
 
     const prescriptions = await prisma.prescription.findMany({
       where: { patient_Id: patientId },
@@ -282,42 +282,33 @@ const generateDateWiseSlots = (availability, schedule, days = 30) => {
 
   const slotsByDate = {};
 
-  // Check day of the week for each date
   dates.forEach((date) => {
     const { from, to } = availability.time;
     const startMinutes = timeToMinutes(from);
     const endMinutes = timeToMinutes(to);
 
-    // Get the day of the week for the date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
     const dayOfWeek = new Date(date).getDay();
     const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
 
-    // Skip if the day is not in the availability.days array
     if (!availability.days.includes(dayName)) {
       return;
     }
 
-    // Get booked appointment times for the specific date
     const bookedTimes = schedule
       .filter(appt => new Date(appt.date).toISOString().split('T')[0] === date)
       .map(appt => timeToMinutes(appt.time));
 
-    const bookedSlots = [];
-    const availableSlots = [];
+    const slots = [];
 
     for (let time = startMinutes; time < endMinutes; time += 30) {
       const slotFrom = minutesToTime(time);
       const slotTo = minutesToTime(time + 30);
+      const isBooked = bookedTimes.includes(time);
 
-      if (bookedTimes.includes(time)) {
-        bookedSlots.push({ from: slotFrom, to: slotTo });
-      } else {
-        availableSlots.push({ from: slotFrom, to: slotTo });
-      }
+      slots.push({ from: slotFrom, to: slotTo, available: !isBooked });
     }
 
-    // Store slots for the date if it's available
-    slotsByDate[date] = { booked: bookedSlots, available: availableSlots };
+    slotsByDate[date] = slots;
   });
 
   return slotsByDate;

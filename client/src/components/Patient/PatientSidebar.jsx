@@ -1,35 +1,37 @@
-import { Calendar, Clipboard, Cross, FileText, Heart, Home, Menu, Stethoscope, X,User, PersonStanding} from "lucide-react";
+import { Calendar, Clipboard, Cross, FileText, Heart, Home, Menu, Stethoscope, X, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-const PatientSidebar = ({ selectedComponent, setSelectedComponent }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on large screens
+const PatientSidebar = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate(); // Hook for navigation
 
   // Close sidebar by default on small screens
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setSidebarOpen(false); // Close sidebar on small screens
+        setSidebarOpen(false);
       } else {
-        setSidebarOpen(true); // Open sidebar on larger screens
+        setSidebarOpen(true);
       }
     };
 
-    handleResize(); // Run on mount
-    window.addEventListener("resize", handleResize); // Listen to resize events
-    return () => window.removeEventListener("resize", handleResize); // Cleanup
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const links = [
-    { name: "Dashboard", icon: <Home size={22} />, component: "Dashboard" },
-    { name: "Book Appointment", icon: <Calendar size={22} />, component: "BookAppointments" },
-    { name: "SkinChecker", icon: <Stethoscope size={22} />, component: "SkinChecker" },
-    { name: "SkinCancer", icon: <Heart size={22} />, component: "SkinCancer" },
-    { name: "Prescriptions", icon: <Clipboard size={22} />, component: "Prescriptions" },
-    { name: "Profile", icon: <User size={22} />, component: "Profile" },
-    { name: "Chat", icon: <PersonStanding size={22} />, component: "Chat" },
-
+    { name: "Dashboard", icon: <Home size={22} />, path: "" },
+    { name: "Book Appointment", icon: <Calendar size={22} />, path: "/book-appointment" },
+    { name: "Symptom Checker", icon: <Stethoscope size={22} />, path: "/symptom-checker" },
+    { name: "Skin Disease Prediction", icon: <Heart size={22} />, path: "/skin-disease" },
+    { name: "EHR", icon: <FileText size={22} />, path: "/ehr" },
+    { name: "Prescriptions", icon: <Clipboard size={22} />, path: "/prescriptions" },
+    { name: "Pharmacy", icon: <Cross size={22} />, path: "/pharmacy" },
+    { name: "Profile", icon: <User size={22} />, path: "/profile" },
   ];
 
   return (
@@ -42,7 +44,6 @@ const PatientSidebar = ({ selectedComponent, setSelectedComponent }) => {
         {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-[#d4e8db] shadow-xl transform transition-transform duration-300 ease-in-out
@@ -53,11 +54,11 @@ const PatientSidebar = ({ selectedComponent, setSelectedComponent }) => {
             <button
               key={idx}
               onClick={() => {
-                setSelectedComponent(link.component);
+                navigate(`/patient-panel${link.path}`); // Redirect to the specified path
                 if (window.innerWidth < 768) toggleSidebar(); // Auto-close sidebar on small screens
               }}
               className={`flex items-center w-full px-6 py-3 text-gray-800 text-left rounded-lg transition-all duration-300 
-                ${selectedComponent === link.component
+                ${window.location.pathname === link.path
                   ? "bg-green-500 text-white shadow-md"
                   : "hover:bg-green-200 hover:text-green-700"
                 }`}
@@ -72,4 +73,4 @@ const PatientSidebar = ({ selectedComponent, setSelectedComponent }) => {
   );
 };
 
-export default PatientSidebar;  
+export default PatientSidebar;

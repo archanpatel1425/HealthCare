@@ -2,11 +2,11 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { fetchUserData } from '../../Store/patient/authslice';  
+import { fetchUserData } from '../../Store/patient/authslice';
 
 const ScheduleAppointment = () => {
     const dispatch = useDispatch();
-    const { patientData } = useSelector((state) => state.auth)
+    const { patientData } = useSelector((state) => state.auth);
     const [slots, setSlots] = useState({});
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [reason, setReason] = useState('');
@@ -16,12 +16,14 @@ const ScheduleAppointment = () => {
     const VITE_API_URL = import.meta.env.VITE_API_URL;
     const location = useLocation();
     const { doctorId } = location.state;
+
     useEffect(() => {
-        dispatch(fetchUserData())
+        dispatch(fetchUserData());
         const fetchData = async () => {
             try {
                 const response = await axios.post(`${VITE_API_URL}/patient/get-schedule`, { doctorId }, { withCredentials: true });
                 setSlots(response.data);
+                console.log(response.data);
             } catch (error) {
                 console.error(error);
             }
@@ -51,12 +53,12 @@ const ScheduleAppointment = () => {
         if (!selectedSlot || (!reason && !customReason)) return;
 
         const appointmentData = {
-            patient_Id:patientData?.patientId,
+            patient_Id: patientData?.patientId,
             doctor_Id: doctorId,
             date: new Date(selectedSlot.date),
             time: selectedSlot.slot.to,
             reason: isOtherReason ? customReason : reason,
-            status: 'Scheduled'
+            status: 'Pending'
         };
 
         await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
@@ -73,18 +75,16 @@ const ScheduleAppointment = () => {
             <h2 className="text-2xl font-semibold text-center mb-6">Schedule Your Appointment</h2>
             <div className="space-y-6 overflow-y-scroll max-h-[54vh]">
                 {Object.keys(slots).map(date => {
-                    const { available, booked } = slots[date];
+                    const slotList = slots[date];
                     return (
                         <div key={date} className="border p-4 rounded-lg bg-gray-100">
                             <h3 className="text-xl font-medium">{date}</h3>
                             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                                {available.length === 0 ? (
+                                {slotList.length === 0 ? (
                                     <p className="col-span-full text-gray-500">No available slots for today.</p>
                                 ) : (
-                                    available.map(slot => {
-                                        const isBooked = booked.some(
-                                            bookedSlot => bookedSlot.from === slot.from && bookedSlot.to === slot.to
-                                        );
+                                    slotList.map(slot => {
+                                        const isBooked = !slot.available;
                                         const isSelected = selectedSlot && selectedSlot.date === date && selectedSlot.slot === slot;
 
                                         return (

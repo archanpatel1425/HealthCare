@@ -46,7 +46,7 @@ const BookAppointment = () => {
         });
     }
     return (
-        <div className="p-6 max-w-7xl mx-auto bg-white shadow-lg rounded-lg">
+        <div className="p-6 w-[85vw] mx-auto bg-white shadow-lg rounded-lg">
             <h2 className="text-3xl font-bold mb-6 text-center text-green-600">Book an Appointment</h2>
 
             <div className="flex gap-4 items-center mb-4">
