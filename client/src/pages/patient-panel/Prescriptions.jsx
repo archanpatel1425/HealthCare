@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 const Prescriptions = () => {
     const api_url = import.meta.env.VITE_API_URL;
@@ -17,6 +17,9 @@ const Prescriptions = () => {
                 setPrescriptions(response.data);
                 setFilteredPrescriptions(response.data);
             } catch (error) {
+                if (error.response.data.message === "Unauthorized: No token provided") {
+                    window.location.href = "/login"
+                }
                 console.error('Error fetching prescriptions:', error);
             } finally {
                 setLoading(false);
@@ -74,9 +77,9 @@ const Prescriptions = () => {
 
     // Format date for display
     const formatDisplayDate = (dateString) => {
-        const options = { 
-            year: 'numeric', 
-            month: 'long', 
+        const options = {
+            year: 'numeric',
+            month: 'long',
             day: 'numeric'
         };
         return new Date(dateString).toLocaleDateString(undefined, options);
@@ -89,7 +92,7 @@ const Prescriptions = () => {
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-6">Prescriptions</h2>
-            
+
             {/* Search and Filter Section */}
             <div className="mb-6 space-y-4">
                 <div className="flex flex-col md:flex-row gap-4">
@@ -103,7 +106,7 @@ const Prescriptions = () => {
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-                    
+
                     {/* Date Filter */}
                     <div className="flex-1">
                         <input
@@ -113,7 +116,7 @@ const Prescriptions = () => {
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-                    
+
                     {/* Clear Filters Button */}
                     {(searchTerm || selectedDate) && (
                         <button
@@ -140,8 +143,8 @@ const Prescriptions = () => {
             {filteredPrescriptions.length > 0 ? (
                 <div className="space-y-4">
                     {filteredPrescriptions.map((prescription) => (
-                        <div 
-                            key={prescription.prescriptionId} 
+                        <div
+                            key={prescription.prescriptionId}
                             className="bg-white border rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -161,7 +164,7 @@ const Prescriptions = () => {
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <div className="mt-4 space-y-2">
                                 <div className="bg-gray-50 p-3 rounded">
                                     <p className="font-medium">Medicines:</p>
@@ -178,8 +181,8 @@ const Prescriptions = () => {
             ) : (
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                     <p className="text-gray-600">
-                        {prescriptions.length === 0 
-                            ? 'No prescriptions found.' 
+                        {prescriptions.length === 0
+                            ? 'No prescriptions found.'
                             : 'No prescriptions match your search criteria.'}
                     </p>
                 </div>

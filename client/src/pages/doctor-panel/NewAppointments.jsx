@@ -36,10 +36,16 @@ const NewAppointments = () => {
   };
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/pending`, { doctorId: patientData?.doctorId }).then((res) => {
-      setPatients(res.data)
-      setFilterPatients(res.data)
-    })
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/pending`, { doctorId: patientData?.doctorId }).then((res) => {
+        setPatients(res.data)
+        setFilterPatients(res.data)
+      })
+    } catch (error) {
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }  
+    }
   }, [])
 
   useEffect(() => {
@@ -52,13 +58,19 @@ const NewAppointments = () => {
   }, [showPopup]);
 
   const AcceptRejectHandler = (appointmentId, status) => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/status`, { appointmentId: appointmentId, status: status }).then((res) => {
-      setPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
-      setFilterPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
-      setShowPopup(false);
-      setSelectedPatient(null);
-      showToast(status === "Accepted" ? "Appointment accepted successfully." : "Appointment rejected...", status === "Accepted" ? "success" : "error")
-    })
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/status`, { appointmentId: appointmentId, status: status }).then((res) => {
+        setPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
+        setFilterPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
+        setShowPopup(false);
+        setSelectedPatient(null);
+        showToast(status === "Accepted" ? "Appointment accepted successfully." : "Appointment rejected...", status === "Accepted" ? "success" : "error")
+      })
+    } catch (error) {
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }  
+    }
   }
 
   const filterBySearch = (name) => {

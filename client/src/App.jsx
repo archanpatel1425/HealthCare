@@ -5,7 +5,7 @@ import ChatPanel from './pages/ChatPanel.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import DoctorHome from './pages/doctor-panel/Home';
 import DoctorSignUp_Form from './pages/DoctorSignUp_Form';
-import Home from './pages/Home';
+import Home from './pages/Home.jsx';
 import Login from './pages/Login';
 import Meeting from './pages/Meeting.jsx';
 import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';

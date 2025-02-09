@@ -64,6 +64,9 @@ const Profile = () => {
             });
             return response.data.url;
         } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+              }          
             showToast('Failed to upload image', 'error');
             throw error;
         }
@@ -98,6 +101,10 @@ const Profile = () => {
                 navigate("/doctor-panel");
             }
         } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+              }
+             
             showToast("Failed to update profile", "error");
             console.error("Error updating profile:", error);
         }

@@ -216,6 +216,10 @@ const ChatPanel = () => {
                 scrollToBottom();
             }
         } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+              }
+             
             console.error('Error uploading image:', error);
             alert('Failed to upload image');
         }
