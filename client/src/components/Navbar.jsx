@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { checkUser} from '../Store/patient/authslice';
+import { checkUser } from '../Store/patient/authslice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const isloggedIN = useSelector((state) => state.auth.isauthenticated); // Ensure your reducer stores this correctly
-
   useEffect(() => {
     dispatch(checkUser());
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log(isloggedIN)
+  }, [isloggedIN]);
 
   const handleLogout = async () => {
     // await dispatch(logoutUser());
@@ -82,9 +85,8 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div
         ref={menuRef}
-        className={`fixed top-0 right-0 h-full bg-[#ebf8ef] shadow-lg transform ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        } transition-transform duration-300 ease-in-out w-64 z-50`}
+        className={`fixed top-0 right-0 h-full bg-[#ebf8ef] shadow-lg transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          } transition-transform duration-300 ease-in-out w-64 z-50`}
       >
         {/* Close Button */}
         <button

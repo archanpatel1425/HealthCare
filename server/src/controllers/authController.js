@@ -1,7 +1,7 @@
 import { checkEmailExists, checkPhoneExists, createUserInDB, fetchuserlist, findUserById, loginUser } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/tokenUtils.js';
 export const getMess = async (req, res) => {
-    res.status(200).json("hello")
+    res.status(200).json("authenticated")
 }
 export const doctorSignUp = async (req, res) => {
     try {
