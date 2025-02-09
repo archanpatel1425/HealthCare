@@ -45,8 +45,9 @@ const BookAppointment = () => {
             }
         });
     }
+
     return (
-        <div className="p-6 w-full bg-white shadow-lg rounded-lg h-full">
+        <div className="p-6 w-full bg-white shadow-lg rounded-lg h-full flex flex-col">
             <h2 className="text-3xl font-bold mb-6 text-center text-green-600">Book an Appointment</h2>
 
             {/* Search and Filter Section */}
@@ -87,11 +88,10 @@ const BookAppointment = () => {
                 </div>
             </div>
 
-            {/* Doctors List Section */}
-            <div className="bg-gray-50 p-4 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-3 text-gray-800">Available Doctors:</h3>
+            <h3 className="font-semibold mb-3 text-gray-800">Available Doctors:</h3>
+            <div className="bg-gray-50 p-4 rounded-lg shadow-md flex-grow overflow-y-auto">
                 {filteredDoctors.length > 0 ? (
-                    <ul className="list-none     overflow-y-auto">
+                    <ul className="list-none overflow-y-auto">
                         {filteredDoctors.map((doctor, index) => (
                             <li key={index} className="p-4 border-b border-gray-200 last:border-b-0 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center space-x-4">
@@ -115,7 +115,6 @@ const BookAppointment = () => {
                 )}
             </div>
         </div>
-
     );
 };
 
