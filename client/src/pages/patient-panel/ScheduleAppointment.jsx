@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Calendar, CheckCircle, Clock, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { fetchUserData } from '../../Store/patient/authslice';
 
 const ScheduleAppointment = () => {
     const dispatch = useDispatch();
-    const { patientData } = useSelector((state) => state.auth)
+    const { patientData } = useSelector((state) => state.auth);
     const [slots, setSlots] = useState({});
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [reason, setReason] = useState('');
@@ -16,17 +17,14 @@ const ScheduleAppointment = () => {
     const VITE_API_URL = import.meta.env.VITE_API_URL;
     const location = useLocation();
     const { doctorId } = location.state;
+
     useEffect(() => {
-        dispatch(fetchUserData())
+        dispatch(fetchUserData());
         const fetchData = async () => {
             try {
                 const response = await axios.post(`${VITE_API_URL}/patient/get-schedule`, { doctorId }, { withCredentials: true });
                 setSlots(response.data);
             } catch (error) {
-                if (error.response.data.message === "Unauthorized: No token provided") {
-                    window.location.href = "/login"
-                }
-
                 console.error(error);
             }
         };
@@ -38,19 +36,6 @@ const ScheduleAppointment = () => {
         setIsModalOpen(true);
     };
 
-    const handleReasonChange = (event) => {
-        const value = event.target.value;
-        setReason(value);
-        setIsOtherReason(value === 'Other');
-        if (value !== 'Other') {
-            setCustomReason('');
-        }
-    };
-
-    const handleCustomReasonChange = (event) => {
-        setCustomReason(event.target.value);
-    };
-
     const handleBookAppointment = async () => {
         if (!selectedSlot || (!reason && !customReason)) return;
 
@@ -60,16 +45,11 @@ const ScheduleAppointment = () => {
             date: new Date(selectedSlot.date),
             time: selectedSlot.slot.to,
             reason: isOtherReason ? customReason : reason,
-            status: 'Scheduled'
+            status: 'Pending'
         };
-        try {
-            await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
 
-        } catch (error) {
-            if (error.response.data.message === "Unauthorized: No token provided") {
-                window.location.href = "/login"
-            }
-        }
+        await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
+
         setSelectedSlot(null);
         setReason('');
         setCustomReason('');
@@ -78,54 +58,69 @@ const ScheduleAppointment = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto p-6 font-sans">
-            <h2 className="text-2xl font-semibold text-center mb-6">Schedule Your Appointment</h2>
-            <div className="space-y-6 overflow-y-scroll max-h-[54vh]">
-                {Object.keys(slots).map(date => {
-                    const { available, booked } = slots[date];
-                    return (
-                        <div key={date} className="border p-4 rounded-lg bg-gray-100">
-                            <h3 className="text-xl font-medium">{date}</h3>
-                            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                                {available.length === 0 ? (
-                                    <p className="col-span-full text-gray-500">No available slots for today.</p>
-                                ) : (
-                                    available.map(slot => {
-                                        const isBooked = booked.some(
-                                            bookedSlot => bookedSlot.from === slot.from && bookedSlot.to === slot.to
-                                        );
-                                        const isSelected = selectedSlot && selectedSlot.date === date && selectedSlot.slot === slot;
+        <div className="bg-gray-50 flex flex-col sm:flex-row h-full w-full shadow-lg rounded-lg">
+            {/* Main Content Area */}
+            <div className="flex-grow sm:w-3/4 p-4">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-6 flex items-center justify-center gap-2 text-gray-700">
+                    <Calendar size={28} className="text-blue-600" /> Schedule Your Appointment
+                </h2>
 
-                                        return (
-                                            <button
-                                                key={`${date}-${slot.from}`}
-                                                className={`px-4 py-2 text-sm rounded-lg transition-colors duration-300 
-                                                    ${isBooked ? 'bg-gray-300 cursor-not-allowed' : isSelected ? 'bg-green-500 text-white' : 'bg-white hover:bg-gray-100'}`}
-                                                onClick={() => !isBooked && handleSlotClick(date, slot)}
-                                                disabled={isBooked}
-                                            >
-                                                {slot.from} - {slot.to}
-                                            </button>
-                                        );
-                                    })
-                                )}
+                {/* Slots List with scroll functionality */}
+                <div className="space-y-6 h-[calc(100vh-200px)] overflow-y-auto p-4">
+                    {Object.keys(slots).map(date => {
+                        const slotList = slots[date];
+                        return (
+                            <div key={date} className="border p-4 rounded-lg bg-white shadow-md">
+                                <h3 className="text-lg sm:text-xl font-medium flex items-center gap-2 text-gray-800">
+                                    <Clock size={20} className="text-blue-500" /> {date}
+                                </h3>
+                                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                    {slotList.length === 0 ? (
+                                        <p className="col-span-full text-gray-500">No available slots for today.</p>
+                                    ) : (
+                                        slotList.map(slot => {
+                                            const isBooked = !slot.available;
+                                            const isSelected = selectedSlot && selectedSlot.date === date && selectedSlot.slot === slot;
+
+                                            return (
+                                                <button
+                                                    key={`${date}-${slot.from}`}
+                                                    className={`px-3 py-2 text-sm rounded-lg transition duration-300 w-full border-2
+                                                    ${isBooked ? 'bg-red-300 cursor-not-allowed border-red-500 ' :
+                                                            isSelected ? 'bg-green-300  border-green-500' :
+                                                                'bg-white  hover:bg-gray-100 border-green-500'}`}
+                                                    onClick={() => !isBooked && handleSlotClick(date, slot)}
+                                                    disabled={isBooked}
+                                                >
+                                                    {slot.from} - {slot.to}
+                                                </button>
+                                            );
+                                        })
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
 
+            {/* Modal for selecting appointment reason */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                        <h3 className="text-xl font-medium mb-4">Select Reason for Appointment</h3>
-
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+                        <button className="absolute top-3 right-3 text-gray-600 hover:text-gray-800" onClick={() => setIsModalOpen(false)}>
+                            <X size={20} />
+                        </button>
+                        <h3 className="text-xl font-medium mb-4 text-gray-700">Select Reason for Appointment</h3>
                         <div className="mt-4">
                             <label htmlFor="reason" className="block text-sm font-medium text-gray-700">Reason for Appointment</label>
                             <select
                                 id="reason"
                                 value={reason}
-                                onChange={handleReasonChange}
+                                onChange={(e) => {
+                                    setReason(e.target.value);
+                                    setIsOtherReason(e.target.value === 'Other');
+                                }}
                                 className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                             >
                                 <option value="">Select a reason</option>
@@ -134,33 +129,21 @@ const ScheduleAppointment = () => {
                                 <option value="Emergency">Emergency</option>
                                 <option value="Other">Other</option>
                             </select>
-
                             {isOtherReason && (
-                                <div className="mt-2">
-                                    <label htmlFor="custom-reason" className="block text-sm font-medium text-gray-700">Please specify the reason</label>
-                                    <input
-                                        type="text"
-                                        id="custom-reason"
-                                        className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
-                                        value={customReason}
-                                        onChange={handleCustomReasonChange}
-                                    />
-                                </div>
+                                <input
+                                    type="text"
+                                    className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
+                                    placeholder="Enter reason"
+                                    value={customReason}
+                                    onChange={(e) => setCustomReason(e.target.value)}
+                                />
                             )}
                         </div>
-
                         <button
                             onClick={handleBookAppointment}
-                            className="mt-4 w-full py-2 text-white bg-green-500 rounded-lg hover:bg-green-400 focus:outline-none"
+                            className="mt-4 w-full py-2 text-white bg-green-500 rounded-lg flex items-center justify-center gap-2 hover:bg-green-400"
                         >
-                            Book Appointment
-                        </button>
-
-                        <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="mt-2 w-full py-2 text-gray-700 bg-gray-300 rounded-lg hover:bg-gray-400 focus:outline-none"
-                        >
-                            Cancel
+                            <CheckCircle size={18} /> Book Appointment
                         </button>
                     </div>
                 </div>
