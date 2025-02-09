@@ -1,5 +1,30 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Initialize once
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const getMedicineLinks = async (medicines) => {
+  if (!medicines || medicines.length === 0) return [];
+
+  try {
+    const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicines.join(", ")}. The link should lead to a trusted medical or pharmaceutical website.`;
+
+    const result = await model.generateContent(prompt);
+    const text = await result.response.text(); // Fetch response text
+
+    const linkRegex = /(https?:\/\/[^\s]+)/g;
+    const links = text.match(linkRegex) || [];
+    return medicines.map((med, index) => ({
+      medicine: med,
+      link: links[index] || "No link found.",
+    }));
+  } catch (error) {
+    console.error("Error fetching medicine links:", error.message);
+    return medicines.map(med => ({ medicine: med, link: "Error fetching link." }));
+  }
+};
 
 export const getDoctorList = async (req, res) => {
   try {
@@ -10,17 +35,17 @@ export const getDoctorList = async (req, res) => {
   }
 }
 
-export const getDoctorInfo=async(req,res)=>{
+export const getDoctorInfo = async (req, res) => {
   try {
-    const doctorId=req.params.doctorId
-    const doctor=await prisma.doctor.findUnique({
-      where:{
-        doctorId:doctorId
+    const doctorId = req.params.doctorId
+    const doctor = await prisma.doctor.findUnique({
+      where: {
+        doctorId: doctorId
       }
     })
     res.status(200).json(doctor)
   } catch (error) {
-    console.log("error is : ",error)
+    console.log("error is : ", error)
   }
 }
 
@@ -116,7 +141,7 @@ export const updatePatientProfile = async (req, res) => {
 
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
-    const patientId  = req.userId;
+    const patientId = req.userId;
 
     const prescriptions = await prisma.prescription.findMany({
       where: { patient_Id: patientId },
@@ -161,20 +186,17 @@ export const getReportsByPatient = async (req, res) => {
 
 export const getDoctorsBySpecialization = async (req, res) => {
   try {
-    const { specialization } = req.params;
 
-    // Fetch doctors based on specialization
     const doctors = await prisma.doctor.findMany({
-      where: {
-        specialization: specialization
-      },
       select: {
         doctorId: true,
         first_name: true,
         last_name: true,
+        specialization: true,
         profilepic: true,
         experience: true,
         qualifications: true,
+        specialization:true,
         availability: true
       }
     });
@@ -194,23 +216,14 @@ export const getDoctorsBySpecialization = async (req, res) => {
 
 export const createAppointment = async (req, res) => {
   try {
-    const { patient_Id, doctor_Id, date, time, reason, status } = req.body;
-
-
-    if (!patient_Id || !doctor_Id || !date || !time) {
+    const appointment_data = req.body;
+    console.log(appointment_data)
+    if (!appointment_data.patient_Id || !appointment_data.doctor_Id || !appointment_data.date || !appointment_data.time) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-
-
+    console.log('here')
     const appointment = await prisma.appointment.create({
-      data: {
-        patient_Id,
-        doctor_Id,
-        date: new Date(date),
-        time,
-        reason: reason || null,
-        status: status || "pending",
-      },
+      data: appointment_data
     });
 
     res.status(201).json({
@@ -224,4 +237,81 @@ export const createAppointment = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export const getDoctorSchedule = async (req, res) => {
+  const doctorId = req.body.doctorId;
+  console.log(req.body)
+  const { availability } = await prisma.doctor.findUnique({
+    where: { doctorId },
+    select: { availability: true },
+  });
+
+  const schedule = await prisma.appointment.findMany({
+    where: { doctor_Id: doctorId },
+    select: {
+      date: true,
+      time: true,
+    },
+  });
+
+  const slotDetails = generateDateWiseSlots(availability, schedule, 30);
+  res.json(slotDetails);
+}
+
+
+const generateDateWiseSlots = (availability, schedule, days = 30) => {
+  const timeToMinutes = (time) => {
+    const [timeString, period] = time.split(' ');
+    let [hours, minutes] = timeString.split(':').map(Number);
+    if (period === 'PM' && hours < 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  };
+
+  const minutesToTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  };
+
+  const today = new Date();
+  const dates = Array.from({ length: days }, (_, i) => {
+    const date = new Date();
+    date.setDate(today.getDate() + i);
+    return date.toISOString().split('T')[0];
+  });
+
+  const slotsByDate = {};
+
+  dates.forEach((date) => {
+    const { from, to } = availability.time;
+    const startMinutes = timeToMinutes(from);
+    const endMinutes = timeToMinutes(to);
+
+    const dayOfWeek = new Date(date).getDay();
+    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
+
+    if (!availability.days.includes(dayName)) {
+      return;
+    }
+
+    const bookedTimes = schedule
+      .filter(appt => new Date(appt.date).toISOString().split('T')[0] === date)
+      .map(appt => timeToMinutes(appt.time));
+
+    const slots = [];
+
+    for (let time = startMinutes; time < endMinutes; time += 30) {
+      const slotFrom = minutesToTime(time);
+      const slotTo = minutesToTime(time + 30);
+      const isBooked = bookedTimes.includes(time);
+
+      slots.push({ from: slotFrom, to: slotTo, available: !isBooked });
+    }
+
+    slotsByDate[date] = slots;
+  });
+
+  return slotsByDate;
 };

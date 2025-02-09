@@ -72,30 +72,56 @@ export const loginUser = createAsyncThunk(
 export const fetchUserData = createAsyncThunk("auth/fetchUserData", async () => {
   try {
     const response = await axios.post(`${VITE_API_URL}/auth/getdata`, {}, { withCredentials: true });
+    
     return response.data.userData;
   } catch (error) {
-    console.log("error is  : ", error)
+    if (error.response.data.message === "Unauthorized: No token provided") {
+      window.location.href = "/login"
+    }
+    // console.log("error is  : ", error)
     return rejectWithValue(error.response.data);
   }
 });
 
-export const fetchUserList=createAsyncThunk("/auth/fetchUserList",async()=>{
+export const fetchUserList = createAsyncThunk("/auth/fetchUserList", async () => {
   try {
-    const response=await axios.post(`${VITE_API_URL}/auth/fetchuserlist`,{},{withCredentials:true})
+    const response = await axios.post(`${VITE_API_URL}/auth/fetchuserlist`, {}, { withCredentials: true })
     return response.data.userlist
   } catch (error) {
-    console.log("error is : ",error)
+    if (error.response.data.message === "Unauthorized: No token provided") {
+      window.location.href = "/login"
+    }
+   
+    console.log("error is : ", error)
   }
 })
 export const updateUserData = createAsyncThunk("auth/updateUserData", async (updatedData) => {
   try {
-    const response = await axios.post(`${VITE_API_URL}/patient/updatePatientprofile`, updatedData,{ withCredentials: true });
+    const response = await axios.post(`${VITE_API_URL}/patient/updatePatientprofile`, updatedData, { withCredentials: true });
     return response.data;
   } catch (error) {
-    console.log("the error is : ",error)
+    if (error.response.data.message === "Unauthorized: No token provided") {
+      window.location.href = "/login"
+    }
+    console.log("the error is : ", error)
   }
 });
-
+export const checkUser=createAsyncThunk("auth/checkUser",async()=>{
+  try {
+    const response = await axios.post(`${VITE_API_URL}/auth/check`, {}, { withCredentials: true })
+    if (response){
+      return true
+    }
+    else{
+      return false
+    }
+  } catch (error) {
+    if (error.response.data.message === "Unauthorized: No token provided") {
+      window.location.href = "/login"
+    }
+    console.log("the error is : ", error)
+  }
+})
 
 const patientAuthSlice = createSlice({
   name: "auth",
@@ -105,6 +131,7 @@ const patientAuthSlice = createSlice({
     profilePicUrl: null,
     patientData: null,
     signupSuccess: false,
+    isAuthenticated:false
   },
   reducers: {},
 
@@ -154,7 +181,7 @@ const patientAuthSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientData=action.payload.user
+        state.patientData = action.payload.user
         state.loginSuccess = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -167,7 +194,7 @@ const patientAuthSlice = createSlice({
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientData=action.payload
+        state.patientData = action.payload
       })
       .addCase(updateUserData.pending, (state, action) => {
         state.loading = true;
@@ -175,7 +202,10 @@ const patientAuthSlice = createSlice({
       })
       .addCase(updateUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientData=action.payload
+        state.patientData = action.payload
+      })
+      .addCase(checkUser.fulfilled, (state, action) => {
+        state.isAuthenticated = action.payload
       })
   },
 });
