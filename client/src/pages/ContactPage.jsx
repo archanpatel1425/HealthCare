@@ -27,6 +27,10 @@ const ContactPage = () => {
         alert('Failed to send message');
       }
     } catch (error) {
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }
+     
       console.error('Error:', error);
     }
   };

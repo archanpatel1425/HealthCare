@@ -52,6 +52,9 @@ const Profile = () => {
             });
             return response.data.url;
         } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+              }          
             toast.error('Failed to upload image', 'error');
             throw error;
         }

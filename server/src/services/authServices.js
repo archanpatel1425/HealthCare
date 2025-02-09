@@ -207,12 +207,29 @@ export const fetchuserlist = async (user_id) => {
         const patient = await prisma.patient.findUnique({
             where: { patientId: user_id }
         });
+
         if (doctor) {
-            const patientList = await prisma.patient.findMany();
-            return patientList;
+            // Fetch patients who have an appointment with this doctor
+            const patientList = await prisma.appointment.findMany({
+                where: { doctor_Id: user_id },
+                include: { patient: true }
+            });
+
+            // Remove duplicates based on patientId
+            const uniquePatients = Array.from(new Map(patientList.map(app => [app.patient.patientId, app.patient])).values());
+
+            return uniquePatients;
         } else if (patient) {
-            const doctorsList = await prisma.doctor.findMany();
-            return doctorsList;
+            // Fetch doctors who have consulted this patient
+            const doctorsList = await prisma.appointment.findMany({
+                where: { patient_Id: user_id },
+                include: { doctor: true }
+            });
+
+            // Remove duplicates based on doctorId
+            const uniqueDoctors = Array.from(new Map(doctorsList.map(app => [app.doctor.doctorId, app.doctor])).values());
+
+            return uniqueDoctors;
         } else {
             return { message: "User not found in both doctor and patient models." };
         }
@@ -220,4 +237,4 @@ export const fetchuserlist = async (user_id) => {
         console.error(error);
         throw new Error("Failed to fetch user list.");
     }
-}
+};

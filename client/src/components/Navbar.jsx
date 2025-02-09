@@ -1,7 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { checkUser} from '../Store/patient/authslice';
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
+
+  useEffect(() => {
+    dispatch(checkUser());
+  }, [dispatch]);
+
+  const handleLogout = async () => {
+    // await dispatch(logoutUser());
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -17,10 +30,7 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   return (
-    <div 
-      className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full 
-      h-20 fixed top-0 left-0 z-50 transition-all duration-300"
-    >    
+    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-50 transition-all duration-300">
       {/* Logo */}
       <div className="text-2xl sm:text-3xl font-bold text-green-700">
         HealCare
@@ -42,21 +52,30 @@ const Navbar = () => {
             <Link to="/contact">Contact</Link>
           </li>
         </ul>
-        <Link to="/login">
-          <button className="bg-green-500 text-white py-2 px-4 rounded-full">
-            Login/SignUp
+        {isloggedIN ? (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white py-2 px-4 rounded-full"
+          >
+            Logout
           </button>
-        </Link>
+        ) : (
+          <Link to="/login">
+            <button className="bg-green-500 text-white py-2 px-4 rounded-full">
+              Login/SignUp
+            </button>
+          </Link>
+        )}
       </div>
 
-      {/* Mobile Menu Button - Visible on md & smaller */}
+      {/* Mobile Menu Button */}
       <div className="flex md:hidden items-center">
         <button
           onClick={() => setIsMenuOpen(true)}
           className="text-green-700 text-3xl"
           aria-label="Open Menu"
         >
-          ☰ {/* Menu icon */}
+          ☰
         </button>
       </div>
 
@@ -73,7 +92,7 @@ const Navbar = () => {
           className="text-green-700 text-3xl absolute top-4 right-4"
           aria-label="Close Menu"
         >
-          ✕ {/* Close icon */}
+          ✕
         </button>
 
         {/* Menu Items */}
@@ -106,14 +125,26 @@ const Navbar = () => {
           >
             Contact
           </Link>
-          <Link to="/login">
+          {isloggedIN ? (
             <button
-              className="bg-green-500 text-white py-2 px-4 rounded-full mt-4"
-              onClick={() => setIsMenuOpen(false)}
+              className="bg-red-500 text-white py-2 px-4 rounded-full mt-4"
+              onClick={() => {
+                handleLogout();
+                setIsMenuOpen(false);
+              }}
             >
-              Login/SignUp
+              Logout
             </button>
-          </Link>
+          ) : (
+            <Link to="/login">
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded-full mt-4"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Login/SignUp
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </div>
