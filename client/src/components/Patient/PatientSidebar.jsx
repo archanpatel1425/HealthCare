@@ -24,11 +24,9 @@ const PatientSidebar = () => {
   const links = [
     { name: "Dashboard", icon: <Home size={22} />, path: "" },
     { name: "Book Appointment", icon: <Calendar size={22} />, path: "/book-appointment" },
-    { name: "Symptom Checker", icon: <Stethoscope size={22} />, path: "/symptom-checker" },
-    { name: "Skin Disease Prediction", icon: <Heart size={22} />, path: "/skin-disease" },
-    { name: "EHR", icon: <FileText size={22} />, path: "/ehr" },
+    { name: "Skin Checker", icon: <Stethoscope size={22} />, path: "/skin-checker" },
+    { name: "Skin Cancer", icon: <Heart size={22} />, path: "/skin-cancer" },
     { name: "Prescriptions", icon: <Clipboard size={22} />, path: "/prescriptions" },
-    { name: "Pharmacy", icon: <Cross size={22} />, path: "/pharmacy" },
     { name: "Profile", icon: <User size={22} />, path: "/profile" },
   ];
 

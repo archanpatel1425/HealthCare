@@ -4,6 +4,10 @@ import PatientLayout from "../../components/Patient/PatientLayout";
 import BookAppointment from "./BookAppointment";
 import Dashboard from "./Dashboard";
 import ScheduleAppointment from "./ScheduleAppointment";
+import SkinCancer from '../../SkinCancer'
+import SkinChecker from '../../SkinChecker'
+import Profile from '../patient-panel/Profile'
+import Prescriptions from '../patient-panel/Prescriptions'
 
 export default function PatientHome() {
 
@@ -14,6 +18,10 @@ export default function PatientHome() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/book-appointment" element={<BookAppointment />} />
           <Route path="/book-slot" element={<ScheduleAppointment />} />
+          <Route path="/skin-cancer" element={<SkinCancer />} />
+          <Route path="/skin-checker" element={<SkinChecker />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/prescriptions" element={<Prescriptions />} />
         </Routes>
       </PatientLayout>
     </div>

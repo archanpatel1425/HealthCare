@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaBriefcaseMedical, FaFilter, FaUserMd } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import DoctorDetails from './DoctorDetails';
 
 const BookAppointment = () => {
     const [search, setSearch] = useState('');
@@ -9,6 +10,7 @@ const BookAppointment = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [doctors, setDoctors] = useState([]);
     const [specializations, setSpecializations] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -48,41 +50,46 @@ const BookAppointment = () => {
             }
         });
     }
+    const openModal = (doctor) => {
+        setSelectedDoctor(doctor);
+    };
+
+    const closeModal = () => {
+        setSelectedDoctor(null);
+    };
 
     return (
         <div className="p-6 w-full bg-white shadow-lg rounded-lg h-full flex flex-col">
-            <h2 className="text-3xl font-bold mb-6 text-center text-green-600">Book an Appointment</h2>
-
-            {/* Search and Filter Section */}
+            <h2 className="text-3xl font-bold mb-6 text-center text-purple-600">Book an Appointment</h2>
+            
             <div className="flex gap-4 items-center mb-4 flex-wrap">
                 <input
                     type="text"
                     placeholder="Search by doctor name..."
-                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="flex-1 p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-
                 <div className="relative">
                     <button
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="p-3 flex items-center gap-2 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="p-3 flex items-center gap-2 border border-teal-200 rounded-lg bg-teal-50 hover:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
                     >
                         <FaFilter /> Filter
                     </button>
                     {isDropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 shadow-lg rounded-lg p-3 z-10">
-                            <h3 className="font-semibold text-gray-700 mb-2">Filter by Specialization</h3>
+                        <div className="absolute right-0 mt-2 w-64 bg-white border border-purple-200 shadow-lg rounded-lg p-3 z-10">
+                            <h3 className="font-semibold text-purple-800 mb-2">Filter by Specialization</h3>
                             <div className="max-h-48 overflow-auto">
                                 {specializations.map((spec) => (
-                                    <label key={spec} className="flex items-center space-x-2 p-1 cursor-pointer hover:bg-gray-100 rounded">
+                                    <label key={spec} className="flex items-center space-x-2 p-1 cursor-pointer hover:bg-purple-50 rounded">
                                         <input
                                             type="checkbox"
                                             checked={selectedSpecializations.includes(spec)}
                                             onChange={() => handleSpecializationChange(spec)}
-                                            className="accent-green-500"
+                                            className="accent-purple-500"
                                         />
-                                        <span className="text-gray-700">{spec}</span>
+                                        <span className="text-purple-900">{spec}</span>
                                     </label>
                                 ))}
                             </div>
@@ -91,32 +98,59 @@ const BookAppointment = () => {
                 </div>
             </div>
 
-            <h3 className="font-semibold mb-3 text-gray-800">Available Doctors:</h3>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-md flex-grow overflow-y-auto">
+            <h3 className="font-semibold mb-3 text-purple-800">Available Doctors:</h3>
+            <div className="bg-purple-50 p-4 rounded-lg shadow-md flex-grow overflow-y-auto">
                 {filteredDoctors.length > 0 ? (
                     <ul className="list-none overflow-y-auto">
                         {filteredDoctors.map((doctor, index) => (
-                            <li key={index} className="p-4 border-b border-gray-200 last:border-b-0 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                            <li key={index} className="p-4 bg-white border border-purple-100 rounded-lg mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between hover:border-purple-300 transition-colors duration-200">
                                 <div className="flex items-center space-x-4">
-                                    <img src={doctor.profilepic} alt={doctor.first_name} className="w-16 h-16 rounded-full border" />
+                                    <img src={doctor.profilepic} alt={doctor.first_name} className="w-16 h-16 rounded-full border-2 border-purple-200" />
                                     <div>
-                                        <p className="font-medium text-green-600 flex items-center gap-2">
-                                            <FaUserMd /> {doctor.first_name} {doctor.last_name}
+                                        <p className="font-medium text-purple-600 flex items-center gap-2">
+                                            {doctor.first_name} {doctor.last_name}
                                         </p>
-                                        <p className="text-gray-700 flex items-center gap-2"><FaBriefcaseMedical /> {doctor.specialization}</p>
-                                        <p className="text-gray-700">Experience: {doctor.experience} years</p>
+                                        <p className="text-purple-800 flex items-center gap-2">
+                                            <FaBriefcaseMedical className="text-teal-500" /> {doctor.specialization}
+                                        </p>
+                                        <p className="text-purple-600">Experience: {doctor.experience} years</p>
                                     </div>
                                 </div>
-                                <button className="mt-2 sm:mt-0 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={() => handleBookAppointment(doctor.doctorId)}>
-                                    Book Appointment
-                                </button>
+                                <div className="flex gap-3 mt-2 sm:mt-0">
+                                    <button 
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200" 
+                                        onClick={() => openModal(doctor)}
+                                    >
+                                        More Info
+                                    </button>
+                                    <button 
+                                        className="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-200" 
+                                        onClick={() => handleBookAppointment(doctor.doctorId)}
+                                    >
+                                        Book Appointment
+                                    </button>
+                                </div>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-red-500">No doctors found.</p>
+                    <p className="text-red-500 text-center font-medium">No doctors found.</p>
                 )}
             </div>
+            
+            {selectedDoctor && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+                        <button 
+                            onClick={closeModal} 
+                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                        >
+                            &times;
+                        </button>
+                        <DoctorDetails doctor1={selectedDoctor} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
