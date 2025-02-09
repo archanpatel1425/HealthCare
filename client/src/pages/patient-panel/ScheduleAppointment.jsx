@@ -56,7 +56,7 @@ const ScheduleAppointment = () => {
             date: new Date(selectedSlot.date),
             time: selectedSlot.slot.to,
             reason: isOtherReason ? customReason : reason,
-            status: 'Scheduled'
+            status: 'Pending'
         };
 
         await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
