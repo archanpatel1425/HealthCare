@@ -79,7 +79,10 @@ const RecentAppointments = () => {
                     console.log(response.data)
                     setAppointments(response.data)
                 })
-                .catch((error) => console.error(error))
+                .catch((error) => {if (error.response.data.message === "Unauthorized: No token provided") {
+                    window.location.href = "/login"
+                  } console.log(error)}
+                 )
         }
 
         fetchData()

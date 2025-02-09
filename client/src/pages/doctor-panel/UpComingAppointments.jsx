@@ -34,10 +34,16 @@ const UpComingAppointments = () => {
   };
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/accepted`, { doctorId: patientData?.doctorId }).then((res) => {
-      setPatients(res.data)
-      setFilterPatients(res.data)
-    })
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/accepted`, { doctorId: patientData?.doctorId }).then((res) => {
+        setPatients(res.data)
+        setFilterPatients(res.data)
+      })
+    } catch (error) {
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }  
+    }
   }, [])
 
   useEffect(() => {

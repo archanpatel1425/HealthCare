@@ -10,20 +10,20 @@ import PatientSignUp_Form from './pages/PatientSignUp_Form';
 
 
 import { ToastContainer } from 'react-toastify';
+import ScheduleAppointment from './components/Patient/ScheduleAppointment.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import DoctorHome from './pages/doctor-panel/Home';
+import BookAppointment from './pages/patient-panel/BookAppointment.jsx';
+import Dashboard from './pages/patient-panel/Dashboard.jsx';
 import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';
 import DoctorList from './pages/patient-panel/DoctorList.jsx';
 import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
 import SkinCancer from './SkinCancer.jsx';
 import SkinChecker from './SkinChecker.jsx';
-import Dashboard from './pages/patient-panel/Dashboard.jsx';
-import BookAppointment from './pages/patient-panel/BookAppointment.jsx';
-import ScheduleAppointment from './components/Patient/ScheduleAppointment.jsx'
 function App() {
   const location = useLocation();
 
-  const pathsWithNavbar = ['/', '/about', '/contactus', '/patient_panel'];
+  const pathsWithNavbar = ['/', '/about', '/contactus', '/patient-panel'];
 
   return (
     <div>
@@ -35,7 +35,7 @@ function App() {
         <Route path="/meet/:meetId" element={<Meeting />} />
         <Route path="/signup/doctor" element={<DoctorSignUp_Form />} />
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
-        <Route path="/patient_panel" element={<PatientPanel />} />
+        <Route path="/patient-panel" element={<PatientPanel />} />
 
         <Route path="/chat" element={<ChatPanel />} />
         <Route path="/doctor-panel/*" element={<DoctorHome />} />
@@ -47,7 +47,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/patient-panel" element={<Dashboard />} />
         <Route path="/patient-panel/book-appointment" element={<BookAppointment />} />
-        <Route path="/patient-panel/book-slot" element={<ScheduleAppointment />} /> 
+        <Route path="/patient-panel/book-slot" element={<ScheduleAppointment />} />
       </Routes>
     </div>
   );

@@ -35,6 +35,10 @@ const SkinCancer = () => {
       setResult(response.data.result);
       setInfo(response.data.info);
     } catch (err) {
+      if (err.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }
+    
       console.error("Upload error:", err);
       setError(err.response?.data?.error || "Error uploading image");
     } finally {

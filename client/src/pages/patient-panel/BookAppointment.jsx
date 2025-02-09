@@ -19,6 +19,9 @@ const BookAppointment = () => {
                 const specs = [...new Set(response.data.doctors.map(doc => doc.specialization))];
                 setSpecializations(specs);
             } catch (error) {
+                if (error.response.data.message === "Unauthorized: No token provided") {
+                    window.location.href = "/login"
+                  }              
                 console.error(error);
             }
         };
@@ -39,7 +42,7 @@ const BookAppointment = () => {
     );
 
     const handleBookAppointment = (doctorId) => {
-        navigate(`/patient-panel/book-slot`, {
+        navigate(`/patientpanel/book-slot`, {
             state: {
                 doctorId,
             }

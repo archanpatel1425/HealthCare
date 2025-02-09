@@ -27,6 +27,10 @@ const SkinChecker = () => {
       setResult(response.data.prediction);
       setError(null);
     } catch (error) {
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }
+     
       setError("Error: Unable to get prediction.");
       console.error(error);
     }

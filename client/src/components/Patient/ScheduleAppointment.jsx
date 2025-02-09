@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { fetchUserData } from '../../Store/patient/authslice';  
+import { fetchUserData } from '../../Store/patient/authslice';
 
 const ScheduleAppointment = () => {
     const dispatch = useDispatch();
@@ -23,6 +23,10 @@ const ScheduleAppointment = () => {
                 const response = await axios.post(`${VITE_API_URL}/patient/get-schedule`, { doctorId }, { withCredentials: true });
                 setSlots(response.data);
             } catch (error) {
+                if (error.response.data.message === "Unauthorized: No token provided") {
+                    window.location.href = "/login"
+                }
+
                 console.error(error);
             }
         };
@@ -51,16 +55,21 @@ const ScheduleAppointment = () => {
         if (!selectedSlot || (!reason && !customReason)) return;
 
         const appointmentData = {
-            patient_Id:patientData?.patientId,
+            patient_Id: patientData?.patientId,
             doctor_Id: doctorId,
             date: new Date(selectedSlot.date),
             time: selectedSlot.slot.to,
             reason: isOtherReason ? customReason : reason,
             status: 'Scheduled'
         };
+        try {
+            await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
 
-        await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
-
+        } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+            }
+        }
         setSelectedSlot(null);
         setReason('');
         setCustomReason('');
