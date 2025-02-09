@@ -108,7 +108,7 @@ export const updateUserData = createAsyncThunk("auth/updateUserData", async (upd
 });
 export const checkUser=createAsyncThunk("auth/checkUser",async()=>{
   try {
-    const response=await axios.post(`${VITE_API_URL}/auth/check`,{},{withCredentials:true})
+    const response = await axios.post(`${VITE_API_URL}/auth/check`, {}, { withCredentials: true })
     if (response){
       return true
     }
@@ -131,7 +131,7 @@ const patientAuthSlice = createSlice({
     profilePicUrl: null,
     patientData: null,
     signupSuccess: false,
-    isauthenticated:false
+    isAuthenticated:false
   },
   reducers: {},
 
@@ -204,8 +204,8 @@ const patientAuthSlice = createSlice({
         state.loading = false;
         state.patientData = action.payload
       })
-      .addCase(checkUser.fulfilled,(state,action)=>{
-        state.isauthenticated = action.payload
+      .addCase(checkUser.fulfilled, (state, action) => {
+        state.isAuthenticated = action.payload
       })
   },
 });

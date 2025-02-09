@@ -42,7 +42,7 @@ const BookAppointment = () => {
     );
 
     const handleBookAppointment = (doctorId) => {
-        navigate(`/patientpanel/book-slot`, {
+        navigate(`/patient-panel/book-slot`, {
             state: {
                 doctorId,
             }
