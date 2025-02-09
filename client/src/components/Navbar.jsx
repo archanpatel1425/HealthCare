@@ -36,7 +36,7 @@ const Navbar = () => {
         HealCare
       </div>
 
-      {/* Desktop Menu */}
+      {/* Desktop   Menu */}
       <div className="hidden md:flex space-x-6 lg:space-x-12 items-center text-base font-semibold">
         <ul className="flex space-x-4 lg:space-x-8">
           <li className="hover:text-green-800 transition duration-300">
