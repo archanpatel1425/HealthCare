@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { checkUser } from '../Store/patient/authslice';
+import { checkUser, fetchUserData } from '../Store/patient/authslice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const isloggedIN = useSelector((state) => state.auth.isauthenticated); // Ensure your reducer stores this correctly
-  useEffect(() => {
-    dispatch(checkUser());
-  }, [dispatch]);
+  const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
+  const patientData = useSelector((state) => state.auth.patientData);
 
   useEffect(() => {
-    console.log(isloggedIN)
-  }, [isloggedIN]);
+    dispatch(checkUser());
+    if (isloggedIN) {
+      dispatch(fetchUserData());
+    }
+    console.log(patientData)
+  }, [dispatch, isloggedIN]);
 
   const handleLogout = async () => {
     // await dispatch(logoutUser());
@@ -46,14 +48,14 @@ const Navbar = () => {
             <Link to="/">Home</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
-            <Link to="/services">Services</Link>
-          </li>
-          <li className="hover:text-green-800 transition duration-300">
             <Link to="/about">About</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
             <Link to="/contact">Contact</Link>
           </li>
+          {isloggedIN && <li className="hover:text-green-800 transition duration-300">
+            <Link to="/patient-panel">Dashboard</Link>
+          </li>}
         </ul>
         {isloggedIN ? (
           <button

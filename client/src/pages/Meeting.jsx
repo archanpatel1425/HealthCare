@@ -1,10 +1,14 @@
 import { Camera, Mic, MicOff, Monitor, PhoneOff, Video, VideoOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from 'react-router-dom';
+import Draggable from "react-draggable";
+import { useNavigate, useParams } from 'react-router-dom';
 import io from "socket.io-client";
 import "../App.css";
 
-const socket = io("http://localhost:5000");
+const socket = io("http://localhost:5000", {
+  withCredentials: true,
+  // transports: ["websocket", "polling"]
+});
 
 function Meeting() {
   const myVideoRef = useRef(null);
@@ -17,8 +21,8 @@ function Meeting() {
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [hasLeft, setHasLeft] = useState(false);
-
+  const navigate = useNavigate();
+  
   const toggleVideo = () => {
     if (localStreamRef.current) {
       const videoTrack = localStreamRef.current
@@ -293,113 +297,73 @@ function Meeting() {
 
       // Notify server
       socket.emit('leave-room', "1234");
-
-      // Update UI state
-      setHasLeft(true);
       setRemoteStream(null);
       setIsScreenSharing(false);
+      navigate('/')
     } catch (err) {
       console.error("Error leaving meeting:", err);
     }
   };
 
-  const rejoinMeeting = async () => {
-    setHasLeft(false);
-    // Reinitialize everything
-    await initializeConnection();
-  };
-
-  if (hasLeft) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
-        <div className="text-white text-xl mb-6">You have left the meeting</div>
-        <button
-          onClick={rejoinMeeting}
-          className="px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white rounded-lg transition-colors"
-        >
-          Rejoin Meeting
-        </button>
-      </div>
-    );
-  }
-
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
-      <div className="relative w-full max-w-4xl">
-        {/* Video Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          {/* Remote Video */}
-          <div className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden">
-            <video
-              ref={remoteVideoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-            {!remoteStream && (
-              <div className="absolute inset-0 flex items-center justify-center text-white">
-                Waiting for others to join...
-              </div>
-            )}
+    <div className="relative flex items-center justify-center min-h-screen bg-gray-900">
+      {/* Remote Video (Full Screen) */}
+      <div className="absolute inset-0 bg-gray-800">
+        <video
+          ref={remoteVideoRef}
+          autoPlay
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        {!remoteStream && (
+          <div className="absolute inset-0 flex items-center justify-center text-white text-lg">
+            Waiting for others to join...
           </div>
-          {/* Local Video */}
-          <div className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden">
-            <video
-              ref={myVideoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover"
-            />
-          </div>
+        )}
+      </div>
+
+      {/* Local Video (Draggable & Bottom-Right Positioned) */}
+      <Draggable bounds="parent">
+        <div className="absolute bottom-4 right-4 w-40 h-28 bg-gray-800 rounded-lg overflow-hidden cursor-move">
+          <video
+            ref={myVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+          />
         </div>
+      </Draggable>
 
-        {/* Controls */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
-          <button
-            onClick={toggleVideo}
-            className={`p-4 rounded-full ${isVideoOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-500 hover:bg-red-400'
-              } transition-colors`}
-          >
-            {isVideoOn ? (
-              <Video className="w-6 h-6 text-white" />
-            ) : (
-              <VideoOff className="w-6 h-6 text-white" />
-            )}
-          </button>
+      {/* Controls */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
+        <button
+          onClick={toggleVideo}
+          className={`p-4 rounded-full ${isVideoOn ? "bg-gray-700 hover:bg-gray-600" : "bg-red-500 hover:bg-red-400"} transition-colors`}
+        >
+          {isVideoOn ? <Video className="w-6 h-6 text-white" /> : <VideoOff className="w-6 h-6 text-white" />}
+        </button>
 
-          <button
-            onClick={toggleAudio}
-            className={`p-4 rounded-full ${isAudioOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-500 hover:bg-red-400'
-              } transition-colors`}
-          >
-            {isAudioOn ? (
-              <Mic className="w-6 h-6 text-white" />
-            ) : (
-              <MicOff className="w-6 h-6 text-white" />
-            )}
-          </button>
+        <button
+          onClick={toggleAudio}
+          className={`p-4 rounded-full ${isAudioOn ? "bg-gray-700 hover:bg-gray-600" : "bg-red-500 hover:bg-red-400"} transition-colors`}
+        >
+          {isAudioOn ? <Mic className="w-6 h-6 text-white" /> : <MicOff className="w-6 h-6 text-white" />}
+        </button>
 
-          <button
-            onClick={toggleScreenShare}
-            className={`p-4 rounded-full ${isScreenSharing ? 'bg-blue-500 hover:bg-blue-400' : 'bg-gray-700 hover:bg-gray-600'
-              } transition-colors`}
-          >
-            {isScreenSharing ? (
-              <Camera className="w-6 h-6 text-white" />
-            ) : (
-              <Monitor className="w-6 h-6 text-white" />
-            )}
-          </button>
+        <button
+          onClick={toggleScreenShare}
+          className={`p-4 rounded-full ${isScreenSharing ? "bg-blue-500 hover:bg-blue-400" : "bg-gray-700 hover:bg-gray-600"} transition-colors`}
+        >
+          {isScreenSharing ? <Camera className="w-6 h-6 text-white" /> : <Monitor className="w-6 h-6 text-white" />}
+        </button>
 
-          <button
-            onClick={leaveMeeting}
-            className="p-4 rounded-full bg-red-500 hover:bg-red-400 transition-colors"
-          >
-            <PhoneOff className="w-6 h-6 text-white" />
-          </button>
-        </div>
+        <button
+          onClick={leaveMeeting}
+          className="p-4 rounded-full bg-red-500 hover:bg-red-400 transition-colors"
+        >
+          <PhoneOff className="w-6 h-6 text-white" />
+        </button>
       </div>
     </div>
   );
