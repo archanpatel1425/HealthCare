@@ -15,6 +15,7 @@ import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import SkinCancer from './SkinCancer.jsx';
 import SkinChecker from './SkinChecker.jsx';
+import Current from './Current.jsx';
 function App() {
 
   const location = useLocation();
@@ -41,6 +42,7 @@ function App() {
         <Route path="/doctor/:id" element={<DoctorDetails />} />
         <Route path="/pr" element={<Prescriptions />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/cr" element={<Current />} />
       </Routes>
     </div>
   );

@@ -308,7 +308,7 @@ function Meeting() {
       setRemoteStream(null);
       setIsScreenSharing(false);
       if(patientData?.doctorId){
-        navigate('/prescriptionform')
+        navigate('//doctor-panel/prescription-form')
       }
       else{
         navigate('/patient-panel')

@@ -10,6 +10,7 @@ const RecentAppointments = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [dateFilter, setDateFilter] = useState('');
     const VITE_API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
         const fetchData = () => {
             axios.get(`${VITE_API_URL}/patient/getAppointments`, { withCredentials: true })
@@ -64,6 +65,33 @@ const RecentAppointments = () => {
 
     const handleChat = (appointmentId) => {
         navigate(`/chat`);
+    };
+
+    const isChatButtonEnabled = (appointmentDate, appointmentTime) => {
+        const now = new Date();
+        const appointmentDateTime = new Date(appointmentDate);
+        console.log("ap : ",appointmentDateTime)
+        console.log("now : ",now)
+        // Check if the appointment is today
+        if (appointmentDateTime.toDateString() !== now.toDateString()) {
+            console.log("in if")
+            return false;
+        }
+
+        // Convert appointment time (assuming format is "17:00" for 5 PM)
+        const [hours, minutes] = appointmentTime.split(':').map(Number);
+        const appointmentHour = hours;
+        const appointmentMinute = minutes;
+
+        // Calculate window start (30 minutes before) and end (45 minutes after)
+        const windowStart = new Date(appointmentDateTime);
+        windowStart.setHours(appointmentHour, appointmentMinute - 30, 0);
+
+        const windowEnd = new Date(appointmentDateTime);
+        windowEnd.setHours(appointmentHour, appointmentMinute + 45, 0);
+        console.log(windowStart,windowEnd)
+        // Check if current time is within the window
+        return now >= windowStart && now <= windowEnd;
     };
 
     const getStatusColor = (status) => {
@@ -132,7 +160,12 @@ const RecentAppointments = () => {
                             </button>
                             <button
                                 onClick={() => handleChat(appointment.appointmentId)}
-                                className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                disabled={!isChatButtonEnabled(appointment.date, appointment.time)}
+                                className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+                                    isChatButtonEnabled(appointment.date, appointment.time)
+                                        ? 'bg-green-500 text-white hover:bg-green-600'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
                             >
                                 <MessageCircle className="w-4 h-4 mr-2" />
                                 Chat
