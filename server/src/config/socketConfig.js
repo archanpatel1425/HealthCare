@@ -26,41 +26,42 @@ export const initializeSocket = (server) => {
             origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
             methods: ["GET", "POST"],
             credentials: true,
-            allowedHeaders: ["Authorization"]
+            // allowedHeaders: ["Authorization"]
         },
-        transports: ["websocket", "polling"]
+        // transports: ["websocket", "polling"]
     });
 
-    const activeUsers = new Map();
+    const activeUsers = new Map();  
 
-    io.use(verifySocketToken);
+    // io.use(verifySocketToken);
 
     io.on("connection", (socket) => {
         // Store user connection
-        activeUsers.set(socket.user.id, socket.id);
+        // activeUsers.set(socket.user.id, socket.id);
         io.emit('activeUsers', Array.from(activeUsers.keys()));
 
         socket.on("join-room", (meetId) => {
             socket.join(meetId);
             socket.to(meetId).emit("user-connected", socket.id);
-          });
-      
-          socket.on("send-offer", ({ meetId, offer }) => {
+        });
+
+        socket.on("send-offer", ({ meetId, offer }) => {
             socket.to(meetId).emit("receive-offer", { offer, senderId: socket.id });
-          });
-      
-          socket.on("send-answer", ({ meetId, answer, senderId }) => {
+        });
+
+        socket.on("send-answer", ({ meetId, answer, senderId }) => {
             io.to(senderId).emit("receive-answer", { answer });
-          });
-      
-          socket.on("send-ice-candidate", ({ meetId, candidate }) => {
+        });
+
+        socket.on("send-ice-candidate", ({ meetId, candidate }) => {
             socket.to(meetId).emit("receive-ice-candidate", { candidate });
-          });
-      
-          socket.on("leave-room", (meetId) => {
+        });
+
+        socket.on("leave-room", (meetId) => {
             socket.leave(meetId);
             socket.to(meetId).emit("user-disconnected", socket.id);
-          });
+        });
+
         socket.on('sendMessage', async (data) => {
             try {
                 const { receiverId, messageType, message } = data;
@@ -152,7 +153,6 @@ export const initializeSocket = (server) => {
         });
 
         socket.on('markAsRead', async (messageId) => {
-            console.log("in read")
             try {
                 const message = await prisma.chat.update({
                     where: { id: messageId },
@@ -191,7 +191,7 @@ export const initializeSocket = (server) => {
             }
         });
         socket.on('disconnect', () => {
-            activeUsers.delete(socket.user.id);
+            // activeUsers.delete(socket.user.id);
             io.emit('activeUsers', Array.from(activeUsers.keys()));
         });
     });

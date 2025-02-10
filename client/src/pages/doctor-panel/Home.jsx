@@ -8,6 +8,7 @@ import UpComingAppointments from "./UpComingAppointments";
 import ConsultedPatients from "./ConsultedPatients";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
+import PrescriptionForm from "./PrescriptionForm";
 
 export default function DoctorPanel() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function DoctorPanel() {
             <Route path="/upcoming-appointments" element={<UpComingAppointments />} />
             <Route path="/consulted-patients" element={<ConsultedPatients />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/prescription-form" element={<PrescriptionForm />} />
           </Routes>
         </div>
       </div>

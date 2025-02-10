@@ -3,8 +3,9 @@ const prisma = new PrismaClient();
 
 const getDoctorProfile = async (req, res) => {
   try {
+
     const doctorId = req.body.doctorId; // Extract doctor ID from token
-    console.log(doctorId);
+
     const doctor = await prisma.doctor.findUnique({
       where: { doctorId: doctorId },
       select: {
@@ -21,7 +22,6 @@ const getDoctorProfile = async (req, res) => {
         availability: true,
       },
     });
-    console.log(doctor);
     if (!doctor) return res.status(404).json({ message: "Doctor not found" });
 
     res.json(doctor);
@@ -48,31 +48,31 @@ const updateDoctorProfile = async (req, res) => {
       availability,
     } = req.body.formData;
 
-  const updatedDoctor = await prisma.doctor.update({
-    where: { doctorId },
-    data: {
-      first_name,
-      last_name,
-      gender,
-      phone_no,
-      profilepic,
-      email,
-      specialization,
-      experience,
-      qualifications,
-      availability:JSON.parse(availability),
-    },
-  });
+    const updatedDoctor = await prisma.doctor.update({
+      where: { doctorId },
+      data: {
+        first_name,
+        last_name,
+        gender,
+        phone_no,
+        profilepic,
+        email,
+        specialization,
+        experience,
+        qualifications,
+        availability: JSON.parse(availability),
+      },
+    });
 
-  res.json({
-    message: "Profile updated successfully",
-    doctor: updatedDoctor,
-  });
-} catch (error) {
-  res
-    .status(500)
-    .json({ message: "Error updating profile", error: error.message });
-}
+    res.json({
+      message: "Profile updated successfully",
+      doctor: updatedDoctor,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating profile", error: error.message });
+  }
 };
 
 const updateAppointmentStatus = async (req, res) => {
@@ -94,6 +94,39 @@ const updateAppointmentStatus = async (req, res) => {
   }
 };
 
+const submitPrescription = async (req, res) => {
+  try {
+    const { data, notes, appointmentId, patientId, doctorId } = req.body;
+    if (!appointmentId || !patientId || !doctorId || !data) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Convert medicine array into JSON string
+    const medicines = JSON.stringify(data);
+
+    // Insert prescription into the database
+    const newPrescription = await prisma.prescription.create({
+      data: {
+        appointment_Id: appointmentId,
+        patient_Id: patientId,
+        doctor_Id: doctorId,
+        medicines: medicines,
+        notes: notes
+      }
+    });
+
+    res.status(201).json({
+      message: "Prescription created successfully",
+      prescription: newPrescription
+    });
+
+  } catch (error) {
+    console.log(error)
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: error.message });
+  }
+};
 
 const getPendingAppointments = async (req, res) => {
   try {
@@ -105,6 +138,9 @@ const getPendingAppointments = async (req, res) => {
         status: "Scheduled",
       },
       include: { patient: true },
+      orderBy: {
+        date: "desc",
+      },
     });
 
     res.json(pendingAppointments);
@@ -116,6 +152,7 @@ const getPendingAppointments = async (req, res) => {
   }
 };
 
+
 const getAcceptedAppointments = async (req, res) => {
   try {
     const doctorId = req.body.doctorId;
@@ -126,6 +163,9 @@ const getAcceptedAppointments = async (req, res) => {
         status: "Accepted",
       },
       include: { patient: true },
+      orderBy: {
+        date: "desc",
+      },
     });
 
     res.json(acceptedAppointments);
@@ -146,6 +186,9 @@ const getDoneAppointments = async (req, res) => {
         doctor_Id: doctorId,
         status: "Completed",
       },
+      orderBy: {
+        date: "desc",
+      },
       include: { patient: true },
     });
 
@@ -158,4 +201,4 @@ const getDoneAppointments = async (req, res) => {
   }
 };
 
-export { getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus };
+export { getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus, submitPrescription };

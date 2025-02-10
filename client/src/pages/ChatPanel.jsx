@@ -216,6 +216,10 @@ const ChatPanel = () => {
                 scrollToBottom();
             }
         } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+              }
+             
             console.error('Error uploading image:', error);
             alert('Failed to upload image');
         }
@@ -280,13 +284,13 @@ const ChatPanel = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
-            <div className="w-1/3 bg-white shadow-lg p-4 overflow-y-auto">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat Users</h2>
+        <div className="flex h-screen bg-green-900">
+            <div className={`w-full md:w-1/3 bg-green-50 shadow-lg p-4 overflow-y-auto ${selectedUser ? 'hidden md:block' : 'block'}`}>
+                <h2 className="text-xl font-semibold text-green-800 mb-4">Chat With Users</h2>
                 <input
                     type="text"
-                    placeholder="Search users..."
-                    className="w-full p-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Search Users..."
+                    className="placeholder-green-900 w-full bg-green-200 p-2 mb-4 text-green-800 border border-green-900 rounded-md focus:outline-none focus:ring-2 focus:ring-green-950"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
@@ -297,8 +301,7 @@ const ChatPanel = () => {
                         {filteredUsers.map((user, index) => (
                             <div
                                 key={index}
-                                className={`flex items-center p-2 rounded-lg cursor-pointer transition ${selectedUser?.id === user.id ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100'
-                                    }`}
+                                className={`flex items-center p-2 rounded-lg cursor-pointer transition ${selectedUser?.id === user.id ? 'bg-green-300 text-green-900' : 'bg-gray-100 hover:bg-blue-100'}`}
                                 onClick={() => {
                                     setSelectedUser(user);
                                     setMessages([]);
@@ -313,110 +316,57 @@ const ChatPanel = () => {
                                         alt="Profile"
                                         className="w-10 h-10 rounded-full mr-3"
                                     />
-                                    <span
-                                        className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(user.doctorId || user.patientId)
-                                            ? 'bg-green-500'
-                                            : 'bg-gray-500'
-                                            }`}
-                                    />
+                                    <span className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(user.doctorId || user.patientId) ? 'bg-green-500' : 'bg-gray-500'}`} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="font-medium">
-                                        {user.first_name} {user.last_name}
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        {onlineUsers.has(user.doctorId || user.patientId)
-                                            ? 'Online'
-                                            : 'Offline'}
-                                    </span>
+                                    <span className="font-medium">{user.first_name} {user.last_name}</span>
+                                    <span className="text-sm text-green-900">{onlineUsers.has(user.doctorId || user.patientId) ? 'Online' : 'Offline'}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
-            <div className="w-2/3 flex flex-col bg-white shadow-lg p-4">
+            <div className={`w-full md:w-2/3 flex flex-col bg-green-50 shadow-lg p-4 ${selectedUser ? 'block' : 'hidden md:block'}`}>
                 {selectedUser ? (
                     <>
                         <div className="flex items-center mb-4 border-b pb-2">
+                            <button className="md:hidden p-2 text-green-900" onClick={() => setSelectedUser(null)}>
+                                ← Back
+                            </button>
                             <div className="relative">
                                 <img
                                     src={selectedUser.profilepic || 'https://via.placeholder.com/40'}
                                     alt="Profile"
                                     className="w-12 h-12 rounded-full mr-3"
                                 />
-                                <span
-                                    className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(selectedUser.doctorId || selectedUser.patientId)
-                                        ? 'bg-green-500'
-                                        : 'bg-gray-500'
-                                        }`}
-                                />
+                                <span className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(selectedUser.doctorId || selectedUser.patientId) ? 'bg-green-500' : 'bg-gray-500'}`} />
                             </div>
                             <div className="flex flex-col">
-                                <h2 className="text-lg font-semibold">
-                                    {selectedUser.first_name} {selectedUser.last_name}
-                                </h2>
-                                <span className="text-sm text-gray-500">
-                                    {onlineUsers.has(selectedUser.doctorId || selectedUser.patientId)
-                                        ? 'Online'
-                                        : 'Offline'}
-                                </span>
+                                <h2 className="text-lg font-semibold text-green-900">{selectedUser.first_name} {selectedUser.last_name}</h2>
+                                <span className="text-sm text-green-900">{onlineUsers.has(selectedUser.doctorId || selectedUser.patientId) ? 'Online' : 'Offline'}</span>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto bg-gray-50 p-3 rounded-lg space-y-4">
-                            {messages.map((msg, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`flex ${isMessageFromCurrentUser(msg) ? 'justify-end' : 'justify-start'}`}
-                                >
-                                    <div
-                                        className={`max-w-sm rounded-lg ${isMessageFromCurrentUser(msg)
-                                            ? 'bg-blue-500 text-white'
-                                            : 'bg-gray-200 text-black'
-                                            }`}
-                                    >
+                        <div className="flex-1 overflow-y-auto bg-green-50 p-3 rounded-lg space-y-4">
+                            {messages.filter(msg => (msg.senderId === selectedUser?.doctorId || msg.senderId === selectedUser?.patientId) || (msg.receiverId === selectedUser?.doctorId || msg.receiverId === selectedUser?.patientId)).map((msg, idx) => (
+                                <div key={idx} className={`flex ${isMessageFromCurrentUser(msg) ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`max-w-sm rounded-lg ${isMessageFromCurrentUser(msg) ? 'bg-green-300 text-green-900' : 'bg-green-400 text-green-900'}`}>
                                         {msg.messageType === "image" ? (
                                             <div className="p-1">
-                                                <img
-                                                    src={msg.message}
-                                                    alt="Shared image"
-                                                    className="max-w-xs rounded-lg"
-                                                />
+                                                <img src={msg.message} alt="Shared image" className="max-w-xs rounded-lg" />
                                             </div>
                                         ) : (
-                                            <div className="p-2">
-                                                {msg.message}
-                                            </div>
+                                            <div className="p-2">{msg.message}</div>
                                         )}
                                         <div className="text-xs opacity-70 p-1 text-right flex items-center justify-end gap-1">
-                                            <span>
-                                                {new Date(msg.createdAt).toLocaleTimeString([], {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}
-                                            </span>
-                                            {isMessageFromCurrentUser(msg) && (
-                                                <span className={getStatusColor(msg.status)}>
-                                                    {getMessageStatus(msg)}
-                                                </span>
-                                            )}
+                                            <span>{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            {isMessageFromCurrentUser(msg) && <span className={getStatusColor(msg.status)}>{getMessageStatus(msg)}</span>}
                                         </div>
                                     </div>
                                     <div ref={messagesEndRef} />
                                 </div>
                             ))}
-                            {typingUsers.size > 0 && (
-                                <div className="text-sm text-gray-500 italic">
-                                    {Array.from(typingUsers).map(userId => {
-                                        const typingUser = filteredUsers.find(
-                                            user => user.doctorId === userId || user.patientId === userId
-                                        );
-                                        return typingUser
-                                            ? `${typingUser.first_name} is typing...`
-                                            : 'Someone is typing...'
-                                    }).join(', ')}
-                                </div>
-                            )}
+                            {selectedUser && typingUsers.has(selectedUser?.doctorId || selectedUser?.patientId) && <div className="text-sm text-gray-500 italic">typing...</div>}
                             <div ref={messagesEndRef} />
                         </div>
                         <div className="mt-4">
@@ -442,7 +392,7 @@ const ChatPanel = () => {
                                 <input
                                     type="text"
                                     placeholder="Type a message..."
-                                    className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="placeholder-green-900 bg-green-100 flex-1 p-2 border border-green-900 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                     value={messageInput}
                                     onChange={handleTyping}
                                     onKeyPress={handleKeyPress}
@@ -454,20 +404,20 @@ const ChatPanel = () => {
                                         className="hidden"
                                         onChange={handleImageSelect}
                                     />
-                                    <span className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                                    <span className="px-4 py-2 bg-green-500 text-green-900 rounded-md hover:bg-green-600">
                                         Image
                                     </span>
                                 </label>
                                 {selectedImage ? (
                                     <button
-                                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                                        className="px-4 py-2 bg-green-500 text-green-900 rounded-md hover:bg-green-600"
                                         onClick={handleUpload}
                                     >
                                         Send Image
                                     </button>
                                 ) : (
                                     <button
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                        className="px-4 py-2 bg-green-500 text-green-900 rounded-md hover:bg-green-600"
                                         onClick={sendMessage}
                                     >
                                         Send
@@ -484,6 +434,7 @@ const ChatPanel = () => {
             </div>
         </div>
     );
+     
 };
 
 export default ChatPanel;

@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from '../../Store/patient/authslice';
 
 const UpComingAppointments = () => {
+
+  const dispatch = useDispatch();
+
+  const { patientData } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchUserData())
+  }, []);
 
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
+  const [searchPatient, setSearchPatient] = useState('')
+
+  // fixed
   const [patients, setPatients] = useState([])
+  // not fixed
+  const [filterPatients, setFilterPatients] = useState([])
 
   const handleRowClick = (patient) => {
     setSelectedPatient(patient);
@@ -19,10 +34,16 @@ const UpComingAppointments = () => {
   };
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/accepted`, { doctorId: "693b8e48-af4f-4077-863d-1ba36b98a9cb" }).then((res) => {
-      setPatients(res.data)
-      console.log(res.data)
-    })
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/accepted`, { doctorId: patientData?.doctorId }).then((res) => {
+        setPatients(res.data)
+        setFilterPatients(res.data)
+      })
+    } catch (error) {
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }  
+    }
   }, [])
 
   useEffect(() => {
@@ -34,14 +55,88 @@ const UpComingAppointments = () => {
     return () => document.body.classList.remove("overflow-hidden");
   }, [showPopup]);
 
+  const filterBySearch = (name) => {
+    setEndDate(null)
+    setStartDate(null)
+    setFilterPatients(patients.filter(patient => patient.patient.first_name.toLowerCase().includes(name.toLowerCase())))
+  }
+
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const filterByDateRange = (startDate, endDate) => {
+    setSearchPatient("")
+    const filtered = patients.filter((patient) => {
+      const appointmentDate = new Date(patient.date);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      if (start && end) {
+        return appointmentDate >= start && appointmentDate <= end;
+      } else if (start) {
+        return appointmentDate >= start;
+      } else if (end) {
+        return appointmentDate <= end;
+      }
+      return true;
+    });
+
+    setFilterPatients(filtered);
+  };
+
   return (
     <div className="">
-      <h1 className="text-2xl font-bold text-gray-700 mb-4">Upcoming Appointments</h1>
+      <div className="flex justify-between items-center mb-4">
+        {/* <h1 className="text-2xl font-bold text-gray-700 mb-4">New Appointments</h1> */}
+        <h1 className="text-2xl font-bold text-gray-700">Upcoming Appointments</h1>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center">
+            <span>Start Date</span>
+            <input
+              type="date"
+              className="px-2 border-2 border-gray-400 rounded-lg focus:border-gray-800 py-1"
+              value={startDate == null ? "" : startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                filterByDateRange(e.target.value, null);
+              }}
+            />
+          </div>
+          {/* End Date Input */}
+          <div className="flex flex-col items-center">
+            <span>End Date</span>
+            <input
+              type="date"
+              className="px-2 border-2 border-gray-400 rounded-lg focus:border-gray-800 py-1"
+              value={endDate == null ? "" : endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                filterByDateRange(startDate, e.target.value);
+              }}
+            />
+          </div>
+          <hr className="border-2 border-black h-12" />
+          {/* Search Input */}
+          <div className="flex flex-col items-center">
+            <span>Patient Name</span>
+            <input
+              className="px-2 border-2 border-gray-400 rounded-lg focus:border-gray-800 py-1"
+              type="text"
+              value={searchPatient}
+              placeholder="Search by Patient name"
+              onChange={(e) => { setSearchPatient(e.target.value); filterBySearch(e.target.value) }}
+            />
+          </div>
+          <hr className="border-2 border-black h-12" />
+          <div>
+            <button className="bg-green-600 text-white px-4 rounded py-3" onClick={() => { setFilterPatients(patients); setSearchPatient(""); setStartDate(null); setEndDate(null) }} >Clear Filter</button>
+          </div>
+        </div>
+      </div>
       <div className="bg-white rounded-lg shadow">
         <div className="max-h-96 overflow-y-auto overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead>
-              <tr className="bg-blue-100 text-gray-700 uppercase text-sm">
+              <tr className="bg-green-600 text-white uppercase text-sm">
                 <th className="px-6 py-3 text-left">Name</th>
                 <th className="px-6 py-3 text-left">Gender</th>
                 <th className="px-6 py-3 text-left">Reason</th>
@@ -49,10 +144,10 @@ const UpComingAppointments = () => {
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient, index) => (
+              {filterPatients.map((patient, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-blue-50 cursor-pointer"
+                  className="hover:bg-green-50 cursor-pointer"
                   onClick={() => handleRowClick(patient)}
                 >
                   <td className="px-6 py-3 border-b">{patient.patient.first_name} {patient.last_name}</td>
