@@ -4,22 +4,21 @@ import { useParams } from 'react-router-dom';
 
 const api_url = import.meta.env.VITE_API_URL;
 
-const DoctorDetails = ({doctor1}) => {
+const DoctorDetails = () => {
+    const { id } = useParams();
     const [doctor, setDoctor] = useState(null);
 
     useEffect(() => {
         const getDoctorDetails = async () => {
             try {
-                setDoctor(doctor1);
+                const response = await axios.get(`${api_url}/patient/doctorinfo/${id}`, { withCredentials: true });
+                setDoctor(response.data);
             } catch (error) {
-                if (error.response.data.message === "Unauthorized: No token provided") {
-                    window.location.href = "/login"
-                  }              
                 console.error('Error fetching doctor details:', error);
             }
         };
         getDoctorDetails();
-    }, []);
+    }, [id]);
 
     if (!doctor) return <p>Loading doctor details...</p>;
 

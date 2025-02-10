@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-
 const prisma = new PrismaClient();
 
 const doctorId = 'aa8caa4b-9cca-4b26-adfd-212de59cdbed';

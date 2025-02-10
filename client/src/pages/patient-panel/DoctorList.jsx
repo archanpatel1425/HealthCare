@@ -14,9 +14,6 @@ const DoctorList = () => {
                 const response = await axios.get(`${api_url}/patient/doctorlist`, { withCredentials: true });
                 setDoctors(response.data);
             } catch (error) {
-                if (error.response.data.message === "Unauthorized: No token provided") {
-                    window.location.href = "/login"
-                  }              
                 console.error('Error fetching doctor list:', error);
             }
         };
