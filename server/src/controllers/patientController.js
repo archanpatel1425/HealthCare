@@ -142,7 +142,7 @@ export const updatePatientProfile = async (req, res) => {
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
     const patientId = req.userId;
-
+    
     const prescriptions = await prisma.prescription.findMany({
       where: { patient_Id: patientId },
       include: {

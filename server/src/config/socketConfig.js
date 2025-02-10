@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 
 export const initializeSocket = (server) => {
-    const verifySocketToken = (socket, next) => {
+    const verifySocketToken = (socket, next) => {   
         try {
             const token = socket.handshake.headers.cookie
                 ? socket.handshake.headers.cookie.split('=')[1]
