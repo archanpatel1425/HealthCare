@@ -60,7 +60,7 @@ const updateDoctorProfile = async (req, res) => {
         specialization,
         experience,
         qualifications,
-        availability: JSON.parse(availability),
+        availability: availability,
       },
     });
 
@@ -69,6 +69,7 @@ const updateDoctorProfile = async (req, res) => {
       doctor: updatedDoctor,
     });
   } catch (error) {
+    console.log(error)
     res
       .status(500)
       .json({ message: "Error updating profile", error: error.message });
