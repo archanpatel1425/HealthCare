@@ -169,6 +169,7 @@ const NewAppointments = () => {
                   <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Gender</th>
                   <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Reason</th>
                   <th className="px-4 py-3 text-left text-sm">Date</th>
+                  <th className="px-4 py-3 text-left text-sm">Time</th>
                   <th className="px-4 py-3 text-center text-sm">Actions</th>
                 </tr>
               </thead>
@@ -186,8 +187,9 @@ const NewAppointments = () => {
                     </td>
                     <td className="px-4 py-3 border-b text-sm">
                       {new Date(patient.date).toLocaleDateString('en-GB').replace(/\//g, '-')}
-                      <br className="md:hidden" />
-                      <span className="md:ml-1">{patient.time}</span>
+                    </td>
+                    <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
+                      {patient.time}
                     </td>
                     <td className="px-4 py-3 border-b text-center relative">
                       <button
