@@ -117,7 +117,6 @@ export const checkUser=createAsyncThunk("auth/checkUser",async()=>{
     }
   } catch (error) {
     if (error.response.data.message === "Unauthorized: No token provided") {
-      window.location.href = "/login"
     }
     console.log("the error is : ", error)
   }
