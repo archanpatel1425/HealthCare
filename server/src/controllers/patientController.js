@@ -192,6 +192,7 @@ export const getDoctorsBySpecialization = async (req, res) => {
         doctorId: true,
         first_name: true,
         last_name: true,
+        specialization: true,
         profilepic: true,
         experience: true,
         qualifications: true,

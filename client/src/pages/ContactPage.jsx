@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
 import axios from 'axios';
 import { Mail, Send } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const ContactPage = () => {
+
+  const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+
+  useEffect(() => {
+    console.log(isloggedIN)
+    if (!isloggedIN) {
+      navigate('/login')
+    }
+  }, [])
 
   const handleChange = (e) => {
     setFormData({
@@ -30,7 +42,7 @@ const ContactPage = () => {
       if (error.response.data.message === "Unauthorized: No token provided") {
         window.location.href = "/login"
       }
-     
+
       console.error('Error:', error);
     }
   };
@@ -47,7 +59,7 @@ const ContactPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid lg:grid-cols-2 gap-8 mb-16">
-          {[ 
+          {[
             { icon: <Mail className="h-8 w-8 text-blue-500" />, title: "Email Us", text: "contact@example.com" },
             { icon: <Mail className="h-8 w-8 text-green-500" />, title: "Call Us", text: "+123 456 7890" }
           ].map((item, index) => (

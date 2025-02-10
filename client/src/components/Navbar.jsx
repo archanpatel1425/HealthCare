@@ -1,15 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { checkUser} from '../Store/patient/authslice';
+import { checkUser, fetchUserData } from '../Store/patient/authslice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const isloggedIN = useSelector((state) => state.auth.isauthenticated); // Ensure your reducer stores this correctly
+  const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
+  const patientData = useSelector((state) => state.auth.patientData);
 
   useEffect(() => {
     dispatch(checkUser());
-  }, [dispatch]);
+    if (isloggedIN) {
+      dispatch(fetchUserData());
+    }
+    console.log(patientData)
+  }, [dispatch, isloggedIN]);
 
   const handleLogout = async () => {
     // await dispatch(logoutUser());
@@ -43,14 +48,14 @@ const Navbar = () => {
             <Link to="/">Home</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
-            <Link to="/services">Services</Link>
-          </li>
-          <li className="hover:text-green-800 transition duration-300">
             <Link to="/about">About</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
             <Link to="/contact">Contact</Link>
           </li>
+          {isloggedIN && <li className="hover:text-green-800 transition duration-300">
+            <Link to="/patient-panel">Dashboard</Link>
+          </li>}
         </ul>
         {isloggedIN ? (
           <button
@@ -82,9 +87,8 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div
         ref={menuRef}
-        className={`fixed top-0 right-0 h-full bg-[#ebf8ef] shadow-lg transform ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        } transition-transform duration-300 ease-in-out w-64 z-50`}
+        className={`fixed top-0 right-0 h-full bg-[#ebf8ef] shadow-lg transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          } transition-transform duration-300 ease-in-out w-64 z-50`}
       >
         {/* Close Button */}
         <button
