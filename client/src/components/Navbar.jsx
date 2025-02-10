@@ -1,22 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { checkUser, fetchUserData } from '../Store/patient/authslice';
+import { checkUser, fetchUserData,logOutUser } from '../Store/patient/authslice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
   const patientData = useSelector((state) => state.auth.patientData);
+
   useEffect(() => {
     dispatch(checkUser());
     if (isloggedIN) {
       dispatch(fetchUserData());
     }
-    console.log(patientData)
   }, [dispatch, isloggedIN]);
 
   const handleLogout = async () => {
-    // await dispatch(logoutUser());
+    await dispatch(logOutUser());
   };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,13 +34,13 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   return (
-    <div className="bg-green-100 flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-50 transition-all duration-300">
+    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-50 transition-all duration-300">
       {/* Logo */}
-      <div className="text-2xl sm:text-3xl font-bold text-green-700">
+      <div className="text-2xl sm:text-3xl font-bold text-green-700 w-full text-center md:text-left md:w-auto">
         HealCare
       </div>
 
-      {/* Desktop   Menu */}
+      {/* Desktop Menu */}
       <div className="hidden md:flex space-x-6 lg:space-x-12 items-center text-base font-semibold">
         <ul className="flex space-x-4 lg:space-x-8">
           <li className="hover:text-green-800 transition duration-300">
@@ -53,14 +53,7 @@ const Navbar = () => {
             <Link to="/contact">Contact</Link>
           </li>
           {isloggedIN && <li className="hover:text-green-800 transition duration-300">
-            {
-              patientData?.patientId?(
-                <Link to="/patient-panel">Dashboard</Link>
-              )
-              :(
-                <Link to="/doctor-panel">Dashboard</Link>
-              )
-            }
+            <Link to="/patient-panel">Dashboard</Link>
           </li>}
         </ul>
         {isloggedIN ? (
@@ -87,7 +80,7 @@ const Navbar = () => {
           aria-label="Open Menu"
         >
           ☰
-        </button> 
+        </button>
       </div>
 
       {/* Mobile Menu */}

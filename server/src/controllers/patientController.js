@@ -142,7 +142,7 @@ export const updatePatientProfile = async (req, res) => {
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
     const patientId = req.userId;
-    
+
     const prescriptions = await prisma.prescription.findMany({
       where: { patient_Id: patientId },
       include: {
@@ -189,6 +189,9 @@ export const getDoctorsBySpecialization = async (req, res) => {
 
     const doctors = await prisma.doctor.findMany({
       select: {
+        email: true,
+        phone_no: true,
+        gender: true,
         doctorId: true,
         first_name: true,
         last_name: true,
@@ -196,7 +199,7 @@ export const getDoctorsBySpecialization = async (req, res) => {
         profilepic: true,
         experience: true,
         qualifications: true,
-        specialization:true,
+        specialization: true,
         availability: true
       }
     });
@@ -224,7 +227,6 @@ export const createAppointment = async (req, res) => {
     const appointment = await prisma.appointment.create({
       data: appointment_data
     });
-    console.log("now  : ",appointment)
     res.status(201).json({
       message: "Appointment created successfully",
       appointment,
