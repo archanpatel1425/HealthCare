@@ -16,7 +16,6 @@ logs/
 *.log
 
 # Model & dataset files
-*.h5
 *.pkl
 *.model
 *.csv
