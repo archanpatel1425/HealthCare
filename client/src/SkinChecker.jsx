@@ -33,9 +33,13 @@ const SkinChecker = () => {
     setError(null);
 
     try {
-      const response = await axios.post("http://127.0.0.1:8080/skin_disease", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        "http://127.0.0.1:8080/skin_disease",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       const prediction = response.data.prediction;
       setResult(prediction);
@@ -60,7 +64,9 @@ const SkinChecker = () => {
       const text = await result.response.text();
 
       // Extract clean text
-      const cureList = text.match(/^[*\-•]\s*(.+)/gm)?.map(item => item.replace(/^[*\-•]\s*/, ""));
+      const cureList = text
+        .match(/^[*\-•]\s*(.+)/gm)
+        ?.map((item) => item.replace(/^[*\-•]\s*/, ""));
 
       if (cureList) {
         setCures(cureList.join("\n"));
@@ -74,27 +80,46 @@ const SkinChecker = () => {
       setPrecautionLoading(false); // Stop loading
     }
   };
+
   return (
-    <div className="p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-xl border border-gray-200 flex flex-col lg:flex-row gap-4 min-h-[450px] h-full w-full">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-xl border border-gray-200 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-[450px] h-full w-full overflow-y-auto">
       {/* Left Side - Image Upload & Prediction */}
       <div className="flex flex-col items-center w-full lg:w-1/2 flex-1">
-        <h1 className="text-3xl font-bold text-center text-green-600 mb-4">Skin Care Assistant</h1>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2"
-        />
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-green-600 mb-4">
+          Skin Care Assistant
+        </h1>
+
+        {/* Custom File Input */}
+        <label className="w-full flex flex-col items-center justify-center p-4 border-2 border-dashed border-green-300 rounded-lg bg-green-50 hover:bg-green-100 transition cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <i className="fas fa-cloud-upload-alt text-3xl text-green-600 mb-2"></i>{" "}
+          {/* Font Awesome Upload Icon */}
+          <p className="text-md font-semibold text-green-700">
+            Drag & drop your photo
+          </p>
+          <p className="text-xs text-gray-500 mt-1">or</p>
+          <span className="mt-2 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition text-sm">
+            Browse files
+          </span>
+        </label>
+
         {preview ? (
           <img
             src={preview}
             alt="Selected Preview"
-            className="w-64 h-64 object-cover rounded-md border border-gray-300 mt-4"
+            className="w-40 sm:w-64 h-40 sm:h-64 object-cover rounded-md border border-gray-300 mt-4"
           />
         ) : (
-          <div className="w-64 h-64 flex flex-col items-center justify-center bg-gray-100 rounded-md border border-gray-300 mt-4">
+          <div className="w-40 sm:w-64 h-40 sm:h-64 flex flex-col items-center justify-center bg-gray-100 rounded-md border border-gray-300 mt-4">
             <p className="text-gray-500 text-center">No image selected.</p>
-            <p className="text-gray-400 text-sm text-center">Upload an image to start analysis.</p>
+            <p className="text-gray-400 text-sm text-center">
+              Upload an image to start analysis.
+            </p>
           </div>
         )}
         <button
@@ -106,15 +131,19 @@ const SkinChecker = () => {
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
         {result && (
           <div className="mt-4 p-4 bg-gray-50 border rounded-md w-full">
-            <h2 className="text-lg font-semibold text-gray-700">Your Skin Type:</h2>
+            <h2 className="text-lg font-semibold text-gray-700">
+              Your Skin Type:
+            </h2>
             <p className="text-gray-600">{result}</p>
           </div>
         )}
       </div>
-  
-      {/* Right Side - Treatment Suggestions (Full Height) */}
-      <div className="w-full lg:w-1/2 bg-green-50 p-6 border border-green-200 rounded-md flex-1 flex flex-col self-stretch">
-        <h2 className="text-2xl font-semibold text-green-700">Treatment Suggestions:</h2>
+
+      {/* Right Side - Treatment Suggestions */}
+      <div className="w-full lg:w-1/2 bg-green-50 p-4 sm:p-6 border border-green-200 rounded-md flex-1 flex flex-col self-stretch h-full">
+        <h2 className="text-xl sm:text-2xl font-semibold text-green-700">
+          Treatment Suggestions:
+        </h2>
         {precautionLoading ? (
           <div className="flex justify-center items-center mt-4">
             <div className="w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
@@ -126,12 +155,13 @@ const SkinChecker = () => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic mt-4 flex-1">Treatment suggestions will be displayed after analysis.</p>
+          <p className="text-gray-500 italic mt-4 flex-1">
+            Treatment suggestions will be displayed after analysis.
+          </p>
         )}
       </div>
     </div>
   );
-  
 };
 
 export default SkinChecker;
