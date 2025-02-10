@@ -2,130 +2,142 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useSelector } from "react-redux";
-import { FaInfoCircle } from "react-icons/fa";
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY); // Initialize once
+import { FaInfoCircle, FaUserMd, FaCalendarAlt,FaFileMedical } from "react-icons/fa";
+
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-const MedicineCard = ({ medicine, link }) => {
-    return (
-        <div className="p-4 bg-green-100 shadow-md rounded-lg border border-green-300">
-            <div className="flex justify-between items-center">
-                <h4 className="font-semibold text-green-800">
-                    {medicine.drugName}
-                </h4>
+const MedicineCard = ({ medicine, link }) => (
+    <div className="p-4 bg-gray-100 shadow-md rounded-lg border border-gray-300">
+        <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-gray-800">{medicine.drugName}</h4>
+            <div className="flex items-center space-x-2">
                 <a
                     href={link || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`text-green-600 hover:text-green-800 ${link === "No link found." ? "cursor-not-allowed opacity-50" : ""}`}
+                    className={`text-blue-600 hover:text-blue-800 ${link === "No link found." ? "cursor-not-allowed opacity-50" : ""}`}
+                >
+                    Buy
+                </a>
+                <a
+                    href={link || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-blue-600 hover:text-blue-800 ${link === "No link found." ? "cursor-not-allowed opacity-50" : ""}`}
                     title="More Info"
                 >
                     <FaInfoCircle size={18} />
                 </a>
             </div>
-            <p className="text-green-600">Meal Timing: {medicine.mealTiming}</p>
-            <div className="flex justify-between w-full mt-2">
-                {console.log(medicine.breakfast)
-                }
-                <span className={`text-sm ${medicine.breakfast ? 'text-red-600' : 'text-green-600'}`}>Breakfast: {medicine.breakfast ? 'Yes' : 'No'}</span>
-                <span className={`text-sm ${medicine.lunch ? 'text-red-600' : 'text-green-600'}`}>Lunch: {medicine.lunch ? 'Yes' : 'No'}</span>
-                <span className={`text-sm ${medicine.dinner ? 'text-red-600' : 'text-green-600'}`}>Dinner: {medicine.dinner ? 'Yes' : 'No'}</span>
-            </div>
         </div>
-    );
-};
+        <p className="text-gray-600">Meal Timing: {medicine.mealTiming}</p>
+        <div className="flex justify-between w-full mt-2">
+            <span className={`text-sm ${medicine.breakfast ? 'text-red-600' : 'text-blue-600'}`}>Breakfast: {medicine.breakfast ? 'Yes' : 'No'}</span>
+            <span className={`text-sm ${medicine.lunch ? 'text-red-600' : 'text-blue-600'}`}>Lunch: {medicine.lunch ? 'Yes' : 'No'}</span>
+            <span className={`text-sm ${medicine.dinner ? 'text-red-600' : 'text-blue-600'}`}>Dinner: {medicine.dinner ? 'Yes' : 'No'}</span>
+        </div>
+    </div>
+);
 
 const Prescriptions = () => {
     const [prescriptions, setPrescriptions] = useState([]);
-    const [selectedPrescription, setSelectedPrescription] = useState(null);
     const [medicineLinks, setMedicineLinks] = useState({});
+    const [filterDate, setFilterDate] = useState("");
+    const [filterDoctor, setFilterDoctor] = useState("");
     const { patientData } = useSelector((state) => state.auth);
 
     useEffect(() => {
         const fetchPrescriptions = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/patient/getpriscription`,{withCredentials:true});
-                const data = response.data.map(prescription => ({
-                    ...prescription,
-                    medicines: JSON.parse(prescription.medicines || "[]")
-                }));
-
+                const data = response.data.map(p => ({ ...p, medicines: JSON.parse(p.medicines || "[]") }));
                 setPrescriptions(data);
-                if (data.length > 0) {
-                    setSelectedPrescription(data[0]);
-                }
-
                 const uniqueMedicines = [...new Set(data.flatMap(p => p.medicines.map(m => m.drugName)))];
                 fetchMedicineLinks(uniqueMedicines);
-
             } catch (error) {
                 console.error("Error fetching prescriptions:", error);
             }
         };
-
         fetchPrescriptions();
     }, [patientData]);
 
     const fetchMedicineLinks = async (medicineNames) => {
         try {
             if (!medicineNames.length) return;
-    
-    
-            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", ")}. The link should lead to a trusted medical or pharmaceutical website.`;
-    
+            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", " )}.`;
             const result = await model.generateContent(prompt);
-            const text = await result.response.text(); // Extract response text
-    
+            const text = await result.response.text();
             const linkRegex = /(https?:\/\/[^\s]+)/g;
             const links = text.match(linkRegex) || [];
-    
             const linksMap = medicineNames.reduce((acc, med, index) => {
                 acc[med] = links[index] || "No link found.";
                 return acc;
             }, {});
-            console.log(linksMap);
             setMedicineLinks(linksMap);
         } catch (error) {
             console.error("Error fetching medicine links:", error);
         }
     };
-    
 
-    const selectPrescription = (prescription) => {
-        setSelectedPrescription(selectedPrescription?.prescriptionId === prescription.prescriptionId ? null : prescription);
-    };
+    const filteredPrescriptions = prescriptions.filter(p => 
+        (!filterDate || new Date(p.createdAt).toISOString().split("T")[0] === filterDate) &&
+        (!filterDoctor || `${p.doctor.first_name} ${p.doctor.last_name}`.toLowerCase().includes(filterDoctor.toLowerCase()))
+    );
 
     return (
-        <div className="max-w-6xl mx-auto p-6 bg-green-100 shadow-lg rounded-lg flex space-x-6">
-            <div className="w-1/3 space-y-3">
-                {prescriptions.map((prescription) => (
-                    <div key={prescription.prescriptionId} className="bg-white border border-green-300 rounded-lg shadow-sm cursor-pointer hover:bg-green-200 transition"
-                        onClick={() => selectPrescription(prescription)}>
-                        <div className="p-4">
-                            <h3 className="text-lg font-semibold text-green-800">Doctor: {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
-                            <p className="text-sm text-green-600">{new Date(prescription.createdAt).toLocaleDateString()}</p>
+            <div className="max-w-6xl mx-auto p-6 bg-green-100 shadow-lg rounded-lg overflow-auto relative sm:p-4 sm:h-auto ">
+
+            <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center"><FaFileMedical className="mr-2" /> Prescriptions</h2>
+                <div className="flex gap-4">
+                    <div className="flex flex-col w-full sm:w-auto">
+                        <label className="text-gray-700 font-medium">Filter by Date:</label>
+                        <input
+                            type="date"
+                            className="p-2 border border-gray-300 rounded-md w-full"
+                            value={filterDate}
+                            onChange={(e) => setFilterDate(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex flex-col w-full sm:w-auto">
+                        <label className="text-gray-700 font-medium">Filter by Doctor:</label>
+                        <input
+                            type="text"
+                            className="p-2 border border-gray-300 rounded-md w-full"
+                            placeholder="Enter doctor's name"
+                            value={filterDoctor}
+                            onChange={(e) => setFilterDoctor(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 w-full sm:w-auto h-10 mt-6"
+                        onClick={() => { setFilterDate(""); setFilterDoctor(""); }}
+                    >
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+            <div>
+                {filteredPrescriptions.map((prescription) => (
+                    <div key={prescription.prescriptionId} className="w-full bg-white border border-gray-300 rounded-lg shadow-md p-6 mb-6 sm:p-4">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <h3 className="text-lg font-semibold text-gray-800 flex items-center"><FaUserMd className="mr-2" /> {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
+                            <p className="text-sm text-gray-600 flex items-center"><FaCalendarAlt className="mr-2" /> {new Date(prescription.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <p className="text-red-600">Notes: {prescription.notes || "No notes available"}</p>
+                        <div className="mt-4 grid grid-cols-1 gap-4">
+                            {prescription.medicines.length > 0 ? (
+                                prescription.medicines.map((medicine, index) => (
+                                    <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
+                                ))
+                            ) : (
+                                <p className="text-gray-500">No medicines prescribed.</p>
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
-
-            {selectedPrescription && (
-                <div className="w-2/3 bg-white border border-green-300 rounded-lg shadow-md p-6">
-                    <div className="flex w-full justify-between">
-                        <h3 className="text-xl font-semibold text-green-800 border border-green-300 p-2 bg-green-100 rounded-md">Doctor: {selectedPrescription.doctor.first_name} {selectedPrescription.doctor.last_name}</h3>
-                        <p className="text-sm text-green-600 border border-green-300 p-1 h-8 rounded-md"  >{new Date(selectedPrescription.createdAt).toLocaleDateString()}</p></div>
-                    <p className="text-green-800 mt-2 text-red-600">Notes: {selectedPrescription.notes || "No notes available"}</p>
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {selectedPrescription.medicines.length > 0 ? (
-                            selectedPrescription.medicines.map((medicine, index) => (
-                                <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
-                            ))
-                        ) : (
-                            <p className="text-green-500">No medicines prescribed.</p>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

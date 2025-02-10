@@ -307,10 +307,10 @@ function Meeting() {
       socket.emit('leave-room', "1234");
       setRemoteStream(null);
       setIsScreenSharing(false);
-      if(patientData?.doctorId){
-        navigate('//doctor-panel/prescription-form')
+      if (patientData?.doctorId) {
+        navigate('/doctor-panel/prescription-form', { state: { appointmentId } })
       }
-      else{
+      else {
         navigate('/patient-panel')
       }
     } catch (err) {
