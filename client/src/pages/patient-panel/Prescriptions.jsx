@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { FaCalendarAlt, FaFileMedical, FaInfoCircle, FaUserMd } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { FaInfoCircle, FaUserMd, FaCalendarAlt,FaFileMedical } from "react-icons/fa";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -50,8 +50,10 @@ const Prescriptions = () => {
     useEffect(() => {
         const fetchPrescriptions = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/patient/getpriscription`,{withCredentials:true});
+                const response = await axios.get(`http://localhost:5000/patient/getpriscription`, { withCredentials: true });
+                console.log(response.data)
                 const data = response.data.map(p => ({ ...p, medicines: JSON.parse(p.medicines || "[]") }));
+                console.log(data)
                 setPrescriptions(data);
                 const uniqueMedicines = [...new Set(data.flatMap(p => p.medicines.map(m => m.drugName)))];
                 fetchMedicineLinks(uniqueMedicines);
@@ -65,7 +67,7 @@ const Prescriptions = () => {
     const fetchMedicineLinks = async (medicineNames) => {
         try {
             if (!medicineNames.length) return;
-            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", " )}.`;
+            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", ")}.`;
             const result = await model.generateContent(prompt);
             const text = await result.response.text();
             const linkRegex = /(https?:\/\/[^\s]+)/g;
@@ -80,17 +82,18 @@ const Prescriptions = () => {
         }
     };
 
-    const filteredPrescriptions = prescriptions.filter(p => 
+    const filteredPrescriptions = prescriptions.filter(p =>
         (!filterDate || new Date(p.createdAt).toISOString().split("T")[0] === filterDate) &&
         (!filterDoctor || `${p.doctor.first_name} ${p.doctor.last_name}`.toLowerCase().includes(filterDoctor.toLowerCase()))
     );
 
     return (
-            <div className="max-w-6xl mx-auto p-6 bg-green-100 shadow-lg rounded-lg overflow-auto relative sm:p-4 sm:h-auto ">
-
-            <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-800 flex items-center"><FaFileMedical className="mr-2" /> Prescriptions</h2>
-                <div className="flex gap-4">
+        <div className="w-full h-full p-6 bg-green-100 shadow-lg rounded-lg overflow-hidden">
+            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+                <h2 className="text-xl font-bold text-gray-800 flex items-center w-full sm:w-auto">
+                    <FaFileMedical className="mr-2" /> Prescriptions
+                </h2>
+                <div className="flex flex-col sm:flex-row sm:gap-4 w-full sm:w-auto">
                     <div className="flex flex-col w-full sm:w-auto">
                         <label className="text-gray-700 font-medium">Filter by Date:</label>
                         <input
@@ -111,14 +114,15 @@ const Prescriptions = () => {
                         />
                     </div>
                     <button
-                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 w-full sm:w-auto h-10 mt-6"
+                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 w-full sm:w-auto h-10 mt-6 sm:mt-0"
                         onClick={() => { setFilterDate(""); setFilterDoctor(""); }}
                     >
                         Clear Filters
                     </button>
                 </div>
             </div>
-            <div>
+            {/* This section now has the vertical scroll only */}
+            <div className="overflow-y-auto max-h-[calc(100vh-220px)]"> {/* Adjusted max-height to account for padding/margins */}
                 {filteredPrescriptions.map((prescription) => (
                     <div key={prescription.prescriptionId} className="w-full bg-white border border-gray-300 rounded-lg shadow-md p-6 mb-6 sm:p-4">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
