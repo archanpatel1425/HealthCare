@@ -18,7 +18,7 @@ export default function DoctorPanel() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Navbar */}

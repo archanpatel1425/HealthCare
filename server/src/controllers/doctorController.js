@@ -60,7 +60,7 @@ const updateDoctorProfile = async (req, res) => {
         specialization,
         experience,
         qualifications,
-        availability: JSON.parse(availability),
+        availability: availability,
       },
     });
 
@@ -86,6 +86,44 @@ const updateAppointmentStatus = async (req, res) => {
 
     res.json({
       message: "Doctor status updated successfully",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: error.message });
+  }
+};
+
+const uploadProfilePhoto = async (req, res) => {
+  try {
+    const { doctorId, photoUrl } = req.body; // Get status from request body
+
+    const updatedDoctor = await prisma.doctor.update({
+      where: { doctorId },
+      data: { profilepic: photoUrl },
+    });
+
+    res.json({
+      message: "success",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: error.message });
+  }
+};
+
+const uploadQualificationPhoto = async (req, res) => {
+  try {
+    const { doctorId, photoUrl } = req.body; // Get status from request body
+
+    const updatedDoctor = await prisma.doctor.update({
+      where: { doctorId },
+      data: { qualifications: photoUrl },
+    });
+
+    res.json({
+      message: "success",
     });
   } catch (error) {
     res
@@ -121,7 +159,6 @@ const submitPrescription = async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error)
     res
       .status(500)
       .json({ message: "Error updating status", error: error.message });
@@ -201,4 +238,4 @@ const getDoneAppointments = async (req, res) => {
   }
 };
 
-export { getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus, submitPrescription };
+export { uploadQualificationPhoto,uploadProfilePhoto, getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus, submitPrescription };
