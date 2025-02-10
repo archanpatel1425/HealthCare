@@ -13,6 +13,7 @@ const Profile = () => {
     const [update, setUpdate] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedImageFile, setSelectedImageFile] = useState(null);
+    const [selectedImageFile1, setSelectedImageFile1] = useState(null);
     const inputImgRef = useRef(null);
 
     const [formData, setFormData] = useState({
@@ -49,11 +50,41 @@ const Profile = () => {
                         specialization: res.data.specialization,
                         experience: res.data.experience,
                         qualifications: res.data.qualifications,
-                        availability: JSON.stringify(res.data.availability),
+                        availability: res.data.availability,
                     });
                 });
         }
     }, [patientData]);
+
+
+    const handleAvailabilityChange = (e) => {
+        const { name, checked } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            availability: {
+                ...prevData.availability,
+                days: checked
+                    ? [...(prevData.availability?.days || []), name] // Add the day
+                    : (prevData.availability?.days || []).filter(day => day !== name) // Remove the day
+            }
+        }));
+    };
+
+    const handleTimeChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            availability: {
+                ...prevData.availability,
+                time: {
+                    ...prevData.availability?.time,
+                    [name]: value
+                }
+            }
+        }));
+    };
+
+
 
     const handleUpload = async (image) => {
         const formData = new FormData();
@@ -62,11 +93,42 @@ const Profile = () => {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            return response.data.url;
+
+            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadprofile-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url })
+            if (newResponse.data.message == 'success') {
+                showToast('Profile photo uploaded successfully', 'success');
+                window.location.reload()
+            }
+
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
-              }          
+            }
+            showToast('Failed to upload image', 'error');
+            throw error;
+        }
+    };
+
+
+    const handleUpload1 = async (image) => {
+        const formData = new FormData();
+        formData.append('image', image);
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadqualification-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url })
+
+            if (newResponse.data.message == 'success') {
+                showToast('Profile photo uploaded successfully', 'success');
+                window.location.reload()
+            }
+
+        } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+            }
             showToast('Failed to upload image', 'error');
             throw error;
         }
@@ -78,17 +140,18 @@ const Profile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
             let updatedFormData = { ...formData };
 
             // If there's a new image selected, upload it first
-            if (selectedImageFile) {
-                const imageUrl = await handleUpload(selectedImageFile);
-                updatedFormData = {
-                    ...updatedFormData,
-                    profilepic: imageUrl
-                };
-            }
+            // if (selectedImageFile) {
+            //     const imageUrl = await handleUpload(selectedImageFile);
+            //     updatedFormData = {
+            //         ...updatedFormData,
+            //         profilepic: imageUrl
+            //     };
+            // }
 
             // Update the profile with all data including new image URL if uploaded
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, {
@@ -98,13 +161,15 @@ const Profile = () => {
 
             if (response.data) {
                 showToast("Profile updated successfully", "success");
-                navigate("/doctor-panel");
+                // navigate("/doctor-panel");
+                setUpdate(false);
+                changeDisabled1()
             }
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
-              }
-             
+            }
+
             showToast("Failed to update profile", "error");
             console.error("Error updating profile:", error);
         }
@@ -114,7 +179,7 @@ const Profile = () => {
         const file = e.target.files[0];
         if (file) {
             const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            
+
             if (!acceptedTypes.includes(file.type)) {
                 showToast('Only JPG, JPEG, and PNG files are allowed', 'error');
                 e.target.value = '';
@@ -127,31 +192,127 @@ const Profile = () => {
         }
     };
 
+
+    const [selectedImage1, setSelectedImage1] = useState(null);
+    const inputImgRef1 = useRef(null)
+
+    const handleImageChange1 = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+            if (!acceptedTypes.includes(file.type)) {
+                showToast('Only JPG, JPEG, and PNG files are allowed', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            const imageURL = URL.createObjectURL(file);
+            setSelectedImage1(imageURL);
+            setSelectedImageFile1(file);
+        }
+    };
+
     const changeDisabled = () => {
         document.querySelectorAll('.input-field').forEach((input) => {
             input.disabled = false;
         });
     };
 
+    const changeDisabled1 = () => {
+        document.querySelectorAll('.input-field').forEach((input) => {
+            input.disabled = true;
+        });
+    };
+
     return (
         <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-1 bg-white shadow-lg rounded-lg p-6">
+            <div className="flex-1 bg-white shadow-lg rounded-lg p-6 h-[80vh] overflow-x-auto">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Doctor Profile</h2>
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input disabled={true} type="text" name="first_name" placeholder="First Name" className="input-field" value={formData.first_name} onChange={handleChange} autoComplete="off" />
-                    <input disabled={true} type="text" name="last_name" placeholder="Last Name" className="input-field" value={formData.last_name} onChange={handleChange} autoComplete="off" />
-                    <select disabled={!update} name="gender" className="input-field" value={formData.gender} onChange={handleChange}>
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <input disabled={true} type="text" name="phone_no" placeholder="Phone Number" className="input-field" value={formData.phone_no} onChange={handleChange} autoComplete="off" />
-                    <input disabled={true} type="email" name="email" placeholder="Email" className="input-field" value={formData.email} onChange={handleChange} autoComplete="off" />
-                    <input disabled={true} type="text" name="specialization" placeholder="Specialization" className="input-field" value={formData.specialization} onChange={handleChange} autoComplete="off" />
-                    <input disabled={true} type="text" name="experience" placeholder="Experience (e.g., 10 years)" className="input-field" value={formData.experience} onChange={handleChange} autoComplete="off" />
-                    <input disabled={true} type="text" name="qualifications" placeholder="Qualifications" className="input-field" value={formData.qualifications} onChange={handleChange} autoComplete="off" />
-                    <input disabled={true} type="text" name="availability" placeholder="Availability (e.g., Monday: 10AM-4PM)" className="input-field" value={formData.availability} onChange={handleChange} autoComplete="off" />
+                    <label className="flex flex-col">
+                        <span>First Name</span>
+                        <input disabled={true} type="text" name="first_name" placeholder="First Name" className="input-field" value={formData.first_name} onChange={handleChange} autoComplete="off" />
+                    </label>
+                    <label className="flex flex-col">
+                        <span>Last Name</span>
+                        <input disabled={true} type="text" name="last_name" placeholder="Last Name" className="input-field" value={formData.last_name} onChange={handleChange} autoComplete="off" />
+                    </label>
+                    <label className="flex flex-col">
+                        <span>Gender</span>
+                        <select disabled={true} name="gender" className="input-field" value={formData.gender} onChange={handleChange}>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </label>
+
+                    <label className="flex flex-col">
+                        <span>Phone No.</span>
+                        <input disabled={true} type="text" name="phone_no" placeholder="Phone Number" className="input-field" value={formData.phone_no} onChange={handleChange} autoComplete="off" />
+                    </label>
+
+                    <label className="flex flex-col">
+                        <span>Email</span>
+                        <input disabled={true} type="email" name="email" placeholder="Email" className="input-field" value={formData.email} onChange={handleChange} autoComplete="off" />
+                    </label>
+
+                    <label className="flex flex-col">
+                        <span>Specialization</span>
+                        <input disabled={true} type="text" name="specialization" placeholder="Specialization" className="input-field" value={formData.specialization} onChange={handleChange} autoComplete="off" />
+                    </label>
+
+                    <label className="flex flex-col">
+                        <span>Experience</span>
+                        <input disabled={true} type="text" name="experience" placeholder="Experience (e.g., 10 years)" className="input-field" value={formData.experience} onChange={handleChange} autoComplete="off" />
+                    </label>
+
+                    <br />
+                    <div className="w-full flex items-center gap-2 mb-[-30px]">
+                        <h4 className="">Available Days</h4>
+                    </div>
+                    <br />
+                    <div className="flex items-center gap-2">
+                        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                            <div className="border px-2 border-gray-800 rounded-lg" key={day}>
+                                <label className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        name={day}
+                                        className="me-2 input-field"
+                                        checked={formData?.availability?.days?.includes(day) || false}
+                                        onChange={handleAvailabilityChange}
+                                        disabled={true}
+                                    />
+                                    <span>{day}</span>
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    <br />
+                    <div className="w-full flex items-center gap-2 mb-[-30px]">
+                        <h4 className="">Available Time</h4>
+                    </div>
+                    <br />
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="time"
+                            className="input-field"
+                            name="from"
+                            value={formData?.availability?.time?.from || ""}
+                            onChange={handleTimeChange}
+                            disabled={true}
+                        />
+                        <input
+                            type="time"
+                            className="input-field"
+                            name="to"
+                            value={formData?.availability?.time?.to || ""}
+                            onChange={handleTimeChange}
+                            disabled={true}
+                        />
+                    </div>
                     {update == false ?
                         <span type="button" onClick={() => { setUpdate(true); changeDisabled() }} className="text-center md:col-span-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Update</span> :
                         <button type="submit" className="md:col-span-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Update Profile</button>
@@ -159,7 +320,7 @@ const Profile = () => {
                 </form>
             </div>
 
-            <div className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-6 flex flex-col items-center">
+            <div className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-6 flex flex-col items-center h-[80vh] overflow-x-auto">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profile Picture</h2>
                 <div className="flex items-center gap-5 justify-center">
                     <img src={formData.profilepic || "https://via.placeholder.com/150"} alt="Profile" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
@@ -168,13 +329,13 @@ const Profile = () => {
                             <i className="fa-solid fa-arrow-right"></i>
                             <div className="relative">
                                 <img src={selectedImage} alt="" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
-                                <button 
+                                <button
                                     type="button"
-                                    onClick={() => { 
-                                        setSelectedImage(null); 
+                                    onClick={() => {
+                                        setSelectedImage(null);
                                         setSelectedImageFile(null);
                                         inputImgRef.current.value = null;
-                                    }} 
+                                    }}
                                     className="absolute top-0 right-0 bg-red-500 rounded-full p-1 text-white"
                                 >
                                     <i className="fa-solid fa-xmark"></i>
@@ -183,14 +344,39 @@ const Profile = () => {
                         </>
                     )}
                 </div>
-                <input 
-                    disabled={!update} 
-                    ref={inputImgRef} 
-                    type="file" 
-                    accept="image/*" 
-                    className="input-field" 
-                    onChange={handleImageChange} 
-                />
+                <input disabled={true} ref={inputImgRef} type="file" accept="image/*" className="input-field" onChange={handleImageChange} />
+                {update == false ?
+                    <></>
+                    :
+                    <button
+                        onClick={() => { handleUpload(selectedImageFile) }}
+                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                        Upload Photo
+                    </button>
+                }
+                <hr className="border w-full mt-3" />
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center mt-2">Qualification</h2>
+                <div className="flex items-center gap-5 justify-center">
+                    <img src={formData.qualifications || "https://via.placeholder.com/150"} alt="Profile" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
+                    {selectedImage1 && (
+                        <>
+                            <i className="fa-solid fa-arrow-right"></i>
+                            <div className="relative">
+                                <img src={selectedImage1} alt="" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
+                                <button onClick={() => { setSelectedImage1(null); inputImgRef1.current.value = null }} className="absolute top-0 right-0 bg-red-500 rounded-full p-1 text-white"><i className="fa-solid fa-xmark"></i></button>
+                            </div>
+
+                        </>
+                    )}
+                </div>
+                <input disabled={true} ref={inputImgRef1} type="file" accept="image/*" className="input-field" onChange={handleImageChange1} />
+                {update == false ?
+                    <></>
+                    :
+                    <button onClick={() => { handleUpload1(selectedImageFile1) }} className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                        Upload Photo
+                    </button>
+                }
             </div>
         </div>
     );

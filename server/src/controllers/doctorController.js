@@ -1,6 +1,33 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+
+const getId = async (req, res) => {
+  try {
+    const doctorId = req.userId;
+    const { appointmentId } = req.body;
+
+    // Find the appointment and get the patient_Id
+    const appointment = await prisma.appointment.findUnique({
+      where: { appointmentId },
+      select: { patient_Id: true }
+    });
+
+    // If no appointment is found
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    res.status(200).json({ patientId: appointment.patient_Id });
+
+  } catch (error) {
+    console.error('Error fetching patientId:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export default getId;
+
 const getDoctorProfile = async (req, res) => {
   try {
 
@@ -60,7 +87,7 @@ const updateDoctorProfile = async (req, res) => {
         specialization,
         experience,
         qualifications,
-        availability: JSON.parse(availability),
+        availability: availability,
       },
     });
 
@@ -94,6 +121,44 @@ const updateAppointmentStatus = async (req, res) => {
   }
 };
 
+const uploadProfilePhoto = async (req, res) => {
+  try {
+    const { doctorId, photoUrl } = req.body; // Get status from request body
+
+    const updatedDoctor = await prisma.doctor.update({
+      where: { doctorId },
+      data: { profilepic: photoUrl },
+    });
+
+    res.json({
+      message: "success",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: error.message });
+  }
+};
+
+const uploadQualificationPhoto = async (req, res) => {
+  try {
+    const { doctorId, photoUrl } = req.body; // Get status from request body
+
+    const updatedDoctor = await prisma.doctor.update({
+      where: { doctorId },
+      data: { qualifications: photoUrl },
+    });
+
+    res.json({
+      message: "success",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: error.message });
+  }
+};
+
 const submitPrescription = async (req, res) => {
   try {
     const { data, notes, appointmentId, patientId, doctorId } = req.body;
@@ -114,14 +179,12 @@ const submitPrescription = async (req, res) => {
         notes: notes
       }
     });
-
     res.status(201).json({
       message: "Prescription created successfully",
       prescription: newPrescription
     });
 
   } catch (error) {
-    console.log(error)
     res
       .status(500)
       .json({ message: "Error updating status", error: error.message });
@@ -160,7 +223,7 @@ const getAcceptedAppointments = async (req, res) => {
     const acceptedAppointments = await prisma.appointment.findMany({
       where: {
         doctor_Id: doctorId,
-        status: "Accepted",
+        status: "Scheduled",
       },
       include: { patient: true },
       orderBy: {
@@ -201,4 +264,5 @@ const getDoneAppointments = async (req, res) => {
   }
 };
 
-export { getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus, submitPrescription };
+export { getAcceptedAppointments, getDoctorProfile, getDoneAppointments, getPendingAppointments, submitPrescription, updateAppointmentStatus, updateDoctorProfile, uploadProfilePhoto, uploadQualificationPhoto,getId};
+

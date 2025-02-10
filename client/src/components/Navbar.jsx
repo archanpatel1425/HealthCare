@@ -7,7 +7,6 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
   const patientData = useSelector((state) => state.auth.patientData);
-
   useEffect(() => {
     dispatch(checkUser());
     if (isloggedIN) {
@@ -35,7 +34,7 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   return (
-    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-50 transition-all duration-300">
+    <div className="bg-green-100 flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-50 transition-all duration-300">
       {/* Logo */}
       <div className="text-2xl sm:text-3xl font-bold text-green-700">
         HealCare
@@ -54,7 +53,14 @@ const Navbar = () => {
             <Link to="/contact">Contact</Link>
           </li>
           {isloggedIN && <li className="hover:text-green-800 transition duration-300">
-            <Link to="/patient-panel">Dashboard</Link>
+            {
+              patientData?.patientId?(
+                <Link to="/patient-panel">Dashboard</Link>
+              )
+              :(
+                <Link to="/doctor-panel">Dashboard</Link>
+              )
+            }
           </li>}
         </ul>
         {isloggedIN ? (
@@ -81,7 +87,7 @@ const Navbar = () => {
           aria-label="Open Menu"
         >
           ☰
-        </button>
+        </button> 
       </div>
 
       {/* Mobile Menu */}

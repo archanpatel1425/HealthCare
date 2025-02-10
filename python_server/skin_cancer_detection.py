@@ -21,7 +21,7 @@ classes = {
     2: ("benign keratosis-like lesions(Non-Cancerous)"),
     3: ("dermatofibroma(Non-Cancerous)"),
     4: ("melanocytic nevi(Non-Cancerous)"),
-    5: ("pyogenic granulomas and hemorrhage(Can lead to cancer)"),
+    5: ("pyogenic granulomas and hemorrhage(Non-Cancerous)"),
     6: ("melanoma(Cancer)"),
 }
 

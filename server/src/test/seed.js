@@ -14,35 +14,35 @@ async function main() {
     await prisma.prescription.createMany({
         data: [
             {
-                appointment_Id: 'a1b2c3d4-e567-89f0-1234-56789abcdef1',
+                appointment_Id: '952b41e9-eaf8-4e47-8e6c-3a99c499bba7',
                 doctor_Id: doctorId,
                 patient_Id: patientId,
                 medicines: 'Paracetamol 500mg, Amoxicillin 250mg',
                 notes: 'Take medicines after food',
             },
             {
-                appointment_Id: 'b5a4ca58-ef92-41fb-8a04-46da37d2e219',
+                appointment_Id: '952b41e9-eaf8-4e47-8e6c-3a99c499bba7',
                 doctor_Id: doctorId,
                 patient_Id: patientId,
                 medicines: 'Ibuprofen 400mg, Vitamin D3',
                 notes: 'Drink plenty of water',
             },
             {
-                appointment_Id: 'ee7827b8-8ca8-4875-8768-6cb7be51e2c9',
+                appointment_Id: '952b41e9-eaf8-4e47-8e6c-3a99c499bba7',
                 doctor_Id: doctorId,
                 patient_Id: patientId,
                 medicines: 'Cough Syrup, Levocetirizine 5mg',
                 notes: 'Avoid cold drinks',
             },
             {
-                appointment_Id: 'a5b6c7d8-e901-23f4-5678-90123abcdef5',
+                appointment_Id: 'ecdf548b-ae0a-435a-ac8f-2a3c3c0f4f00',
                 doctor_Id: doctorId,
                 patient_Id: patientId,
                 medicines: 'Omeprazole 20mg, Antacid Gel',
                 notes: 'Take before meals',
             },
             {
-                appointment_Id: 'f6870bdd-0151-4d52-8556-cee9a54ce6f6',
+                appointment_Id: 'ecdf548b-ae0a-435a-ac8f-2a3c3c0f4f00',
                 doctor_Id: doctorId,
                 patient_Id: patientId,
                 medicines: 'Painkiller, Muscle Relaxant',
