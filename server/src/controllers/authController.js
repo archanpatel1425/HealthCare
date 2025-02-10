@@ -1,8 +1,5 @@
 import { checkEmailExists, checkPhoneExists, createUserInDB, fetchuserlist, findUserById, loginUser } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/tokenUtils.js';
-export const getMess = async (req, res) => {
-    res.status(200).json("authenticated")
-}
 export const doctorSignUp = async (req, res) => {
     try {
         console.log(req.body);
@@ -120,7 +117,7 @@ export const patientSignUp = async (req, res) => {
     try {
         let userData = req.body;
         delete userData.confirmPassword;
-
+        
         const user = await createUserInDB(userData, 'Patient');
         res.status(201).json({ success: true, message: 'User created successfully !', user });
 
