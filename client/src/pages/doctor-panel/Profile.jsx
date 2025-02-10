@@ -13,6 +13,7 @@ const Profile = () => {
     const [update, setUpdate] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedImageFile, setSelectedImageFile] = useState(null);
+    const [selectedImageFile1, setSelectedImageFile1] = useState(null);
     const inputImgRef = useRef(null);
 
     const [formData, setFormData] = useState({
@@ -39,7 +40,6 @@ const Profile = () => {
                     doctorId: patientData?.doctorId,
                 })
                 .then((res) => {
-                    console.log(res.data)
                     setFormData({
                         first_name: res.data.first_name,
                         last_name: res.data.last_name,
@@ -93,7 +93,38 @@ const Profile = () => {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            return response.data.url;
+
+            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadprofile-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url })
+            if (newResponse.data.message == 'success') {
+                showToast('Profile photo uploaded successfully', 'success');
+                window.location.reload()
+            }
+
+        } catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+            }
+            showToast('Failed to upload image', 'error');
+            throw error;
+        }
+    };
+
+
+    const handleUpload1 = async (image) => {
+        const formData = new FormData();
+        formData.append('image', image);
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadqualification-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url })
+
+            if (newResponse.data.message == 'success') {
+                showToast('Profile photo uploaded successfully', 'success');
+                window.location.reload()
+            }
+
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
@@ -112,7 +143,6 @@ const Profile = () => {
 
         try {
             let updatedFormData = { ...formData };
-            console.log(updatedFormData)
 
             // If there's a new image selected, upload it first
             // if (selectedImageFile) {
@@ -131,7 +161,9 @@ const Profile = () => {
 
             if (response.data) {
                 showToast("Profile updated successfully", "success");
-                navigate("/doctor-panel");
+                // navigate("/doctor-panel");
+                setUpdate(false);
+                changeDisabled1()
             }
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
@@ -167,14 +199,29 @@ const Profile = () => {
     const handleImageChange1 = (e) => {
         const file = e.target.files[0];
         if (file) {
+            const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+            if (!acceptedTypes.includes(file.type)) {
+                showToast('Only JPG, JPEG, and PNG files are allowed', 'error');
+                e.target.value = '';
+                return;
+            }
+
             const imageURL = URL.createObjectURL(file);
             setSelectedImage1(imageURL);
+            setSelectedImageFile1(file);
         }
     };
 
     const changeDisabled = () => {
         document.querySelectorAll('.input-field').forEach((input) => {
             input.disabled = false;
+        });
+    };
+
+    const changeDisabled1 = () => {
+        document.querySelectorAll('.input-field').forEach((input) => {
+            input.disabled = true;
         });
     };
 
@@ -192,7 +239,7 @@ const Profile = () => {
                         <input disabled={true} type="text" name="last_name" placeholder="Last Name" className="input-field" value={formData.last_name} onChange={handleChange} autoComplete="off" />
                     </label>
                     <label className="flex flex-col">
-                        <span>Last Name</span>
+                        <span>Gender</span>
                         <select disabled={true} name="gender" className="input-field" value={formData.gender} onChange={handleChange}>
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
@@ -301,7 +348,9 @@ const Profile = () => {
                 {update == false ?
                     <></>
                     :
-                    <button className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                    <button
+                        onClick={() => { handleUpload(selectedImageFile) }}
+                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
                         Upload Photo
                     </button>
                 }
@@ -324,7 +373,7 @@ const Profile = () => {
                 {update == false ?
                     <></>
                     :
-                    <button className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                    <button onClick={() => { handleUpload1(selectedImageFile1) }} className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
                         Upload Photo
                     </button>
                 }

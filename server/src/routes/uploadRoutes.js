@@ -14,7 +14,6 @@ router.post('/', upload.single('image'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
-        console.log(req.file.path)
         const result = await uploadImage(req.file.path);
         // Delete the local file after uploading to Cloudinary
         fs.unlinkSync(req.file.path);
