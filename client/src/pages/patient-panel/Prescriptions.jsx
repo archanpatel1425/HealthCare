@@ -1,192 +1,143 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useSelector } from "react-redux";
+import { FaInfoCircle, FaUserMd, FaCalendarAlt,FaFileMedical } from "react-icons/fa";
+
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const MedicineCard = ({ medicine, link }) => (
+    <div className="p-4 bg-gray-100 shadow-md rounded-lg border border-gray-300">
+        <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-gray-800">{medicine.drugName}</h4>
+            <div className="flex items-center space-x-2">
+                <a
+                    href={link || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-blue-600 hover:text-blue-800 ${link === "No link found." ? "cursor-not-allowed opacity-50" : ""}`}
+                >
+                    Buy
+                </a>
+                <a
+                    href={link || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-blue-600 hover:text-blue-800 ${link === "No link found." ? "cursor-not-allowed opacity-50" : ""}`}
+                    title="More Info"
+                >
+                    <FaInfoCircle size={18} />
+                </a>
+            </div>
+        </div>
+        <p className="text-gray-600">Meal Timing: {medicine.mealTiming}</p>
+        <div className="flex justify-between w-full mt-2">
+            <span className={`text-sm ${medicine.breakfast ? 'text-red-600' : 'text-blue-600'}`}>Breakfast: {medicine.breakfast ? 'Yes' : 'No'}</span>
+            <span className={`text-sm ${medicine.lunch ? 'text-red-600' : 'text-blue-600'}`}>Lunch: {medicine.lunch ? 'Yes' : 'No'}</span>
+            <span className={`text-sm ${medicine.dinner ? 'text-red-600' : 'text-blue-600'}`}>Dinner: {medicine.dinner ? 'Yes' : 'No'}</span>
+        </div>
+    </div>
+);
 
 const Prescriptions = () => {
-    const api_url = import.meta.env.VITE_API_URL;
     const [prescriptions, setPrescriptions] = useState([]);
-    const [filteredPrescriptions, setFilteredPrescriptions] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedDate, setSelectedDate] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [medicineLinks, setMedicineLinks] = useState({});
+    const [filterDate, setFilterDate] = useState("");
+    const [filterDoctor, setFilterDoctor] = useState("");
+    const { patientData } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        const getData = async () => {
+        const fetchPrescriptions = async () => {
             try {
-                setLoading(true);
-                const response = await axios.get(`${api_url}/patient/getpriscription`, { withCredentials: true });
-                setPrescriptions(response.data);
-                setFilteredPrescriptions(response.data);
+                const response = await axios.get(`http://localhost:5000/patient/getpriscription`,{withCredentials:true});
+                const data = response.data.map(p => ({ ...p, medicines: JSON.parse(p.medicines || "[]") }));
+                setPrescriptions(data);
+                const uniqueMedicines = [...new Set(data.flatMap(p => p.medicines.map(m => m.drugName)))];
+                fetchMedicineLinks(uniqueMedicines);
             } catch (error) {
-                if (error.response.data.message === "Unauthorized: No token provided") {
-                    window.location.href = "/login"
-                }
-                console.error('Error fetching prescriptions:', error);
-            } finally {
-                setLoading(false);
+                console.error("Error fetching prescriptions:", error);
             }
         };
-        getData();
-    }, []);
+        fetchPrescriptions();
+    }, [patientData]);
 
-    // Helper function to format date string to YYYY-MM-DD
-    const formatDateString = (dateString) => {
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
-    };
-
-    // Filter prescriptions based on search term and selected date
-    useEffect(() => {
-        let filtered = [...prescriptions];
-
-        // Filter by doctor name
-        if (searchTerm) {
-            filtered = filtered.filter(prescription => {
-                const doctorFullName = `${prescription.doctor.first_name} ${prescription.doctor.last_name}`.toLowerCase();
-                return doctorFullName.includes(searchTerm.toLowerCase());
-            });
+    const fetchMedicineLinks = async (medicineNames) => {
+        try {
+            if (!medicineNames.length) return;
+            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", " )}.`;
+            const result = await model.generateContent(prompt);
+            const text = await result.response.text();
+            const linkRegex = /(https?:\/\/[^\s]+)/g;
+            const links = text.match(linkRegex) || [];
+            const linksMap = medicineNames.reduce((acc, med, index) => {
+                acc[med] = links[index] || "No link found.";
+                return acc;
+            }, {});
+            setMedicineLinks(linksMap);
+        } catch (error) {
+            console.error("Error fetching medicine links:", error);
         }
-
-        // Filter by date
-        if (selectedDate) {
-            filtered = filtered.filter(prescription => {
-                // Format the prescription date to YYYY-MM-DD for comparison
-                const prescriptionDate = formatDateString(prescription.appointment.date);
-                return prescriptionDate === selectedDate;
-            });
-        }
-
-        setFilteredPrescriptions(filtered);
-    }, [searchTerm, selectedDate, prescriptions]);
-
-    // Handle search input change
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
     };
 
-    // Handle date filter change
-    const handleDateChange = (e) => {
-        setSelectedDate(e.target.value);
-    };
-
-    // Clear all filters
-    const clearFilters = () => {
-        setSearchTerm('');
-        setSelectedDate('');
-        setFilteredPrescriptions(prescriptions);
-    };
-
-    // Format date for display
-    const formatDisplayDate = (dateString) => {
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    };
-
-    if (loading) {
-        return <div className="text-center py-4">Loading prescriptions...</div>;
-    }
+    const filteredPrescriptions = prescriptions.filter(p => 
+        (!filterDate || new Date(p.createdAt).toISOString().split("T")[0] === filterDate) &&
+        (!filterDoctor || `${p.doctor.first_name} ${p.doctor.last_name}`.toLowerCase().includes(filterDoctor.toLowerCase()))
+    );
 
     return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6">Prescriptions</h2>
+            <div className="max-w-6xl mx-auto p-6 bg-green-100 shadow-lg rounded-lg overflow-auto relative sm:p-4 sm:h-auto ">
 
-            {/* Search and Filter Section */}
-            <div className="mb-6 space-y-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                    {/* Search Input */}
-                    <div className="flex-1">
-                        <input
-                            type="text"
-                            placeholder="Search by doctor name..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    {/* Date Filter */}
-                    <div className="flex-1">
+            <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center"><FaFileMedical className="mr-2" /> Prescriptions</h2>
+                <div className="flex gap-4">
+                    <div className="flex flex-col w-full sm:w-auto">
+                        <label className="text-gray-700 font-medium">Filter by Date:</label>
                         <input
                             type="date"
-                            value={selectedDate}
-                            onChange={handleDateChange}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="p-2 border border-gray-300 rounded-md w-full"
+                            value={filterDate}
+                            onChange={(e) => setFilterDate(e.target.value)}
                         />
                     </div>
-
-                    {/* Clear Filters Button */}
-                    {(searchTerm || selectedDate) && (
-                        <button
-                            onClick={clearFilters}
-                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                        >
-                            Clear Filters
-                        </button>
-                    )}
-                </div>
-
-                {/* Results Count */}
-                <div className="text-sm text-gray-600">
-                    Showing {filteredPrescriptions.length} of {prescriptions.length} prescriptions
-                    {selectedDate && (
-                        <span className="ml-2">
-                            for date: {formatDisplayDate(selectedDate)}
-                        </span>
-                    )}
+                    <div className="flex flex-col w-full sm:w-auto">
+                        <label className="text-gray-700 font-medium">Filter by Doctor:</label>
+                        <input
+                            type="text"
+                            className="p-2 border border-gray-300 rounded-md w-full"
+                            placeholder="Enter doctor's name"
+                            value={filterDoctor}
+                            onChange={(e) => setFilterDoctor(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 w-full sm:w-auto h-10 mt-6"
+                        onClick={() => { setFilterDate(""); setFilterDoctor(""); }}
+                    >
+                        Clear Filters
+                    </button>
                 </div>
             </div>
-
-            {/* Prescriptions List */}
-            {filteredPrescriptions.length > 0 ? (
-                <div className="space-y-4">
-                    {filteredPrescriptions.map((prescription) => (
-                        <div
-                            key={prescription.prescriptionId}
-                            className="bg-white border rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p className="font-medium text-lg text-blue-600">
-                                        Dr. {prescription.doctor.first_name} {prescription.doctor.last_name}
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-gray-600">
-                                        <span className="font-medium">Date:</span>{' '}
-                                        {formatDisplayDate(prescription.appointment.date)}
-                                    </p>
-                                    <p className="text-gray-600">
-                                        <span className="font-medium">Time:</span>{' '}
-                                        {prescription.appointment.time}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 space-y-2">
-                                <div className="bg-gray-50 p-3 rounded">
-                                    <p className="font-medium">Medicines:</p>
-                                    <p className="text-gray-700">{prescription.medicines || 'No medicines prescribed'}</p>
-                                </div>
-                                <div className="bg-gray-50 p-3 rounded">
-                                    <p className="font-medium">Notes:</p>
-                                    <p className="text-gray-700">{prescription.notes || 'No notes available'}</p>
-                                </div>
-                            </div>
+            <div>
+                {filteredPrescriptions.map((prescription) => (
+                    <div key={prescription.prescriptionId} className="w-full bg-white border border-gray-300 rounded-lg shadow-md p-6 mb-6 sm:p-4">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <h3 className="text-lg font-semibold text-gray-800 flex items-center"><FaUserMd className="mr-2" /> {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
+                            <p className="text-sm text-gray-600 flex items-center"><FaCalendarAlt className="mr-2" /> {new Date(prescription.createdAt).toLocaleDateString()}</p>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600">
-                        {prescriptions.length === 0
-                            ? 'No prescriptions found.'
-                            : 'No prescriptions match your search criteria.'}
-                    </p>
-                </div>
-            )}
+                        <p className="text-red-600">Notes: {prescription.notes || "No notes available"}</p>
+                        <div className="mt-4 grid grid-cols-1 gap-4">
+                            {prescription.medicines.length > 0 ? (
+                                prescription.medicines.map((medicine, index) => (
+                                    <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
+                                ))
+                            ) : (
+                                <p className="text-gray-500">No medicines prescribed.</p>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

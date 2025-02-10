@@ -1,9 +1,11 @@
 import { Camera, Mic, MicOff, Monitor, PhoneOff, Video, VideoOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from 'react-router-dom';
 import io from "socket.io-client";
 import "../App.css";
+import { fetchUserData } from "../Store/patient/authslice";
 
 const socket = io("http://localhost:5000", {
   withCredentials: true,
@@ -11,18 +13,24 @@ const socket = io("http://localhost:5000", {
 });
 
 function Meeting() {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchUserData())
+  }, [dispatch])
   const myVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerRef = useRef(null);
   const localStreamRef = useRef(null);
   const screenStreamRef = useRef(null);
   const { meetId } = useParams();
+  const [appointmentId, setappointmentId] = useState(meetId)
   const [remoteStream, setRemoteStream] = useState(null);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const patientData = useSelector((state) => state.auth.patientData)
   const navigate = useNavigate();
-  
+
   const toggleVideo = () => {
     if (localStreamRef.current) {
       const videoTrack = localStreamRef.current
@@ -299,7 +307,12 @@ function Meeting() {
       socket.emit('leave-room', "1234");
       setRemoteStream(null);
       setIsScreenSharing(false);
-      navigate('/')
+      if (patientData?.doctorId) {
+        navigate('/doctor-panel/prescription-form', { state: { appointmentId } })
+      }
+      else {
+        navigate('/patient-panel')
+      }
     } catch (err) {
       console.error("Error leaving meeting:", err);
     }

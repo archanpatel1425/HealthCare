@@ -1,6 +1,33 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+
+const getId = async (req, res) => {
+  try {
+    const doctorId = req.userId;
+    const { appointmentId } = req.body;
+
+    // Find the appointment and get the patient_Id
+    const appointment = await prisma.appointment.findUnique({
+      where: { appointmentId },
+      select: { patient_Id: true }
+    });
+
+    // If no appointment is found
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    res.status(200).json({ patientId: appointment.patient_Id });
+
+  } catch (error) {
+    console.error('Error fetching patientId:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export default getId;
+
 const getDoctorProfile = async (req, res) => {
   try {
 
@@ -152,7 +179,6 @@ const submitPrescription = async (req, res) => {
         notes: notes
       }
     });
-
     res.status(201).json({
       message: "Prescription created successfully",
       prescription: newPrescription
@@ -197,7 +223,7 @@ const getAcceptedAppointments = async (req, res) => {
     const acceptedAppointments = await prisma.appointment.findMany({
       where: {
         doctor_Id: doctorId,
-        status: "Accepted",
+        status: "Scheduled",
       },
       include: { patient: true },
       orderBy: {
@@ -238,4 +264,5 @@ const getDoneAppointments = async (req, res) => {
   }
 };
 
-export { uploadQualificationPhoto,uploadProfilePhoto, getDoctorProfile, getPendingAppointments, updateDoctorProfile, getAcceptedAppointments, getDoneAppointments, updateAppointmentStatus, submitPrescription };
+export { getAcceptedAppointments, getDoctorProfile, getDoneAppointments, getPendingAppointments, submitPrescription, updateAppointmentStatus, updateDoctorProfile, uploadProfilePhoto, uploadQualificationPhoto,getId};
+
