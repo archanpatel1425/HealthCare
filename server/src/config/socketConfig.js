@@ -3,41 +3,41 @@ import jwt from 'jsonwebtoken';
 import { Server as SocketIOServer } from 'socket.io';
 const prisma = new PrismaClient();
 
-const verifySocketToken = (socket, next) => {
-    try {
-        const token = socket.handshake.headers.cookie
-            ? socket.handshake.headers.cookie.split('=')[1]
-            : null;
-        if (!token) {
-            return next(new Error('Authentication error: Token missing'));
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        socket.user = decoded;
-        next();
-    } catch (error) {
-        console.log("in error : ", error)
-        next(new Error('Authentication error: Invalid token'));
-    }
-};
 
 export const initializeSocket = (server) => {
+    const verifySocketToken = (socket, next) => {
+        try {
+            const token = socket.handshake.headers.cookie
+                ? socket.handshake.headers.cookie.split('=')[1]
+                : null;
+            if (!token) {
+                return next(new Error('Authentication error: Token missing'));
+            }
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            socket.user = decoded;
+            next();
+        } catch (error) {
+            console.log("in error : ", error)
+            next(new Error('Authentication error: Invalid token'));
+        }
+    };
     const io = new SocketIOServer(server, {
         cors: {
             origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
             methods: ["GET", "POST"],
             credentials: true,
-            // allowedHeaders: ["Authorization"]
+            allowedHeaders: ["Authorization"]
         },
-        // transports: ["websocket", "polling"]
+        transports: ["websocket", "polling"]
     });
 
     const activeUsers = new Map();  
 
-    // io.use(verifySocketToken);
+    io.use(verifySocketToken);
 
     io.on("connection", (socket) => {
         // Store user connection
-        // activeUsers.set(socket.user.id, socket.id);
+        activeUsers.set(socket.user.id, socket.id);
         io.emit('activeUsers', Array.from(activeUsers.keys()));
 
         socket.on("join-room", (meetId) => {

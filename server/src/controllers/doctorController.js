@@ -114,7 +114,7 @@ const submitPrescription = async (req, res) => {
         notes: notes
       }
     });
-
+    console.log("new priscription : ",newPrescription)
     res.status(201).json({
       message: "Prescription created successfully",
       prescription: newPrescription

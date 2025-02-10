@@ -1,14 +1,15 @@
 import axios from 'axios';
-import { Calendar, Clock, FileText, User, Search, X } from 'lucide-react';
+import { Calendar, Clock, FileText, MessageCircle, Search, User, Video, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const RecentAppointments = () => {
+    const navigate = useNavigate();
     const [appointments, setAppointments] = useState([]);
     const [filteredAppointments, setFilteredAppointments] = useState([]);
     const [doctorSearch, setDoctorSearch] = useState('');
     const [dateFilter, setDateFilter] = useState('');
     const VITE_API_URL = import.meta.env.VITE_API_URL;
-
     useEffect(() => {
         const fetchData = () => {
             axios.get(`${VITE_API_URL}/patient/getAppointments`, { withCredentials: true })
@@ -36,14 +37,14 @@ const RecentAppointments = () => {
 
         if (doctorSearch) {
             const searchTerm = doctorSearch.toLowerCase();
-            filtered = filtered.filter(app => 
+            filtered = filtered.filter(app =>
                 `${app.doctor.first_name} ${app.doctor.last_name}`.toLowerCase().includes(searchTerm)
             );
         }
 
         if (dateFilter) {
             const filterDate = new Date(dateFilter).toDateString();
-            filtered = filtered.filter(app => 
+            filtered = filtered.filter(app =>
                 new Date(app.date).toDateString() === filterDate
             );
         }
@@ -55,6 +56,14 @@ const RecentAppointments = () => {
         setDoctorSearch('');
         setDateFilter('');
         setFilteredAppointments(appointments);
+    };
+
+    const handleVideoCall = (appointmentId) => {
+        navigate(`/meet/${appointmentId}`);
+    };
+
+    const handleChat = (appointmentId) => {
+        navigate(`/chat`);
     };
 
     const getStatusColor = (status) => {
@@ -111,6 +120,25 @@ const RecentAppointments = () => {
                             {appointment.reason}
                         </span>
                     </div>
+
+                    {appointment.status.toLowerCase() === 'scheduled' && (
+                        <div className="flex space-x-3 mt-3">
+                            <button
+                                onClick={() => handleVideoCall(appointment.appointmentId)}
+                                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                            >
+                                <Video className="w-4 h-4 mr-2" />
+                                Video Call
+                            </button>
+                            <button
+                                onClick={() => handleChat(appointment.appointmentId)}
+                                className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                            >
+                                <MessageCircle className="w-4 h-4 mr-2" />
+                                Chat
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-3 text-right">
@@ -118,10 +146,10 @@ const RecentAppointments = () => {
                         {appointment.status}
                     </span>
                     <p className="text-gray-800 font-medium">
-                       DR. {appointment.doctor.first_name} {appointment.doctor.last_name}
+                        DR. {appointment.doctor.first_name} {appointment.doctor.last_name}
                     </p>
                     <p className="text-gray-600 font-medium">
-                       Specicalization : {appointment.doctor.specialization}
+                        Specialization: {appointment.doctor.specialization}
                     </p>
                 </div>
             </div>
@@ -129,10 +157,10 @@ const RecentAppointments = () => {
     );
 
     const StatusSection = ({ title, appointments, status, bgColor }) => {
-        const filteredAppointments = appointments.filter(app => 
+        const filteredAppointments = appointments.filter(app =>
             app.status.toLowerCase() === status.toLowerCase()
         );
-        
+
         return (
             <div className={`p-6 rounded-lg ${bgColor}`}>
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
@@ -140,8 +168,8 @@ const RecentAppointments = () => {
                 </h3>
                 <div className="h-[calc(30vh-2rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 pr-4">
                     {filteredAppointments.map(appointment => (
-                        <AppointmentCard 
-                            key={appointment.appointmentId} 
+                        <AppointmentCard
+                            key={appointment.appointmentId}
                             appointment={appointment}
                         />
                     ))}
@@ -159,7 +187,7 @@ const RecentAppointments = () => {
         <div className="bg-white shadow-lg p-6 w-full">
             <div className="flex flex-col space-y-4 mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Appointments Dashboard</h2>
-                
+
                 <div className="flex flex-wrap gap-4 items-center">
                     <div className="relative flex-1 min-w-[200px]">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -190,25 +218,25 @@ const RecentAppointments = () => {
                     </button>
                 </div>
             </div>
-            
+
             {filteredAppointments && (
                 <div className="grid grid-rows-1 lg:grid-rows-3 gap-6">
-                    <StatusSection 
-                        title="Pending Appointments" 
+                    <StatusSection
+                        title="Pending Appointments"
                         appointments={filteredAppointments}
                         status="pending"
                         bgColor="bg-yellow-50"
                     />
-                    
-                    <StatusSection 
-                        title="Scheduled Appointments" 
+
+                    <StatusSection
+                        title="Scheduled Appointments"
                         appointments={filteredAppointments}
                         status="scheduled"
                         bgColor="bg-blue-50"
                     />
-                    
-                    <StatusSection 
-                        title="Rejected Appointments" 
+
+                    <StatusSection
+                        title="Rejected Appointments"
                         appointments={filteredAppointments}
                         status="rejected"
                         bgColor="bg-red-50"

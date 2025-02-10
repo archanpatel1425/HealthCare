@@ -7,7 +7,6 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
   const patientData = useSelector((state) => state.auth.patientData);
-
   useEffect(() => {
     dispatch(checkUser());
     if (isloggedIN) {
@@ -54,7 +53,14 @@ const Navbar = () => {
             <Link to="/contact">Contact</Link>
           </li>
           {isloggedIN && <li className="hover:text-green-800 transition duration-300">
-            <Link to="/patient-panel">Dashboard</Link>
+            {
+              patientData?.patientId?(
+                <Link to="/patient-panel">Dashboard</Link>
+              )
+              :(
+                <Link to="/doctor-panel">Dashboard</Link>
+              )
+            }
           </li>}
         </ul>
         {isloggedIN ? (
