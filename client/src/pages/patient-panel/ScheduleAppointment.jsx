@@ -2,10 +2,12 @@ import axios from 'axios';
 import { Calendar, CheckCircle, Clock, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { fetchUserData } from '../../Store/patient/authslice';
 
 const ScheduleAppointment = () => {
+    const navigate=useNavigate()
     const dispatch = useDispatch();
     const { patientData } = useSelector((state) => state.auth);
     const [slots, setSlots] = useState({});
@@ -47,14 +49,23 @@ const ScheduleAppointment = () => {
             reason: isOtherReason ? customReason : reason,
             status: 'Pending'
         };
+        try {
 
-        await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
-
-        setSelectedSlot(null);
-        setReason('');
-        setCustomReason('');
-        setIsOtherReason(false);
-        setIsModalOpen(false);
+            await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
+            toast.success("Appointment Booked SuccessFully!")
+            navigate('/patient-panel')
+            setSelectedSlot(null);
+            setReason('');
+            setCustomReason('');
+            setIsOtherReason(false);
+            setIsModalOpen(false);
+        }
+        catch (error) {
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+            }
+            console.error(error);
+        }
     };
 
     return (

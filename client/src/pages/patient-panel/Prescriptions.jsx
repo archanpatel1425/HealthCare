@@ -123,23 +123,23 @@ const Prescriptions = () => {
             </div>
             {/* This section now has the vertical scroll only */}
             <div className="p-4 overflow-y-auto max-h-[calc(100vh-400px)] sm:max-h-[calc(100vh-270px)] md:max-h-[calc(100vh-260px)] lg:max-h-[calc(100vh-240px)]"> {/* Adjusted max-height to give more space on smaller screens */}                {filteredPrescriptions.map((prescription) => (
-                <div key={prescription.prescriptionId} className="w-full bg-green-50 border border-green-600 rounded-lg shadow-md p-6 mb-6 sm:p-4">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                        <h3 className="text-lg font-semibold text-green-800 flex items-center"><FaUserMd className="mr-2" /> {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
-                        <p className="text-sm text-green-600 flex items-center"><FaCalendarAlt className="mr-2" /> {new Date(prescription.createdAt).toLocaleDateString()}</p>
+                    <div key={prescription.prescriptionId} className="w-full bg-green-50 border border-green-600 rounded-lg shadow-md p-6 mb-6 sm:p-4">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <h3 className="text-lg font-semibold text-green-800 flex items-center"><FaUserMd className="mr-2" /> {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
+                            <p className="text-sm text-green-600 flex items-center"><FaCalendarAlt className="mr-2" /> {new Date(prescription.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <p className="text-red-600">Notes: {prescription.notes || "No notes available"}</p>
+                        <div className="mt-4 grid grid-cols-1 gap-4">
+                            {prescription.medicines.length > 0 ? (
+                                prescription.medicines.map((medicine, index) => (
+                                    <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
+                                ))
+                            ) : (
+                                <p className="text-green-500">No medicines prescribed.</p>
+                            )}
+                        </div>
                     </div>
-                    <p className="text-red-600">Notes: {prescription.notes || "No notes available"}</p>
-                    <div className="mt-4 grid grid-cols-1 gap-4">
-                        {prescription.medicines.length > 0 ? (
-                            prescription.medicines.map((medicine, index) => (
-                                <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
-                            ))
-                        ) : (
-                            <p className="text-green-500">No medicines prescribed.</p>
-                        )}
-                    </div>
-                </div>
-            ))}
+                ))}
             </div>
         </div>
     );
