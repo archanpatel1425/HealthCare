@@ -189,6 +189,9 @@ export const getDoctorsBySpecialization = async (req, res) => {
 
     const doctors = await prisma.doctor.findMany({
       select: {
+        email: true,
+        phone_no: true,
+        gender: true,
         doctorId: true,
         first_name: true,
         last_name: true,
@@ -196,7 +199,7 @@ export const getDoctorsBySpecialization = async (req, res) => {
         profilepic: true,
         experience: true,
         qualifications: true,
-        specialization:true,
+        specialization: true,
         availability: true
       }
     });
@@ -221,11 +224,9 @@ export const createAppointment = async (req, res) => {
     if (!appointment_data.patient_Id || !appointment_data.doctor_Id || !appointment_data.date || !appointment_data.time) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-    console.log('here')
     const appointment = await prisma.appointment.create({
       data: appointment_data
     });
-
     res.status(201).json({
       message: "Appointment created successfully",
       appointment,

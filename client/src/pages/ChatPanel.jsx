@@ -137,10 +137,13 @@ const ChatPanel = () => {
                 }
             });
         }
+        scrollToBottom()
     }, [selectedUser, messages]);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+        }
     };
 
     const handleImageSelect = (e) => {
@@ -218,8 +221,8 @@ const ChatPanel = () => {
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
-              }
-             
+            }
+
             console.error('Error uploading image:', error);
             alert('Failed to upload image');
         }
@@ -347,7 +350,7 @@ const ChatPanel = () => {
                                 <span className="text-sm text-green-900">{onlineUsers.has(selectedUser.doctorId || selectedUser.patientId) ? 'Online' : 'Offline'}</span>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto bg-green-50 p-3 rounded-lg space-y-4">
+                        <div className="flex-1 overflow-y-scroll bg-green-50 p-3 rounded-lg space-y-4" ref={messagesEndRef}>
                             {messages.filter(msg => (msg.senderId === selectedUser?.doctorId || msg.senderId === selectedUser?.patientId) || (msg.receiverId === selectedUser?.doctorId || msg.receiverId === selectedUser?.patientId)).map((msg, idx) => (
                                 <div key={idx} className={`flex ${isMessageFromCurrentUser(msg) ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-sm rounded-lg ${isMessageFromCurrentUser(msg) ? 'bg-green-300 text-green-900' : 'bg-green-400 text-green-900'}`}>
@@ -363,11 +366,9 @@ const ChatPanel = () => {
                                             {isMessageFromCurrentUser(msg) && <span className={getStatusColor(msg.status)}>{getMessageStatus(msg)}</span>}
                                         </div>
                                     </div>
-                                    <div ref={messagesEndRef} />
                                 </div>
                             ))}
                             {selectedUser && typingUsers.has(selectedUser?.doctorId || selectedUser?.patientId) && <div className="text-sm text-gray-500 italic">typing...</div>}
-                            <div ref={messagesEndRef} />
                         </div>
                         <div className="mt-4">
                             {selectedImagePreview && (
@@ -434,7 +435,7 @@ const ChatPanel = () => {
             </div>
         </div>
     );
-     
+
 };
 
 export default ChatPanel;

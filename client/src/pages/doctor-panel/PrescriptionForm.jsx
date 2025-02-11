@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchUserData } from '../../Store/patient/authslice';
+import { showToast } from "./Alerts";
 
 const PrescriptionForm = () => {
-
+    const navigate = useNavigate()
+    const location = useLocation();
+    const appointmentId = location.state?.appointmentId;
     const dispatch = useDispatch();
 
     const { patientData } = useSelector((state) => state.auth);
@@ -35,16 +39,20 @@ const PrescriptionForm = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/getId`, { appointmentId }, { withCredentials: true })
+        const patientId = res.data?.patientId
         let data = prescriptions.filter(p => p.drugName.trim() !== '');
         try {
-            axios.post(`${import.meta.env.VITE_API_URL}/doctor/submit-prescription`, { data: data, note: note, appointmentId: "ab4be390-48b1-45b6-9fa9-828ea8ff5901", patientId: "02a43da6-d460-44f0-8f7f-a202c856d4af", doctorId: patientData?.doctorId }).then((res) => {
+            axios.post(`${import.meta.env.VITE_API_URL}/doctor/submit-prescription`, { data: data, notes: note, appointmentId: appointmentId, patientId: patientId, doctorId: patientData?.doctorId }).then((res) => {
             });
+                showToast("Prescription Filled Up SuccessFully!.","success");
+                navigate('/doctor-panel')
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
-              }          
+            }
         }
     };
 

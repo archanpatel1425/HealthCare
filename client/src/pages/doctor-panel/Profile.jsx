@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import './a.css'
-import { showToast } from './Alerts'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom';
 import { fetchUserData } from "../../Store/patient/authslice";
+import './a.css';
+import { showToast } from './Alerts';
 
 const Profile = () => {
     const dispatch = useDispatch();
@@ -35,24 +35,30 @@ const Profile = () => {
 
     useEffect(() => {
         if (patientData) {
-            axios
-                .post(`${import.meta.env.VITE_API_URL}/doctor/getprofile`, {
-                    doctorId: patientData?.doctorId,
-                })
-                .then((res) => {
-                    setFormData({
-                        first_name: res.data.first_name,
-                        last_name: res.data.last_name,
-                        gender: res.data.gender,
-                        phone_no: res.data.phone_no,
-                        profilepic: res.data.profilepic,
-                        email: res.data.email,
-                        specialization: res.data.specialization,
-                        experience: res.data.experience,
-                        qualifications: res.data.qualifications,
-                        availability: res.data.availability,
+            try {
+                axios
+                    .post(`${import.meta.env.VITE_API_URL}/doctor/getprofile`, {
+                        doctorId: patientData?.doctorId,
+                    }, { withCredentials: true })
+                    .then((res) => {
+                        setFormData({
+                            first_name: res.data.first_name,
+                            last_name: res.data.last_name,
+                            gender: res.data.gender,
+                            phone_no: res.data.phone_no,
+                            profilepic: res.data.profilepic,
+                            email: res.data.email,
+                            specialization: res.data.specialization,
+                            experience: res.data.experience,
+                            qualifications: res.data.qualifications,
+                            availability: res.data.availability,
+                        });
                     });
-                });
+            } catch (error) {
+                if (error.response.data.message === "Unauthorized: No token provided") {
+                    window.location.href = "/login"
+                }
+            }
         }
     }, [patientData]);
 
@@ -91,16 +97,17 @@ const Profile = () => {
         formData.append('image', image);
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true
             });
 
-            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadprofile-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url })
+            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadprofile-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url }, { withCredentials: true })
             if (newResponse.data.message == 'success') {
                 showToast('Profile photo uploaded successfully', 'success');
                 window.location.reload()
             }
 
         } catch (error) {
+            console.log("profile erorro", error)
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
             }
@@ -115,10 +122,10 @@ const Profile = () => {
         formData.append('image', image);
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true
             });
 
-            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadqualification-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url })
+            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadqualification-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url }, { withCredentials: true })
 
             if (newResponse.data.message == 'success') {
                 showToast('Profile photo uploaded successfully', 'success');
@@ -157,6 +164,8 @@ const Profile = () => {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, {
                 doctorId: patientData?.doctorId,
                 formData: updatedFormData
+            }, {
+                withCredentials: true
             });
 
             if (response.data) {

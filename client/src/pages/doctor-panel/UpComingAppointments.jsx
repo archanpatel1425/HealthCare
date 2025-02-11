@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserData } from '../../Store/patient/authslice';
 
@@ -22,10 +22,17 @@ const UpComingAppointments = () => {
   }, []);
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/accepted`, { doctorId: patientData?.doctorId }).then((res) => {
-      setPatients(res.data);
-      setFilterPatients(res.data);
-    });
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/accepted`, { doctorId: patientData?.doctorId }, { withCredentials: true }).then((res) => {
+        setPatients(res.data);
+        setFilterPatients(res.data);
+      });
+    } catch (error) {
+      alert(error)
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -81,7 +88,6 @@ const UpComingAppointments = () => {
     setEndDate(null);
     setShowFilters(false);
   };
-
   return (
     <div className="md:px-6 py-2">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">

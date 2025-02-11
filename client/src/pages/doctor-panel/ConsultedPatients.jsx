@@ -22,11 +22,15 @@ const ConsultedPatients = () => {
   }, []);
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/done`, { doctorId: patientData?.doctorId })
-      .then((res) => {
-        setPatients(res.data);
-        setFilterPatients(res.data);
-      });
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/done`, { doctorId: patientData?.doctorId },{withCredentials:true})
+        .then((res) => {
+          setPatients(res.data);
+          setFilterPatients(res.data);
+        });
+    } catch (error) {
+      
+    }
   }, [patientData]);
 
   useEffect(() => {
