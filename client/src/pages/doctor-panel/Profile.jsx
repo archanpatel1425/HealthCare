@@ -232,15 +232,15 @@ const Profile = () => {
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <label className="flex flex-col">
                         <span>First Name</span>
-                        <input disabled={true} type="text" name="first_name" placeholder="First Name" className="input-field" value={formData.first_name} onChange={handleChange} autoComplete="off" />
+                        <input disabled={true} type="text" name="first_name" placeholder="First Name" className="input-field disabled:border-green-600 disabled:border-2" value={formData.first_name} onChange={handleChange} autoComplete="off" />
                     </label>
                     <label className="flex flex-col">
                         <span>Last Name</span>
-                        <input disabled={true} type="text" name="last_name" placeholder="Last Name" className="input-field" value={formData.last_name} onChange={handleChange} autoComplete="off" />
+                        <input disabled={true} type="text" name="last_name" placeholder="Last Name" className="input-field disabled:border-green-600 disabled:border-2" value={formData.last_name} onChange={handleChange} autoComplete="off" />
                     </label>
                     <label className="flex flex-col">
                         <span>Gender</span>
-                        <select disabled={true} name="gender" className="input-field" value={formData.gender} onChange={handleChange}>
+                        <select disabled={true} name="gender" className="input-field disabled:border-green-600 disabled:border-2" value={formData.gender} onChange={handleChange}>
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -250,22 +250,22 @@ const Profile = () => {
 
                     <label className="flex flex-col">
                         <span>Phone No.</span>
-                        <input disabled={true} type="text" name="phone_no" placeholder="Phone Number" className="input-field" value={formData.phone_no} onChange={handleChange} autoComplete="off" />
+                        <input disabled={true} type="text" name="phone_no" placeholder="Phone Number" className="input-field disabled:border-green-600 disabled:border-2" value={formData.phone_no} onChange={handleChange} autoComplete="off" />
                     </label>
 
                     <label className="flex flex-col">
                         <span>Email</span>
-                        <input disabled={true} type="email" name="email" placeholder="Email" className="input-field" value={formData.email} onChange={handleChange} autoComplete="off" />
+                        <input disabled={true} type="email" name="email" placeholder="Email" className="input-field disabled:border-green-600 disabled:border-2" value={formData.email} onChange={handleChange} autoComplete="off" />
                     </label>
 
                     <label className="flex flex-col">
                         <span>Specialization</span>
-                        <input disabled={true} type="text" name="specialization" placeholder="Specialization" className="input-field" value={formData.specialization} onChange={handleChange} autoComplete="off" />
+                        <input disabled={true} type="text" name="specialization" placeholder="Specialization" className="input-field disabled:border-green-600 disabled:border-2" value={formData.specialization} onChange={handleChange} autoComplete="off" />
                     </label>
 
                     <label className="flex flex-col">
                         <span>Experience</span>
-                        <input disabled={true} type="text" name="experience" placeholder="Experience (e.g., 10 years)" className="input-field" value={formData.experience} onChange={handleChange} autoComplete="off" />
+                        <input disabled={true} type="text" name="experience" placeholder="Experience (e.g., 10 years)" className="input-field disabled:border-green-600 disabled:border-2" value={formData.experience} onChange={handleChange} autoComplete="off" />
                     </label>
 
                     <br />
@@ -273,7 +273,7 @@ const Profile = () => {
                         <h4 className="">Available Days</h4>
                     </div>
                     <br />
-                    <div className="flex items-center gap-2">
+                    <div className="w-[213%] flex flex-wrap items-center gap-2">
                         {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
                             <div className="border px-2 border-gray-800 rounded-lg" key={day}>
                                 <label className="flex items-center">
@@ -298,7 +298,7 @@ const Profile = () => {
                     <div className="flex items-center gap-2">
                         <input
                             type="time"
-                            className="input-field"
+                            className="input-field disabled:border-green-600 disabled:border-2"
                             name="from"
                             value={formData?.availability?.time?.from || ""}
                             onChange={handleTimeChange}
@@ -306,7 +306,7 @@ const Profile = () => {
                         />
                         <input
                             type="time"
-                            className="input-field"
+                            className="input-field disabled:border-green-600 disabled:border-2"
                             name="to"
                             value={formData?.availability?.time?.to || ""}
                             onChange={handleTimeChange}
@@ -322,41 +322,107 @@ const Profile = () => {
 
             <div className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-6 flex flex-col items-center h-[80vh] overflow-x-auto">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profile Picture</h2>
-                <div className="flex items-center gap-5 justify-center">
-                    <img src={formData.profilepic || "https://via.placeholder.com/150"} alt="Profile" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
-                    {selectedImage && (
-                        <>
-                            <i className="fa-solid fa-arrow-right"></i>
-                            <div className="relative">
-                                <img src={selectedImage} alt="" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setSelectedImage(null);
-                                        setSelectedImageFile(null);
-                                        inputImgRef.current.value = null;
-                                    }}
-                                    className="absolute top-0 right-0 bg-red-500 rounded-full p-1 text-white"
-                                >
-                                    <i className="fa-solid fa-xmark"></i>
-                                </button>
-                            </div>
-                        </>
-                    )}
+                <div className="relative group">
+                    {/* Show selected image preview if available */}
+                    <img
+                        src={selectedImage || formData.profilepic || "https://via.placeholder.com/150"}
+                        alt="Profile"
+                        className="w-48 h-48 rounded-full border-4 border-green-600 object-cover mb-4"
+                    />
+
+                    {update &&
+                        <div
+                            className="rounded-full w-48 h-48 absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            onClick={() => inputImgRef.current.click()}
+                        >
+                            <i className="fa-solid fa-camera text-white text-2xl"></i>
+                        </div>
+                    }
+
+                    {/* Hidden Input for File Selection */}
+                    <input
+                        ref={inputImgRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                    />
                 </div>
-                <input disabled={true} ref={inputImgRef} type="file" accept="image/*" className="input-field" onChange={handleImageChange} />
-                {update == false ?
-                    <></>
-                    :
+
+                {/* Show Remove Image Button if a new image is selected */}
+                {selectedImage && (
                     <button
-                        onClick={() => { handleUpload(selectedImageFile) }}
-                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                        onClick={() => {
+                            setSelectedImage(null);
+                            setSelectedImageFile(null);
+                            inputImgRef.current.value = null;
+                        }}
+                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                    >
+                        Remove Image
+                    </button>
+                )}
+
+                {/* Upload Image Button (Visible only if update mode is active) */}
+                {update && selectedImage && (
+                    <button
+                        onClick={() => handleUpload(selectedImageFile)}
+                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                    >
                         Upload Photo
                     </button>
-                }
+                )}
                 <hr className="border w-full mt-3" />
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center mt-2">Qualification</h2>
-                <div className="flex items-center gap-5 justify-center">
+                <div className="relative group">
+                    {/* Show selected image preview if available */}
+                    <img
+                        src={selectedImage1 || formData.qualifications || "https://via.placeholder.com/150"}
+                        alt="Profile"
+                        className="w-48 h-48 rounded-full border-4 border-green-600 object-cover mb-4"
+                    />
+                    {update &&
+                        <div
+                            className="rounded-full w-48 h-48 absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            onClick={() => inputImgRef1.current.click()}
+                        >
+                            <i className="fa-solid fa-camera text-white text-2xl"></i>
+                        </div>
+                    }
+                    {/* Hidden Input for File Selection */}
+                    <input
+                        ref={inputImgRef1}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange1}
+                    />
+                </div>
+
+                {/* Show Remove Image Button if a new image is selected */}
+                {selectedImage1 && (
+                    <button
+                        onClick={() => {
+                            setSelectedImage1(null);
+                            setSelectedImageFile1(null);
+                            inputImgRef1.current.value = null;
+                        }}
+                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                    >
+                        Remove Image
+                    </button>
+                )}
+
+                {/* Upload Image Button (Visible only if update mode is active) */}
+                {selectedImage1 && (
+                    <button
+                        onClick={() => handleUpload1(selectedImageFile1)}
+                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                    >
+                        Upload Photo
+                    </button>
+                )}
+                {/* <div className="flex items-center gap-5 justify-center">
                     <img src={formData.qualifications || "https://via.placeholder.com/150"} alt="Profile" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
                     {selectedImage1 && (
                         <>
@@ -376,7 +442,7 @@ const Profile = () => {
                     <button onClick={() => { handleUpload1(selectedImageFile1) }} className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
                         Upload Photo
                     </button>
-                }
+                } */}
             </div>
         </div>
     );

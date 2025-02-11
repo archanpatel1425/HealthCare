@@ -153,9 +153,9 @@ const ConsultedPatients = () => {
                 <tr>
                   <th className="px-4 py-3 text-left text-sm">Name</th>
                   <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Gender</th>
-                  <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Reason</th>
+                  <th className="px-4 py-3 text-left text-sm">Reason</th>
                   <th className="px-4 py-3 text-left text-sm">Date</th>
-                  <th className="px-4 py-3 text-left text-sm">Time</th>
+                  <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Time</th>
                   <th className="px-4 py-3 text-center text-sm">Actions</th>
                 </tr>
               </thead>
@@ -168,7 +168,7 @@ const ConsultedPatients = () => {
                     <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
                       {patient.patient.gender}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm">
                       {patient.reason}
                     </td>
                     <td className="px-4 py-3 border-b text-sm">
@@ -187,6 +187,9 @@ const ConsultedPatients = () => {
                     </td>
                   </tr>
                 ))}
+                {filterPatients.length == 0 && (
+                  <tr></tr>
+                )}
               </tbody>
             </table>
           </div>
