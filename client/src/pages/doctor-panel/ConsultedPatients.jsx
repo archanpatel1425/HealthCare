@@ -191,6 +191,9 @@ const ConsultedPatients = () => {
                     </td>
                   </tr>
                 ))}
+                {filterPatients.length == 0 && (
+                  <tr></tr>
+                )}
               </tbody>
             </table>
           </div>
