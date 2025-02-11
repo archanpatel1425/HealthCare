@@ -85,13 +85,13 @@ const ChatPanel = () => {
         });
 
         newSocket.on('messageStatusUpdated', ({ messageId, status }) => {
+            console.log(status)
             setMessages(prev => prev.map(msg =>
                 msg.id === messageId ? { ...msg, status } : { ...msg, status }
             ));
 
         });
         newSocket.on('userTyping', ({ userId, isTyping }) => {
-            console.log("in typing")
             setTypingUsers(prev => {
                 const newUsers = new Set(prev);
                 if (isTyping) {

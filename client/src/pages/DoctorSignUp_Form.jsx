@@ -47,8 +47,7 @@ const DoctorSignUp_Form = () => {
   });
 
   const validateTimeRange = (timeFrom, timeTo) => {
-    if (!timeFrom || !timeTo) return true;
-    return timeFrom < timeTo;
+    
   };
   const password = watch("password");
 
@@ -120,20 +119,7 @@ const DoctorSignUp_Form = () => {
     ) {
       errors.push("Please select at least one day for custom availability");
     }
-    if (!values.timeFrom) {
-      errors.push("Please select start time");
-    }
-    console.log("Validation values: ", values);
-    if (!values.timeTo) {
-      errors.push("Please select end time");
-    } else if (
-      values.timeFrom &&
-      values.timeTo &&
-      !validateTimeRange(values.timeFrom, values.timeTo)
-    ) {
-      errors.push("End time must be after start time");
-    }
-
+    
     console.log("Errors in validation: ", errors);
     return errors;
   };
