@@ -1,16 +1,15 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import EmailPasswordForm from "../components/auth/EmailPasswordForm";
 import PersonalDetailsForm from "../components/auth/PersonalDetailsForm";
 import {
-  checkEmailExists,
-  uploadProfilePic,
   PatientSignup,
+  uploadProfilePic
 } from "../Store/patient/authslice";
-import { useSelector, useDispatch } from "react-redux";
 
 const PatientSignUp_Form = () => {
   const [step, setStep] = useState(1);
@@ -156,13 +155,9 @@ const PatientSignUp_Form = () => {
           alert("Email already registered");
           return;
         }
-        const response1 = await dispatch(PatientSignup(finalData));
-
-        if (response1.payload?.success) {
-          // ✅ Use payload.success instead of data.success
-          toast.success("Registration successful!");
-          setTimeout(() => navigate("/login"), 2000);
-        }
+        dispatch(PatientSignup(finalData));
+        toast.success("Registration successful!");
+        setTimeout(() => navigate("/login"), 2000);
       } catch (error) {
         toast.error(error);
       } finally {
@@ -171,9 +166,6 @@ const PatientSignUp_Form = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const renderCurrentStep = () => {
     switch (step) {
@@ -203,19 +195,17 @@ const PatientSignUp_Form = () => {
           {[1, 2].map((stepNumber) => (
             <React.Fragment key={stepNumber}>
               <div
-                className={`w-10 h-10 flex items-center justify-center text-lg font-bold rounded-full transition-all ${
-                  step >= stepNumber
+                className={`w-10 h-10 flex items-center justify-center text-lg font-bold rounded-full transition-all ${step >= stepNumber
                     ? "bg-green-600 text-white"
                     : "bg-gray-300 text-gray-600"
-                }`}
+                  }`}
               >
                 {stepNumber}
               </div>
               {stepNumber < 2 && (
                 <div
-                  className={`flex-1 h-1 mx-2 transition-all ${
-                    step > stepNumber ? "bg-green-600" : "bg-gray-300"
-                  }`}
+                  className={`flex-1 h-1 mx-2 transition-all ${step > stepNumber ? "bg-green-600" : "bg-gray-300"
+                    }`}
                 />
               )}
             </React.Fragment>

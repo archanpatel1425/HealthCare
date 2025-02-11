@@ -1,8 +1,25 @@
 import { checkEmailExists, checkPhoneExists, createUserInDB, fetchuserlist, findUserById, loginUser } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/tokenUtils.js';
+
+export const logOut = async (req, res) => {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true, 
+            secure: false,  // Change to `true` in production (if using HTTPS)
+            sameSite: 'Lax'
+        });
+        
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Logout failed" });
+    }
+};
+
+
 export const getMess = async (req, res) => {
     res.status(200).json("authenticated")
 }
+
 export const doctorSignUp = async (req, res) => {
     try {
         console.log(req.body);
@@ -159,7 +176,7 @@ export const login = async (req, res) => {
             token = generateAccessToken(response.user.user_id, "PATIENT");
         }
         res.cookie('token', token, {
-            httpOnly: true,
+            httpOnly:false,
             secure: false,
             sameSite: 'Lax',
             expires: new Date(Date.now() + 60 * 50000)

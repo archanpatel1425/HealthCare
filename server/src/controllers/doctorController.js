@@ -194,18 +194,16 @@ const submitPrescription = async (req, res) => {
 const getPendingAppointments = async (req, res) => {
   try {
     const doctorId = req.body.doctorId;
-
     const pendingAppointments = await prisma.appointment.findMany({
       where: {
         doctor_Id: doctorId,
-        status: "Scheduled",
+        status: "Pending",
       },
       include: { patient: true },
       orderBy: {
         date: "desc",
       },
     });
-
     res.json(pendingAppointments);
   } catch (error) {
     res.status(500).json({
@@ -219,7 +217,6 @@ const getPendingAppointments = async (req, res) => {
 const getAcceptedAppointments = async (req, res) => {
   try {
     const doctorId = req.body.doctorId;
-
     const acceptedAppointments = await prisma.appointment.findMany({
       where: {
         doctor_Id: doctorId,
@@ -230,7 +227,6 @@ const getAcceptedAppointments = async (req, res) => {
         date: "desc",
       },
     });
-
     res.json(acceptedAppointments);
   } catch (error) {
     res.status(500).json({
@@ -243,7 +239,6 @@ const getAcceptedAppointments = async (req, res) => {
 const getDoneAppointments = async (req, res) => {
   try {
     const doctorId = req.body.doctorId;
-
     const doneAppointments = await prisma.appointment.findMany({
       where: {
         doctor_Id: doctorId,
@@ -254,7 +249,6 @@ const getDoneAppointments = async (req, res) => {
       },
       include: { patient: true },
     });
-
     res.json(doneAppointments);
   } catch (error) {
     res.status(500).json({

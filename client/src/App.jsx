@@ -8,19 +8,14 @@ import DoctorSignUp_Form from './pages/DoctorSignUp_Form';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login';
 import Meeting from './pages/Meeting.jsx';
-import DoctorDetails from './pages/patient-panel/DoctorDetails.jsx';
-import DoctorList from './pages/patient-panel/DoctorList.jsx';
 import PatientHome from './pages/patient-panel/PatientHome.jsx';
-import Prescriptions from './pages/patient-panel/Prescriptions.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
-import SkinCancer from './SkinCancer.jsx';
-import SkinChecker from './SkinChecker.jsx';
-import Current from './Current.jsx';
-function App() {
+import ProtectedRoute from './ProtectedRoute';  
 
+function App() {
   const location = useLocation();
   const showNavbar =
-    ['/', '/about', '/contactus'].includes(location.pathname) ||
+    ['/', '/about', '/contact'].includes(location.pathname) ||
     location.pathname.startsWith('/patient-panel');
 
   return (
@@ -30,19 +25,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/meet/:meetId" element={<Meeting />} />
         <Route path="/signup/doctor" element={<DoctorSignUp_Form />} />
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
-        <Route path="/patient-panel/*" element={<PatientHome />} />
-        <Route path="/chat" element={<ChatPanel />} />
-        <Route path="/doctor-panel/*" element={<DoctorHome />} />
-        <Route path="/sc" element={<SkinCancer />} />
-        <Route path="/sk" element={<SkinChecker />} />
-        <Route path="/dl" element={<DoctorList />} />
-        <Route path="/doctor/:id" element={<DoctorDetails />} />
-        <Route path="/pr" element={<Prescriptions />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/cr" element={<Current />} />
+
+        <Route path="/meet/:meetId" element={<ProtectedRoute element={<Meeting />} />} />
+        <Route path="/chat" element={<ProtectedRoute element={<ChatPanel />} />} />
+        <Route path="/doctor-panel/*" element={<ProtectedRoute element={<DoctorHome />} />} />
+        <Route path="/patient-panel/*" element={<ProtectedRoute element={<PatientHome />} />} />
       </Routes>
     </div>
   );

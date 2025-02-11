@@ -203,7 +203,6 @@ const DoctorSignUp_Form = () => {
     return errors;
   };
   const onSubmit = async (data) => {
-    console.log("validation");
 
     try {
       let validationErrors = [];
@@ -246,7 +245,6 @@ const DoctorSignUp_Form = () => {
         customDays: isCustomAvailability ? data.customDays || [] : [],
       };
 
-      console.log("hello");
 
       const response = await axios.post(
         `${VITE_API_URL}/auth/doctor-signup`,
@@ -254,10 +252,8 @@ const DoctorSignUp_Form = () => {
         { withCredentials: true }
       );
 
-      if (response.data.success) {
         toast.success("Registration successful!");
         setTimeout(() => navigate("/login"), 2000);
-      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Registration failed";
@@ -268,9 +264,6 @@ const DoctorSignUp_Form = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const renderCurrentStep = () => {
     switch (step) {
