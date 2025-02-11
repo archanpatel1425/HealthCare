@@ -250,10 +250,10 @@ const ChatPanel = () => {
     const getMessageStatus = (message) => {
         switch (message.status) {
             case 'READ':
-                return  <div className="inline-flex relative w-4">
-                <i className="fa-solid fa-check text-xs"></i>
-                <i className="fa-solid fa-check text-xs -ml-1"></i>
-            </div>
+                return <div className="inline-flex relative w-4">
+                    <i className="fa-solid fa-check text-xs"></i>
+                    <i className="fa-solid fa-check text-xs -ml-1"></i>
+                </div>
             case 'DELIVERED':
                 return '✓✓';
             case 'SENT':
