@@ -35,14 +35,14 @@ const UpComingAppointments = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (showPopup) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-    return () => document.body.classList.remove("overflow-hidden");
-  }, [showPopup]);
+  // useEffect(() => {
+  //   if (showPopup) {
+  //     document.body.classList.add("overflow-hidden");
+  //   } else {
+  //     document.body.classList.remove("overflow-hidden");
+  //   }
+  //   return () => document.body.classList.remove("overflow-hidden");
+  // }, [showPopup]);
 
   const handleShowMore = (patient) => {
     setSelectedPatient(patient);
@@ -89,10 +89,10 @@ const UpComingAppointments = () => {
     setShowFilters(false);
   };
   return (
-    <div className="md:px-6 py-2">
+    <div className="md:px-6 py-2 h-full w-full rounded-lg p-4 overflow-hidden">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
         <h1 className="text-xl md:text-2xl font-bold text-gray-700">Upcoming Appointments</h1>
-  
+
         {/* Mobile Filter Toggle */}
         <div className="md:hidden">
           <button
@@ -102,7 +102,7 @@ const UpComingAppointments = () => {
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
         </div>
-  
+
         {/* Filters Section */}
         <div className={`flex flex-col md:flex-row gap-4 ${showFilters || 'hidden md:flex'}`}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -118,7 +118,7 @@ const UpComingAppointments = () => {
                 }}
               />
             </div>
-  
+
             <div className="flex flex-col">
               <span className="text-sm">End Date</span>
               <input
@@ -131,7 +131,7 @@ const UpComingAppointments = () => {
                 }}
               />
             </div>
-  
+
             <div className="flex flex-col">
               <span className="text-sm">Patient Name</span>
               <input
@@ -145,7 +145,7 @@ const UpComingAppointments = () => {
                 }}
               />
             </div>
-  
+
             <button
               className="bg-green-600 text-white px-4 rounded py-2 h-fit mt-auto"
               onClick={clearFilters}
@@ -155,62 +155,58 @@ const UpComingAppointments = () => {
           </div>
         </div>
       </div>
-  
-      {/* Table Section with Horizontal Scroll */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-scroll">
-          <div className="inline-block min-w-full">
-            <div className="max-h-[72.5vh] overflow-y-auto">
-              <table className="min-w-full table-fixed">
-                <thead className="sticky top-0 bg-green-600 text-white uppercase z-10">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm w-48 whitespace-nowrap">Name</th>
-                    <th className="px-4 py-3 text-left text-sm w-24 whitespace-nowrap">Gender</th>
-                    <th className="px-4 py-3 text-left text-sm w-48 whitespace-nowrap">Reason</th>
-                    <th className="px-4 py-3 text-left text-sm w-32 whitespace-nowrap">Date</th>
-                    <th className="px-4 py-3 text-left text-sm w-32 whitespace-nowrap">Time</th>
-                    <th className="px-4 py-3 text-center text-sm w-24 whitespace-nowrap">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filterPatients.map((patient, index) => (
-                    <tr key={index} className="hover:bg-green-50">
-                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                        {patient.patient.first_name} {patient.patient.last_name}
-                      </td>
-                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                        {patient.patient.gender}
-                      </td>
-                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                        {patient.reason}
-                      </td>
-                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                        {new Date(patient.date).toLocaleDateString('en-GB').replace(/\//g, '-')}
-                      </td>
-                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                        {patient.time}
-                      </td>
-                      <td className="px-4 py-3 border-b text-center">
-                        <button
-                          onClick={() => handleShowMore(patient)}
-                          className="bg-green-600 text-white px-3 py-1 rounded text-sm"
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+
+      {/* Table Section with Horizontal & Vertical Scroll */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto overflow-y-auto max-h-[72.5vh]">
+          <table className="min-w-full table-fixed">
+            <thead className="sticky top-0 bg-green-600 text-white uppercase z-10">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm w-48">Name</th>
+                <th className="px-4 py-3 text-left text-sm w-24">Gender</th>
+                <th className="px-4 py-3 text-left text-sm w-48">Reason</th>
+                <th className="px-4 py-3 text-left text-sm w-32">Date</th>
+                <th className="px-4 py-3 text-left text-sm w-32">Time</th>
+                <th className="px-4 py-3 text-center text-sm w-24">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filterPatients.map((patient, index) => (
+                <tr key={index} className="hover:bg-green-50">
+                  <td className="px-4 py-3 border-b text-sm">
+                    {patient.patient.first_name} {patient.patient.last_name}
+                  </td>
+                  <td className="px-4 py-3 border-b text-sm">
+                    {patient.patient.gender}
+                  </td>
+                  <td className="px-4 py-3 border-b text-sm">
+                    {patient.reason}
+                  </td>
+                  <td className="px-4 py-3 border-b text-sm">
+                    {new Date(patient.date).toLocaleDateString('en-GB').replace(/\//g, '-')}
+                  </td>
+                  <td className="px-4 py-3 border-b text-sm">
+                    {patient.time}
+                  </td>
+                  <td className="px-4 py-3 border-b text-center">
+                    <button
+                      onClick={() => handleShowMore(patient)}
+                      className="bg-green-600 text-white px-3 py-1 rounded text-sm"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-  
+
       {/* Patient Details Popup */}
       {showPopup && selectedPatient && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
             <div className="flex justify-between sticky top-0 bg-white p-4 border-b">
               <h2 className="text-lg md:text-xl font-bold text-gray-700">Patient Details</h2>
               <button className="text-2xl" onClick={closePopup}>×</button>
@@ -248,6 +244,7 @@ const UpComingAppointments = () => {
       )}
     </div>
   );
+
 };
 
 export default UpComingAppointments;

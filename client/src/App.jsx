@@ -10,13 +10,14 @@ import Login from './pages/Login';
 import Meeting from './pages/Meeting.jsx';
 import PatientHome from './pages/patient-panel/PatientHome.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
-import ProtectedRoute from './ProtectedRoute';  
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   const location = useLocation();
   const showNavbar =
     ['/', '/about', '/contact'].includes(location.pathname) ||
-    location.pathname.startsWith('/patient-panel');
+    location.pathname.startsWith('/patient-panel') || location.pathname.startsWith('/doctor-panel')
+
 
   return (
     <div>
