@@ -299,6 +299,13 @@ const RecentAppointments = () => {
                         status="rejected"
                         bgColor="bg-red-50"
                     />
+
+                    <StatusSection
+                        title="Completed Appointments"
+                        appointments={filteredAppointments}
+                        status="completed"
+                        bgColor="bg-green-50"
+                    />
                 </div>
             )}
         </div>

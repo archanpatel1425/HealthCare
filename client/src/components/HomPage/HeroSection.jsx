@@ -7,15 +7,27 @@ import img3 from '../../assets/pulmonary.png'
 import img4 from '../../assets/cardiology.png'
 import img5 from '../../assets/dental-care.png'
 import img6 from '../../assets/neurology.png'
+import md1 from '../../assets/Doc1.png'
+import md2 from '../../assets/Doc2.jpeg'
+import md3 from '../../assets/Doc3.jpg'
+import md4 from '../../assets/Doc4.png'
+import fd1 from '../../assets/Doc5.jpg'
+import fd2 from '../../assets/Doc6.jpg'
+import fd3 from '../../assets/Doc7.png'
+import amb from '../../assets/amb.jpg'
+import eq1 from '../../assets/eq1.jpg'
+import eq2 from '../../assets/eq2.jpg'
+import eq3 from '../../assets/eq3.png'
+import eq4 from '../../assets/eq4.jpg'
+import eq5 from '../../assets/eq5.jpg'
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
-import Footer from '../Footer';
 
 const specialties = [
     { name: "Crutches", icon: "🦵", image: img1 },
     { name: "X-ray", icon: "🩻", image: img2 },
-    { name: "Pulmonary", icon: "🩸", image: img3 },
+    { name: "Pulmonary", icon: "🩻", image: img3 },
     { name: "Cardiology", icon: "❤️", image: img4 },
     { name: "Dental care", icon: "🦷", image: img5 },
     { name: "Neurology", icon: "🧠", image: img6 },
@@ -25,37 +37,37 @@ const doctors = [
     {
         name: "Dr. Philip Bailey",
         specialty: "Urology",
-        image: "https://randomuser.me/api/portraits/men/45.jpg",
+        image: md1,
     },
     {
         name: "Dr. Vera Hasson",
         specialty: "Cardiology",
-        image: "https://randomuser.me/api/portraits/women/47.jpg",
+        image: fd1,
     },
     {
         name: "Dr. Matthew Hill",
         specialty: "Neurosurgery",
-        image: "https://randomuser.me/api/portraits/men/50.jpg",
+        image: md2,
     },
     {
         name: "Dr. Jeanette Hoff",
         specialty: "Surgery",
-        image: "https://randomuser.me/api/portraits/women/55.jpg",
+        image: fd2,
     },
     {
         name: "Dr. Robert Smith",
         specialty: "Dermatology",
-        image: "https://randomuser.me/api/portraits/men/35.jpg",
+        image: md3,
     },
     {
         name: "Dr. Lisa Adams",
         specialty: "Pediatrics",
-        image: "https://randomuser.me/api/portraits/women/39.jpg",
+        image: fd3,
     },
     {
         name: "Dr. Kevin Brown",
         specialty: "Orthopedics",
-        image: "https://randomuser.me/api/portraits/men/41.jpg",
+        image: md4,
     },
 ];
 
@@ -86,7 +98,6 @@ const testimonials = [
 const HeroSection = () => {
 
     const [openIndex, setOpenIndex] = useState(0); // First answer open by default
-
     const faqs = [
         {
             question: "What is Medi solution?",
@@ -109,25 +120,20 @@ const HeroSection = () => {
             answer: "We provide 24/7 emergency care with a dedicated team of doctors and nurses to assist in critical situations.",
         },
     ];
-
     const toggleFAQ = (index) => {
         setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
     };
 
     const [selectedSpecialty, setSelectedSpecialty] = useState(specialties[0]);
-
     const [index, setIndex] = useState(0);
-
     // Clone doctors to create infinite loop effect
     const loopedDoctors = [...doctors, ...doctors];
-
     useEffect(() => {
         const interval = setInterval(() => {
             nextDoctor();
         }, 5000);
         return () => clearInterval(interval);
     }, [index]);
-
     const nextDoctor = () => {
         setIndex((prevIndex) => (prevIndex + 1) % doctors.length);
     };
@@ -135,36 +141,25 @@ const HeroSection = () => {
     return (
         <>
 
-            <div className="relative w-full min-h-screen flex items-center justify-between bg-gradient-to-r from-cyan-100 via-green-200 to-green-300 px-6 overflow-hidden">
-                {/* Left Content Box */}
-                <div className="relative z-10 bg-white p-8 rounded-lg shadow-lg max-w-2xl ml-10 flex flex-col items-center">
-                    <h1 className="text-3xl text-center font-bold text-gray-900 leading-tight">
-                        Take best quality treatment from{" "}
-                        <span className="text-black md:text-5xl">
-                            HealWell
-                        </span>
-                    </h1>
-                    <p className="mt-4 text-3xl text-center text-gray-600">
-                        "Your Wellness, Our Mission"
-                    </p>
-
-                    {/* Centered Appointment Button */}
-                   
-                    {/* Decorative Line */}
-                    <div className="absolute bottom-0 left-0 w-20 h-1 bg-yellow-400"></div>
+            <div className=''>
+                <div className="h-screen pt-16">
+                    <div className="bg-[#d4e8db] w-full h-full">
+                        <div className='flex justify-between items-center mx-24'>
+                            <div>
+                                <div className=' text-5xl font-bold text-center'>
+                                    HealWell<br /> <span className='text-4xl'>Your Wellness Our Mission</span>
+                                </div>
+                                <div></div>
+                                <button
+                                    className='text-white bg-green-600 p-4 rounded-full mt-8 font-bold'
+                                >
+                                    Book An Appointment
+                                </button>
+                            </div>
+                            <img src={HeroSectionImage1} alt="" className='mt-8 h-[85vh] w-[40vw]' />
+                        </div>
+                    </div>
                 </div>
-
-                {/* Right Doctor Image */}
-                <div className="">
-                    <img
-                        src={doctor}
-                        alt="Doctor"
-                        className=""
-                    />
-                </div>
-
-                {/* Curved Background Shape */}
-                <div className="absolute left-0 top-0 w-1/2 h-full bg-white rounded-br-full -z-10"></div>
             </div>
 
 
@@ -202,7 +197,25 @@ const HeroSection = () => {
                 </div>
             </section>
 
-            <section className="py-12 px-4 bg-white ms-12 me-12">
+            <section className="py-12 px-4 bg-white">
+                <div className="max-w-6xl mx-auto text-center">
+                    <h2 className="text-3xl font-bold text-gray-900">
+                        Who Are We?
+                    </h2>
+                    <div className="w-16 h-1 bg-teal-500 mx-auto my-2"></div>
+                    <p className="text-gray-600">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Hic natus officiis veniam ea incidunt sed libero quod quibusdam sit! Laudantium id quibusdam, cum tenetur deserunt repellendus reprehenderit atque voluptas sequi?
+                        Natus nihil quam ut atque et, obcaecati cum ducimus officia explicabo! Dolor fugiat ipsum possimus sequi accusantium labore, voluptates repudiandae facere consequuntur cupiditate odio quam, dolore ducimus perspiciatis nihil quasi.
+                        Provident sunt ut impedit adipisci voluptates. Nihil aliquid corporis aliquam, ad nemo omnis explicabo quam, praesentium quibusdam sequi ipsa! Itaque corrupti adipisci a sapiente distinctio animi suscipit et asperiores enim.
+                        In aliquam, labore tempora soluta minus voluptatem dolorum? Illo praesentium laborum excepturi voluptate est omnis accusantium fugiat temporibus, aut commodi? Mollitia velit necessitatibus expedita sequi eos, laudantium ratione sed porro.
+                        Aut sapiente earum, quaerat reiciendis, recusandae fugit ratione tenetur ipsa aspernatur ad deleniti. Quasi consequatur exercitationem pariatur dignissimos officia ducimus facere numquam corporis soluta. Blanditiis temporibus molestias exercitationem perferendis ad.
+                        Exercitationem nesciunt dignissimos modi deserunt ipsum aut quae placeat? Necessitatibus, facere enim corporis earum reprehenderit quae, aliquam est maxime et numquam quas dolore ducimus doloremque distinctio. Unde repellendus voluptatum vel!
+                        Debitis alias aspernatur mollitia laborum! Ratione aliquid totam beatae. Necessitatibus dolorum recusandae dolores ut, sequi exercitationem dolor quidem beatae est expedita molestias quia autem alias aspernatur eum facere vero voluptatem.
+                    </p>
+                </div>
+            </section>
+
+            <section className="py-12 px-4 bg-gray-200">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-gray-900">Meet our specialists</h2>
                     <div className="w-16 h-1 bg-teal-500 mx-auto my-2"></div>
@@ -251,8 +264,7 @@ const HeroSection = () => {
                 </div>
             </section>
 
-            <div className="p-6 md:p-12 bg-gray-100">
-
+            <div className="p-6 md:p-12 bg-white">
                 <div className="max-w-6xl mx-auto text-center mb-4">
                     <h2 className="text-3xl font-bold text-gray-900">
                         Our Specialities
@@ -296,26 +308,19 @@ const HeroSection = () => {
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-12">
+            <div className="mx-auto bg-gray-200 py-12 flex flex-col md:flex-row gap-12">
                 {/* Left Side - Icons */}
-                <div className="grid grid-cols-3 gap-6 flex-1">
-                    {[
-                        "https://img.icons8.com/external-flat-icons-inmotus-design/64/26e07f/external-heart-healthcare-flat-icons-inmotus-design.png",
-                        "https://img.icons8.com/external-flat-icons-inmotus-design/64/26e07f/external-ambulance-healthcare-flat-icons-inmotus-design.png",
-                        "https://img.icons8.com/external-flat-icons-inmotus-design/64/26e07f/external-syringe-healthcare-flat-icons-inmotus-design.png",
-                        "https://img.icons8.com/external-flat-icons-inmotus-design/64/26e07f/external-test-tubes-healthcare-flat-icons-inmotus-design.png",
-                        "https://img.icons8.com/external-flat-icons-inmotus-design/64/26e07f/external-first-aid-kit-healthcare-flat-icons-inmotus-design.png",
-                        "https://img.icons8.com/external-flat-icons-inmotus-design/64/26e07f/external-medicine-healthcare-flat-icons-inmotus-design.png",
-                    ].map((src, index) => (
-                        <div key={index} className="bg-white p-4 rounded-full shadow-lg flex items-center justify-center">
-                            <img src={src} alt="Medical Icon" className="w-12 h-12" />
+                <div className="ms-16 grid grid-cols-3 gap-6 flex-1">
+                    {[amb, eq1, eq2, eq3, eq4, eq5].map((src, index) => (
+                        <div key={index} className="bg-white rounded-full shadow-lg border-2 flex items-center justify-center">
+                            <img src={src} alt="Medical Icon" className="w-32 h-32 max-w-full max-h-full object-contain" />
                         </div>
                     ))}
                 </div>
 
                 {/* Right Side - FAQ */}
-                <div className="flex-1">
-                    <h2 className="text-2xl font-bold mb-6">Just Answer the Questions</h2>
+                <div className="me-16 flex-1">
+                    <h2 className="text-2xl text-center font-bold mb-6">Find Answer To Your Questions</h2>
                     <div className="space-y-4">
                         {faqs.map((faq, index) => (
                             <div key={index} className="border rounded-lg shadow">
@@ -335,7 +340,6 @@ const HeroSection = () => {
                     </div>
                 </div>
             </div>
-      <Footer />
         </>
     );
 };
