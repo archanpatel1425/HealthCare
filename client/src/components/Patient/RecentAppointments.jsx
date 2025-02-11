@@ -10,17 +10,17 @@ const RecentAppointments = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [dateFilter, setDateFilter] = useState('');
     const VITE_API_URL = import.meta.env.VITE_API_URL;
-
     useEffect(() => {
         const fetchData = () => {
             axios.get(`${VITE_API_URL}/patient/getAppointments`, { withCredentials: true })
                 .then((response) => {
+                    console.log(response.data);
                     setAppointments(response.data);
                     setFilteredAppointments(response.data);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "Unauthorized: No token provided") {
-                        window.location.href = "/login";
+                        // window.location.href = "/login";
                     }
                     console.log(error);
                 });
@@ -68,28 +68,11 @@ const RecentAppointments = () => {
     };
 
     const isVideoCallButtonEnabled = (appointmentDate, appointmentTime) => {
-        const now = new Date();
-        const appointmentDateTime = new Date(appointmentDate);
-
-        // Check if the appointment is today
-        if (appointmentDateTime.toDateString() !== now.toDateString()) {
-            return false;
+        const currentDate = new Date().toDateString();
+        appointmentDate = new Date(appointmentDate).toDateString()
+        if (appointmentDate === currentDate) {
+            return true;
         }
-
-        // Convert appointment time (assuming format is "17:00" for 5 PM)
-        const [hours, minutes] = appointmentTime.split(':').map(Number);
-        const appointmentHour = hours;
-        const appointmentMinute = minutes;
-
-        // Calculate window start (30 minutes before) and end (45 minutes after)
-        const windowStart = new Date(appointmentDateTime);
-        windowStart.setHours(appointmentHour, appointmentMinute - 30, 0);
-
-        const windowEnd = new Date(appointmentDateTime);
-        windowEnd.setHours(appointmentHour, appointmentMinute + 45, 0);
-
-        // Check if current time is within the window
-        return now >= windowStart && now <= windowEnd;
     };
 
     const isChatButtonEnabled = (appointmentDate, appointmentTime) => {
@@ -177,20 +160,18 @@ const RecentAppointments = () => {
                             <button
                                 onClick={() => handleVideoCall(appointment.appointmentId)}
                                 disabled={!isVideoCallButtonEnabled(appointment.date, appointment.time)}
-                                className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${
-                                    isVideoCallButtonEnabled(appointment.date, appointment.time)
-                                        ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                }`}
+                                className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${isVideoCallButtonEnabled(appointment.date, appointment.time)
+                                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
                             >
                                 <Video className="w-4 h-4 mr-2" />
                                 Video Call
                             </button>
                             <button
                                 onClick={() => handleChat(appointment.appointmentId)}
-                                className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${
-                                        'bg-green-500 text-white hover:bg-green-600'
-                                }`}
+                                className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${'bg-green-500 text-white hover:bg-green-600'
+                                    }`}
                             >
                                 <MessageCircle className="w-4 h-4 mr-2" />
                                 Chat

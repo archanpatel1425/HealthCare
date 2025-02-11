@@ -12,7 +12,6 @@ const Navbar = () => {
     if (isloggedIN) {
       dispatch(fetchUserData());
     }
-    console.log(patientData)
   }, [dispatch, isloggedIN]);
 
   const handleLogout = async () => {

@@ -52,7 +52,7 @@ export const getDoctorInfo = async (req, res) => {
 export const getAppointmentsByPatient = async (req, res) => {
   try {
     const { patientId } = req.body
-
+    console.log(patientId)
     const appointments = await prisma.appointment.findMany({
       where: { patient_Id: patientId },
       include: {
