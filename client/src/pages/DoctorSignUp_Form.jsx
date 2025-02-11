@@ -246,7 +246,6 @@ const DoctorSignUp_Form = () => {
         customDays: isCustomAvailability ? data.customDays || [] : [],
       };
 
-      console.log("hello");
 
       const response = await axios.post(
         `${VITE_API_URL}/auth/doctor-signup`,
@@ -268,9 +267,6 @@ const DoctorSignUp_Form = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const renderCurrentStep = () => {
     switch (step) {

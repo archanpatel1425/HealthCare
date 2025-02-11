@@ -227,7 +227,6 @@ const getAcceptedAppointments = async (req, res) => {
         date: "desc",
       },
     });
-    console.log(acceptedAppointments)
     res.json(acceptedAppointments);
   } catch (error) {
     res.status(500).json({
