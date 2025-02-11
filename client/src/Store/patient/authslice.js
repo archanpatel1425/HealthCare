@@ -72,7 +72,6 @@ export const loginUser = createAsyncThunk(
 export const fetchUserData = createAsyncThunk("auth/fetchUserData", async () => {
   try {
     const response = await axios.post(`${VITE_API_URL}/auth/getdata`, {}, { withCredentials: true });
-
     return response.data.userData;
   } catch (error) {
     if (error.response.data.message === "Unauthorized: No token provided") {
