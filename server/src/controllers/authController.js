@@ -176,7 +176,7 @@ export const login = async (req, res) => {
             token = generateAccessToken(response.user.user_id, "PATIENT");
         }
         res.cookie('token', token, {
-            httpOnly: false,
+            httpOnly:true,
             secure: false,
             sameSite: 'Lax',
             expires: new Date(Date.now() + 60 * 50000)

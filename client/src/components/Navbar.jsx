@@ -53,7 +53,13 @@ const Navbar = () => {
             <Link to="/contact">Contact</Link>
           </li>
           {isloggedIN && <li className="hover:text-green-800 transition duration-300">
-            <Link to="/patient-panel">Dashboard</Link>
+            {
+              patientData?.doctorId?(
+                <Link to="/doctor-panel">Dashboard</Link>
+              ):(
+                <Link to="/patient-panel">Dashboard</Link>
+              )
+            }
           </li>}
         </ul>
         {isloggedIN ? (

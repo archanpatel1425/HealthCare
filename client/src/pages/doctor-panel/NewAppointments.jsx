@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { showToast } from "./Alerts";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserData } from '../../Store/patient/authslice';
+import { showToast } from "./Alerts";
 
 const NewAppointments = () => {
   const dispatch = useDispatch();
@@ -19,14 +19,21 @@ const NewAppointments = () => {
 
   useEffect(() => {
     dispatch(fetchUserData());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/pending`, { doctorId: patientData?.doctorId }).then((res) => {
-      setPatients(res.data);
-      setFilterPatients(res.data);
-    });
-  }, []);
+    try {
+      if(patientData?.doctorId){
+        axios.post(`${import.meta.env.VITE_API_URL}/doctor/pending`, { doctorId: patientData?.doctorId }, { withCredentials: true }).then((res) => {
+          setPatients(res.data);
+          setFilterPatients(res.data);
+        });
+      }
+    } catch (error) {
+      
+    }
+  }, [patientData]);
+
 
   useEffect(() => {
     if (showPopup) {
@@ -49,13 +56,18 @@ const NewAppointments = () => {
   };
 
   const AcceptRejectHandler = (appointmentId, status) => {
-    axios.post(`${import.meta.env.VITE_API_URL}/doctor/status`, { appointmentId, status }).then((res) => {
-      setPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
-      setFilterPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
-      setShowPopup(false);
-      setSelectedPatient(null);
-      showToast(status === "Scheduled" ? "Appointment Scheduled successfully." : "Appointment rejected...", status === "Scheduled" ? "success" : "error");
-    });
+    try {
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/status`, { appointmentId, status }, { withCredentials: true }).then((res) => {
+        setPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
+        setFilterPatients((prevPatients) => prevPatients.filter(patient => patient.appointmentId !== appointmentId));
+        setShowPopup(false);
+        setSelectedPatient(null);
+        showToast(status === "Scheduled" ? "Appointment Scheduled successfully." : "Appointment rejected...", status === "Scheduled" ? "success" : "error");
+      });
+
+    } catch (error) {
+
+    }
   };
 
   const filterBySearch = (name) => {
@@ -89,7 +101,6 @@ const NewAppointments = () => {
     setEndDate(null);
     setShowFilters(false);
   };
-
   return (
     <div className="md:px-6 py-2">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
@@ -167,9 +178,9 @@ const NewAppointments = () => {
                 <tr>
                   <th className="px-4 py-3 text-left text-sm">Name</th>
                   <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Gender</th>
-                  <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Reason</th>
+                  <th className="px-4 py-3 text-left text-sm">Reason</th>
                   <th className="px-4 py-3 text-left text-sm">Date</th>
-                  <th className="px-4 py-3 text-left text-sm">Time</th>
+                  <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Time</th>
                   <th className="px-4 py-3 text-center text-sm">Actions</th>
                 </tr>
               </thead>
@@ -182,7 +193,7 @@ const NewAppointments = () => {
                     <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
                       {patient.patient.gender}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm">
                       {patient.reason}
                     </td>
                     <td className="px-4 py-3 border-b text-sm">
@@ -235,7 +246,7 @@ const NewAppointments = () => {
                 </div>
                 <div className="flex gap-3 mt-4">
                   <button
-                    onClick={() => AcceptRejectHandler(selectedPatient.appointmentId, "Scheduled")}
+                    onClick={() => AcceptRejectHandler(selectedPatient.appointmentId, "Accepted")}
                     className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm md:text-base"
                   >
                     Accept
