@@ -48,8 +48,7 @@ const QualificationsForm = ({
   };
 
   const validateTimeRange = (timeFrom, timeTo) => {
-    if (!timeFrom || !timeTo) return true;
-    return timeFrom < timeTo;
+    console.log("compont",timeFrom,timeTo)
   };
 
   return (
@@ -198,16 +197,6 @@ const QualificationsForm = ({
               type="time"
               {...register("timeTo", {
                 required: true,
-                onChange: (e) => {
-                  if (!e.target.value) {
-                    toast.error("Please select end time");
-                  } else {
-                    const timeFrom = watch("timeFrom");
-                    if (!validateTimeRange(timeFrom, e.target.value)) {
-                      toast.error("End time must be after start time");
-                    }
-                  }
-                },
               })}
               className="mt-1 block w-full border-2 border-green-300 focus:ring-green-600 focus:border-green-600 outline-none rounded-md px-3 py-2"
             />

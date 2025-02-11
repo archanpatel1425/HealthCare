@@ -9,18 +9,19 @@ const RecentAppointments = () => {
     const [filteredAppointments, setFilteredAppointments] = useState([]);
     const [doctorSearch, setDoctorSearch] = useState('');
     const [dateFilter, setDateFilter] = useState('');
+    const [isfiltered, setfilter] = useState(false)
     const VITE_API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
         const fetchData = () => {
             axios.get(`${VITE_API_URL}/patient/getAppointments`, { withCredentials: true })
                 .then((response) => {
-                    console.log(response.data);
                     setAppointments(response.data);
                     setFilteredAppointments(response.data);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "Unauthorized: No token provided") {
-                        // window.location.href = "/login";
+                        window.location.href = "/login";
                     }
                     console.log(error);
                 });
@@ -41,6 +42,7 @@ const RecentAppointments = () => {
             filtered = filtered.filter(app =>
                 `${app.doctor.first_name} ${app.doctor.last_name}`.toLowerCase().includes(searchTerm)
             );
+
         }
 
         if (dateFilter) {
@@ -68,11 +70,23 @@ const RecentAppointments = () => {
     };
 
     const isVideoCallButtonEnabled = (appointmentDate, appointmentTime) => {
-        const currentDate = new Date().toDateString();
-        appointmentDate = new Date(appointmentDate).toDateString()
-        if (appointmentDate === currentDate) {
-            return true;
+        const now = new Date();
+        const appointmentDateTime = new Date(appointmentDate);
+
+        if (appointmentDateTime.toDateString() !== now.toDateString()) {
+            return false;
         }
+
+        const [hours, minutes] = appointmentTime.split(':').map(Number);
+        const appointmentHour = hours;
+        const appointmentMinute = minutes;
+
+        const windowStart = new Date(appointmentDateTime);
+        windowStart.setHours(appointmentHour, appointmentMinute - 15, 0);
+
+        const windowEnd = new Date(appointmentDateTime);
+        windowEnd.setHours(appointmentHour, appointmentMinute + 15, 0);
+        return now >= windowStart && now <= windowEnd;
     };
 
     const isChatButtonEnabled = (appointmentDate, appointmentTime) => {
@@ -161,8 +175,8 @@ const RecentAppointments = () => {
                                 onClick={() => handleVideoCall(appointment.appointmentId)}
                                 disabled={!isVideoCallButtonEnabled(appointment.date, appointment.time)}
                                 className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${isVideoCallButtonEnabled(appointment.date, appointment.time)
-                                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
                                 <Video className="w-4 h-4 mr-2" />
@@ -219,8 +233,8 @@ const RecentAppointments = () => {
                     )}
                 </div>
             </div>
-        );
-    };
+        )
+    }
 
     return (
         <div className="bg-white shadow-lg p-6 w-full">
@@ -234,7 +248,11 @@ const RecentAppointments = () => {
                             type="text"
                             placeholder="Search by doctor name..."
                             value={doctorSearch}
-                            onChange={(e) => setDoctorSearch(e.target.value)}
+                            onChange={(e) => {
+                                setDoctorSearch(e.target.value)
+                                e.target.value ? setfilter(true) : setfilter(false)
+                            }
+                            }
                             className="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -243,14 +261,18 @@ const RecentAppointments = () => {
                         <input
                             type="date"
                             value={dateFilter}
-                            onChange={(e) => setDateFilter(e.target.value)}
+                            onChange={(e) => {
+                                setDateFilter(e.target.value)
+                                e.target.value ? setfilter(true) : setfilter(false)
+                            }
+                            }
                             className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
                     <button
-                        onClick={clearFilters}
-                        className="flex items-center px-4 py-2 bg-red-300 hover:bg-red-400 rounded-lg text-gray-600 transition-colors"
+                        onClick={() => { setDateFilter(""); setDoctorSearch(""); setfilter(false) }}
+                        className={`flex items-center px-4 py-2 bg-red-300 hover:bg-red-400 rounded-lg  ${isfiltered ? '' : 'hidden'}  text-gray-600 transition-colors`}
                     >
                         <X className="w-4 h-4 mr-2" />
                         Clear Filters
@@ -260,6 +282,13 @@ const RecentAppointments = () => {
 
             {filteredAppointments && (
                 <div className="grid grid-cols-1 lg:grid-rows-3 gap-6">
+
+                    <StatusSection
+                        title="Scheduled Appointments"
+                        appointments={filteredAppointments}
+                        status="scheduled"
+                        bgColor="bg-blue-50"
+                    />
                     <StatusSection
                         title="Pending Appointments"
                         appointments={filteredAppointments}
@@ -268,12 +297,11 @@ const RecentAppointments = () => {
                     />
 
                     <StatusSection
-                        title="Scheduled Appointments"
+                        title="Completed Appointments"
                         appointments={filteredAppointments}
-                        status="scheduled"
-                        bgColor="bg-blue-50"
+                        status="completed"
+                        bgColor="bg-green-50"
                     />
-
                     <StatusSection
                         title="Rejected Appointments"
                         appointments={filteredAppointments}
@@ -281,12 +309,6 @@ const RecentAppointments = () => {
                         bgColor="bg-red-50"
                     />
 
-                    <StatusSection
-                        title="Completed Appointments"
-                        appointments={filteredAppointments}
-                        status="completed"
-                        bgColor="bg-green-50"
-                    />
                 </div>
             )}
         </div>
