@@ -67,11 +67,13 @@ const Prescriptions = () => {
     const fetchMedicineLinks = async (medicineNames) => {
         try {
             if (!medicineNames.length) return;
-            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", ")}.`;
+            const prompt = `give me the link of this ${medicineNames.join(", ")} medicine to purchase.`;
             const result = await model.generateContent(prompt);
             const text = await result.response.text();
+            console.log(text)
             const linkRegex = /(https?:\/\/[^\s]+)/g;
             const links = text.match(linkRegex) || [];
+            console.log("links : ",links)
             const linksMap = medicineNames.reduce((acc, med, index) => {
                 acc[med] = links[index] || "No link found.";
                 return acc;

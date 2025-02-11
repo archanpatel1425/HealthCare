@@ -242,7 +242,10 @@ const ChatPanel = () => {
     const getMessageStatus = (message) => {
         switch (message.status) {
             case 'READ':
-                return '✓✓ Done';
+                return  <div className="inline-flex relative w-4">
+                <i className="fa-solid fa-check text-xs"></i>
+                <i className="fa-solid fa-check text-xs -ml-1"></i>
+            </div>
             case 'DELIVERED':
                 return '✓✓';
             case 'SENT':
@@ -255,7 +258,7 @@ const ChatPanel = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'READ':
-                return 'text-blue-400';
+                return 'text-blue-800';
             case 'DELIVERED':
                 return 'text-gray-400';
             case 'SENT':
@@ -263,7 +266,7 @@ const ChatPanel = () => {
             default:
                 return '';
         }
-    };
+    }
     const handleTyping = (e) => {
         setMessageInput(e.target.value);
 

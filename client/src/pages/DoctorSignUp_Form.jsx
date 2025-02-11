@@ -203,7 +203,6 @@ const DoctorSignUp_Form = () => {
     return errors;
   };
   const onSubmit = async (data) => {
-    console.log("validation");
 
     try {
       let validationErrors = [];
@@ -253,10 +252,8 @@ const DoctorSignUp_Form = () => {
         { withCredentials: true }
       );
 
-      if (response.data.success) {
         toast.success("Registration successful!");
         setTimeout(() => navigate("/login"), 2000);
-      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Registration failed";
