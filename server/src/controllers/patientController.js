@@ -257,19 +257,16 @@ export const getDoctorSchedule = async (req, res) => {
   res.json(slotDetails);
 }
 
-
 const generateDateWiseSlots = (availability, schedule, days = 30) => {
   const timeToMinutes = (time) => {
-    const [timeString, period] = time.split(' ');
-    let [hours, minutes] = timeString.split(':').map(Number);
-    if (period === 'PM' && hours < 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
+    const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   };
 
   const minutesToTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
+    const adjustedMinutes = (minutes + 1440) % 1440; // Wrap around 24 hours
+    const hours = Math.floor(adjustedMinutes / 60);
+    const mins = adjustedMinutes % 60;
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
   };
 
@@ -284,8 +281,8 @@ const generateDateWiseSlots = (availability, schedule, days = 30) => {
 
   dates.forEach((date) => {
     const { from, to } = availability.time;
-    const startMinutes = timeToMinutes(from);
-    const endMinutes = timeToMinutes(to);
+    let startMinutes = timeToMinutes(from);
+    let endMinutes = timeToMinutes(to);
 
     const dayOfWeek = new Date(date).getDay();
     const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
@@ -300,10 +297,15 @@ const generateDateWiseSlots = (availability, schedule, days = 30) => {
 
     const slots = [];
 
+    // Handle overnight slots
+    if (endMinutes <= startMinutes) {
+      endMinutes += 1440; // Extend past midnight
+    }
+
     for (let time = startMinutes; time < endMinutes; time += 30) {
       const slotFrom = minutesToTime(time);
       const slotTo = minutesToTime(time + 30);
-      const isBooked = bookedTimes.includes(time);
+      const isBooked = bookedTimes.includes(time % 1440); // Ensure modulo for wrapping
 
       slots.push({ from: slotFrom, to: slotTo, available: !isBooked });
     }
