@@ -104,8 +104,7 @@ const updateDoctorProfile = async (req, res) => {
 
 const updateAppointmentStatus = async (req, res) => {
   try {
-    const { appointmentId, status } = req.body; // Get status from request body
-
+    const { appointmentId, status } = req.body; 
     const updatedDoctor = await prisma.appointment.update({
       where: { appointmentId },
       data: { status },
