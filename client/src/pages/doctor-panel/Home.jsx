@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
 import Dashboard from "./Dashboard";
 import NewAppointments from "./NewAppointments";
 import UpComingAppointments from "./UpComingAppointments";
@@ -9,6 +8,7 @@ import ConsultedPatients from "./ConsultedPatients";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
 import PrescriptionForm from "./PrescriptionForm";
+import Navbar from './Navbar'
 
 export default function DoctorPanel() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,7 +23,8 @@ export default function DoctorPanel() {
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
         <Navbar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        <Alerts />
+        {/* <Navbar /> */}
+        <Alerts sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}/>
         {/* Content */}
         <div className="p-6 bg-gray-50 flex-1">
           <Routes>

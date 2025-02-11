@@ -45,7 +45,7 @@ const PrescriptionForm = () => {
         const patientId = res.data?.patientId
         let data = prescriptions.filter(p => p.drugName.trim() !== '');
         try {
-            axios.post(`${import.meta.env.VITE_API_URL}/doctor/submit-prescription`, { data: data, notes: note, appointmentId: appointmentId, patientId: patientId, doctorId: patientData?.doctorId }).then((res) => {
+            axios.post(`${import.meta.env.VITE_API_URL}/doctor/submit-prescription`, { data: data, notes: note, appointmentId: appointmentId, patientId: patientId, doctorId: patientData?.doctorId },{withCredentials:true}).then((res) => {
             });
                 showToast("Prescription Filled Up SuccessFully!.","success");
                 navigate('/doctor-panel')

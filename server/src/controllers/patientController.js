@@ -31,7 +31,7 @@ export const getDoctorList = async (req, res) => {
     const doctors = await prisma.doctor.findMany()
     res.status(200).json(doctors)
   } catch (error) {
-    console.log("error : ", error)
+    console.error("error : ", error)
   }
 }
 
@@ -45,13 +45,13 @@ export const getDoctorInfo = async (req, res) => {
     })
     res.status(200).json(doctor)
   } catch (error) {
-    console.log("error is : ", error)
+    console.error("error is : ", error)
   }
 }
 
 export const getAppointmentsByPatient = async (req, res) => {
   try {
-    const { patientId } = req.body
+    const patientId=req.userId
 
     const appointments = await prisma.appointment.findMany({
       where: { patient_Id: patientId },
@@ -104,7 +104,6 @@ export const updatePatientProfile = async (req, res) => {
       resetToken,
       refreshToken,
     } = req.body;
-    console.log(req.body)
     // Update the patient profile in the database
     const updatedPatient = await prisma.patient.update({
       where: { patientId }, // Use patientId to find the patient
@@ -142,7 +141,7 @@ export const updatePatientProfile = async (req, res) => {
 export const getPrescriptionsByPatient = async (req, res) => {
   try {
     const patientId = req.userId;
-    
+
     const prescriptions = await prisma.prescription.findMany({
       where: { patient_Id: patientId },
       include: {
@@ -189,6 +188,9 @@ export const getDoctorsBySpecialization = async (req, res) => {
 
     const doctors = await prisma.doctor.findMany({
       select: {
+        email: true,
+        phone_no: true,
+        gender: true,
         doctorId: true,
         first_name: true,
         last_name: true,
@@ -196,7 +198,7 @@ export const getDoctorsBySpecialization = async (req, res) => {
         profilepic: true,
         experience: true,
         qualifications: true,
-        specialization:true,
+        specialization: true,
         availability: true
       }
     });
@@ -217,14 +219,12 @@ export const getDoctorsBySpecialization = async (req, res) => {
 export const createAppointment = async (req, res) => {
   try {
     const appointment_data = req.body;
-    console.log(appointment_data)
     if (!appointment_data.patient_Id || !appointment_data.doctor_Id || !appointment_data.date || !appointment_data.time) {
       return res.status(400).json({ message: "Missing required fields" });
     }
     const appointment = await prisma.appointment.create({
       data: appointment_data
     });
-    console.log("now  : ",appointment)
     res.status(201).json({
       message: "Appointment created successfully",
       appointment,
@@ -240,7 +240,6 @@ export const createAppointment = async (req, res) => {
 
 export const getDoctorSchedule = async (req, res) => {
   const doctorId = req.body.doctorId;
-  console.log(req.body)
   const { availability } = await prisma.doctor.findUnique({
     where: { doctorId },
     select: { availability: true },

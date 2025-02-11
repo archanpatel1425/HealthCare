@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, patientSignUp,doctorSignUp ,checkEmail, checkPhone,getUserData,fetchUserList,getMess } from '../controllers/authController.js';
+import { login, patientSignUp,doctorSignUp ,checkEmail, checkPhone,getUserData,fetchUserList,getMess,logOut } from '../controllers/authController.js';
 import { verifyAccessToken } from '../utils/tokenUtils.js';
 
 const router = express.Router();
@@ -12,6 +12,7 @@ router.post('/check-phone', checkPhone);
 router.post('/check',verifyAccessToken,getMess);
 router.post('/getdata',verifyAccessToken,getUserData);
 router.post('/fetchuserlist',verifyAccessToken,fetchUserList);
+router.post('/logout',logOut);
 
 // router.post('/login', authController.login);
 // router.post('/logout', authController.logout);

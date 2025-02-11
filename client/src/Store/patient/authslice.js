@@ -72,7 +72,6 @@ export const loginUser = createAsyncThunk(
 export const fetchUserData = createAsyncThunk("auth/fetchUserData", async () => {
   try {
     const response = await axios.post(`${VITE_API_URL}/auth/getdata`, {}, { withCredentials: true });
-    
     return response.data.userData;
   } catch (error) {
     if (error.response.data.message === "Unauthorized: No token provided") {
@@ -91,7 +90,7 @@ export const fetchUserList = createAsyncThunk("/auth/fetchUserList", async () =>
     if (error.response.data.message === "Unauthorized: No token provided") {
       window.location.href = "/login"
     }
-   
+
     console.log("error is : ", error)
   }
 })
@@ -106,19 +105,29 @@ export const updateUserData = createAsyncThunk("auth/updateUserData", async (upd
     console.log("the error is : ", error)
   }
 });
-export const checkUser=createAsyncThunk("auth/checkUser",async()=>{
+export const checkUser = createAsyncThunk("auth/checkUser", async () => {
   try {
     const response = await axios.post(`${VITE_API_URL}/auth/check`, {}, { withCredentials: true })
-    if (response){
+    if (response) {
       return true
     }
-    else{
+    else {
       return false
     }
   } catch (error) {
     if (error.response.data.message === "Unauthorized: No token provided") {
     }
     console.log("the error is : ", error)
+  }
+})
+export const logOutUser = createAsyncThunk("patient/logout", async () => {
+  try {
+    const response = await axios.post(`${VITE_API_URL}/auth/logout`, {}, { withCredentials: true })
+    if (response) {
+      window.location.href = "/"
+    }
+  } catch (error) {
+    window.location.href = "/login"
   }
 })
 
@@ -130,7 +139,7 @@ const patientAuthSlice = createSlice({
     profilePicUrl: null,
     patientData: null,
     signupSuccess: false,
-    isAuthenticated:false
+    isAuthenticated: false
   },
   reducers: {},
 
