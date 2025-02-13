@@ -138,18 +138,7 @@ const NewAppointments = () => {
 
           {/* Filters Section */}
           <div className={`flex flex-col md:flex-row gap-4 ${showFilters || 'hidden md:flex'}`}>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="flex flex-col">
-                {showFilter &&
-                  <button
-                    className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
-                    onClick={clearFilters}
-                  >
-                    <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
-                  </button>
-                }
-              </div>
-
+            <div className={`grid grid-cols-1 ${showFilter ? "md:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
               <div className="flex flex-col">
                 <span className="text-sm">Start Date</span>
                 <input
@@ -190,6 +179,16 @@ const NewAppointments = () => {
                 />
               </div>
 
+              <div className="flex flex-col">
+                {showFilter &&
+                  <button
+                    className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
+                    onClick={clearFilters}
+                  >
+                    <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
+                  </button>
+                }
+              </div>
             </div>
           </div>
         </div>
