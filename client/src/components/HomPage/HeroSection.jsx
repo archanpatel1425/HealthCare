@@ -170,7 +170,7 @@ const navigate=useNavigate()
         <>
             <div className="text-center min-h-screen">
                 <div className="pt-8 lg:pt-16">
-                    <div className="bg-[#d4e8db] w-full min-h-screen">
+                    <div className="bg-[#d4e8db] w-full">
                         <div className="container mx-auto px-4">
                             <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-8 lg:gap-16">
 
@@ -194,7 +194,7 @@ const navigate=useNavigate()
                                     <img
                                         src={HeroSectionImage1}
                                         alt="Hero Section"
-                                        className="w-full max-w-md mx-auto lg:max-w-none h-auto object-cover"
+                                        className="w-full h-full max-w-md mx-auto lg:max-w-none object-cover"
                                     />
                                 </div>
 
