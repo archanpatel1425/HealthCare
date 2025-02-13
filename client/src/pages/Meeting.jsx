@@ -9,6 +9,7 @@ import "../App.css";
 import { fetchUserData } from "../Store/patient/authslice";
 
 const socket = io("http://localhost:5000", {
+  path: "/meet-socket/",
   withCredentials: true,
   transports: ["websocket", "polling"]
 });
