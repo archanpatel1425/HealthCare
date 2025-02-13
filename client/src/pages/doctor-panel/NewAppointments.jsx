@@ -120,7 +120,7 @@ const NewAppointments = () => {
   }, [startDate, endDate, searchPatient]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-aos="zoom-in-up">
       {/* Header and Filters */}
       <div className="md:px-6 py-2 w-full rounded-lg p-4">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
