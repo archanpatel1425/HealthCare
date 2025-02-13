@@ -14,6 +14,7 @@ const Sidebar = () => {
   ];
 
   return (
+
     <>
       {/* Sidebar Toggler Button (Only visible on mobile) */}
       <button
@@ -46,6 +47,7 @@ const Sidebar = () => {
             <Link
               key={idx}
               to={link.path}
+
               className={`flex items-center px-4 py-2 transition ${location.pathname === link.path
                   ? "bg-green-600 text-white"
                   : "text-gray-700 hover:bg-green-100 hover:text-green-600"
@@ -58,6 +60,7 @@ const Sidebar = () => {
           ))}
         </nav>
       </div>
+
 
       {/* Overlay for mobile view (closes sidebar when clicked) */}
       {sidebarOpen && (

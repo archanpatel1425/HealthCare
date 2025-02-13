@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Camera, Mic, MicOff, Monitor, PhoneOff, Video, VideoOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
@@ -8,8 +9,11 @@ import "../App.css";
 import { fetchUserData } from "../Store/patient/authslice";
 
 const socket = io("http://localhost:5000", {
+  query: {
+    type: "meeting",
+  },
   withCredentials: true,
-  // transports: ["websocket", "polling"]
+  transports: ["websocket", "polling"]
 });
 
 function Meeting() {
@@ -313,7 +317,11 @@ function Meeting() {
       else {
         navigate('/patient-panel')
       }
+      axios.post(`${import.meta.env.VITE_API_URL}/doctor/status`, { appointmentId, status: "Completed" }, { withCredentials: true })
     } catch (err) {
+      if (err.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login";
+      }
       console.error("Error leaving meeting:", err);
     }
   };

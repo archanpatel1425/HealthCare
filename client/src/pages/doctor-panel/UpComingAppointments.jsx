@@ -94,6 +94,7 @@ const UpComingAppointments = () => {
     setShowFilters(false);
   };
 
+
   useEffect(() => {
     if (startDate || endDate || searchPatient) {
       setShowFilter(true);
@@ -179,6 +180,7 @@ const UpComingAppointments = () => {
       </div>
 
       {/* Table Section with Horizontal & Vertical Scroll */}
+
       <div className="bg-white rounded-lg shadow">
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="max-h-[72.5vh] overflow-y-auto">
@@ -277,6 +279,7 @@ const UpComingAppointments = () => {
       )}
     </div>
   );
+
 };
 
 export default UpComingAppointments;

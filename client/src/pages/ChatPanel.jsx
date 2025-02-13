@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 import { io } from 'socket.io-client';
 import { fetchUserData, fetchUserList } from '../Store/patient/authslice';
 
@@ -23,6 +24,9 @@ const ChatPanel = () => {
     const [msgStatus, setMsgStatus] = useState("")
     const [typingUsers, setTypingUsers] = useState(new Set());
     const typingTimeoutRef = useRef(null);
+    const navigate = useNavigate();
+
+
     useEffect(() => {
         dispatch(fetchUserData())
         const newSocket = io('http://localhost:5000', {
@@ -81,13 +85,13 @@ const ChatPanel = () => {
         });
 
         newSocket.on('messageStatusUpdated', ({ messageId, status }) => {
+            console.log(status)
             setMessages(prev => prev.map(msg =>
                 msg.id === messageId ? { ...msg, status } : { ...msg, status }
             ));
 
         });
         newSocket.on('userTyping', ({ userId, isTyping }) => {
-            console.log("in typing")
             setTypingUsers(prev => {
                 const newUsers = new Set(prev);
                 if (isTyping) {
@@ -234,6 +238,10 @@ const ChatPanel = () => {
         }
     };
 
+    const handleBack = () => {
+        navigate("/patient-panel");
+    };
+
     const isMessageFromCurrentUser = (message) => {
         const currentUserId = patientData?.patientId || patientData?.doctorId;
         return message.senderId === currentUserId;
@@ -242,7 +250,10 @@ const ChatPanel = () => {
     const getMessageStatus = (message) => {
         switch (message.status) {
             case 'READ':
-                return '✓✓ Done';
+                return <div className="inline-flex relative w-4">
+                    <i className="fa-solid fa-check text-xs"></i>
+                    <i className="fa-solid fa-check text-xs -ml-1"></i>
+                </div>
             case 'DELIVERED':
                 return '✓✓';
             case 'SENT':
@@ -255,7 +266,7 @@ const ChatPanel = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'READ':
-                return 'text-blue-400';
+                return 'text-blue-800';
             case 'DELIVERED':
                 return 'text-gray-400';
             case 'SENT':
@@ -263,7 +274,7 @@ const ChatPanel = () => {
             default:
                 return '';
         }
-    };
+    }
     const handleTyping = (e) => {
         setMessageInput(e.target.value);
 
@@ -289,7 +300,17 @@ const ChatPanel = () => {
     return (
         <div className="flex h-screen bg-green-900">
             <div className={`w-full md:w-1/3 bg-green-50 shadow-lg p-4 overflow-y-auto ${selectedUser ? 'hidden md:block' : 'block'}`}>
-                <h2 className="text-xl font-semibold text-green-800 mb-4">Chat With Users</h2>
+                {/* Back Button */}
+                <button
+                    onClick={handleBack}
+                    className="flex items-center gap-2 text-green-900 hover:text-green-600 mb-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back to Dashboard
+                </button>
+                <h2 className="text-xl font-semibold text-green-800 mb-4 mt-4">Chat With Users</h2>
                 <input
                     type="text"
                     placeholder="Search Users..."

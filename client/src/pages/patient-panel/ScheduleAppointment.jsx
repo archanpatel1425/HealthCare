@@ -45,7 +45,7 @@ const ScheduleAppointment = () => {
             patient_Id: patientData?.patientId,
             doctor_Id: doctorId,
             date: new Date(selectedSlot.date),
-            time: selectedSlot.slot.to,
+            time: selectedSlot.slot.from,
             reason: isOtherReason ? customReason : reason,
             status: 'Pending'
         };

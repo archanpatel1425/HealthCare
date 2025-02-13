@@ -31,7 +31,7 @@ export const getDoctorList = async (req, res) => {
     const doctors = await prisma.doctor.findMany()
     res.status(200).json(doctors)
   } catch (error) {
-    console.log("error : ", error)
+    console.error("error : ", error)
   }
 }
 
@@ -45,14 +45,14 @@ export const getDoctorInfo = async (req, res) => {
     })
     res.status(200).json(doctor)
   } catch (error) {
-    console.log("error is : ", error)
+    console.error("error is : ", error)
   }
 }
 
 export const getAppointmentsByPatient = async (req, res) => {
   try {
     const { patientId } = req.body
-
+    console.log(patientId)
     const appointments = await prisma.appointment.findMany({
       where: { patient_Id: patientId },
       include: {
@@ -104,7 +104,6 @@ export const updatePatientProfile = async (req, res) => {
       resetToken,
       refreshToken,
     } = req.body;
-    console.log(req.body)
     // Update the patient profile in the database
     const updatedPatient = await prisma.patient.update({
       where: { patientId }, // Use patientId to find the patient
@@ -220,7 +219,6 @@ export const getDoctorsBySpecialization = async (req, res) => {
 export const createAppointment = async (req, res) => {
   try {
     const appointment_data = req.body;
-    console.log(appointment_data)
     if (!appointment_data.patient_Id || !appointment_data.doctor_Id || !appointment_data.date || !appointment_data.time) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -242,7 +240,6 @@ export const createAppointment = async (req, res) => {
 
 export const getDoctorSchedule = async (req, res) => {
   const doctorId = req.body.doctorId;
-  console.log(req.body)
   const { availability } = await prisma.doctor.findUnique({
     where: { doctorId },
     select: { availability: true },
@@ -260,19 +257,16 @@ export const getDoctorSchedule = async (req, res) => {
   res.json(slotDetails);
 }
 
-
 const generateDateWiseSlots = (availability, schedule, days = 30) => {
   const timeToMinutes = (time) => {
-    const [timeString, period] = time.split(' ');
-    let [hours, minutes] = timeString.split(':').map(Number);
-    if (period === 'PM' && hours < 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
+    const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   };
 
   const minutesToTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
+    const adjustedMinutes = (minutes + 1440) % 1440; // Wrap around 24 hours
+    const hours = Math.floor(adjustedMinutes / 60);
+    const mins = adjustedMinutes % 60;
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
   };
 
@@ -287,8 +281,8 @@ const generateDateWiseSlots = (availability, schedule, days = 30) => {
 
   dates.forEach((date) => {
     const { from, to } = availability.time;
-    const startMinutes = timeToMinutes(from);
-    const endMinutes = timeToMinutes(to);
+    let startMinutes = timeToMinutes(from);
+    let endMinutes = timeToMinutes(to);
 
     const dayOfWeek = new Date(date).getDay();
     const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
@@ -303,10 +297,15 @@ const generateDateWiseSlots = (availability, schedule, days = 30) => {
 
     const slots = [];
 
+    // Handle overnight slots
+    if (endMinutes <= startMinutes) {
+      endMinutes += 1440; // Extend past midnight
+    }
+
     for (let time = startMinutes; time < endMinutes; time += 30) {
       const slotFrom = minutesToTime(time);
       const slotTo = minutesToTime(time + 30);
-      const isBooked = bookedTimes.includes(time);
+      const isBooked = bookedTimes.includes(time % 1440); // Ensure modulo for wrapping
 
       slots.push({ from: slotFrom, to: slotTo, available: !isBooked });
     }

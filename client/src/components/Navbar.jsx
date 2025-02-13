@@ -65,7 +65,7 @@ const Navbar = () => {
         {isloggedIN ? (
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white py-2 px-4 rounded-full"
+            className="bg-green-500 text-white py-2 px-4 rounded-full"
           >
             Logout
           </button>
@@ -134,9 +134,18 @@ const Navbar = () => {
           >
             Contact
           </Link>
+          {isloggedIN && <li className="text-lg font-semibold text-green-700 hover:text-green-800 transition duration-300">
+            {
+              patientData?.doctorId?(
+                <Link to="/doctor-panel">Dashboard</Link>
+              ):(
+                <Link to="/patient-panel">Dashboard</Link>
+              )
+            }
+          </li>}
           {isloggedIN ? (
             <button
-              className="bg-red-500 text-white py-2 px-4 rounded-full mt-4"
+              className="bg-green-500 text-white py-2 px-4 rounded-full mt-4"
               onClick={() => {
                 handleLogout();
                 setIsMenuOpen(false);

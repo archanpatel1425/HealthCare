@@ -9,9 +9,8 @@ import Profile from "./Profile";
 import UpComingAppointments from "./UpComingAppointments";
 
 export default function DoctorPanel() {
-
   return (
-    <div className="flex h-screen bg-gray-100 ">
+    <div className="flex h-screen bg-gray-100">
       <DoctorLayout >
         <Routes>
           <Route path="/" element={<Dashboard />} />

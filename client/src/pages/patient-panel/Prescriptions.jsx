@@ -1,11 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { FaCalendarAlt, FaFileMedical, FaInfoCircle, FaUserMd } from "react-icons/fa";
+import { FaCalendarAlt, FaFileMedical, FaFilter, FaInfoCircle, FaUserMd } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
 
 const MedicineCard = ({ medicine, link }) => (
     <div className="p-4 bg-green-100 shadow-md rounded-lg border border-green-600">
@@ -46,6 +46,8 @@ const Prescriptions = () => {
     const [filterDate, setFilterDate] = useState("");
     const [filterDoctor, setFilterDoctor] = useState("");
     const { patientData } = useSelector((state) => state.auth);
+    const [isfiltered, setfilter] = useState(false)
+
 
     useEffect(() => {
         const fetchPrescriptions = async () => {
@@ -67,9 +69,11 @@ const Prescriptions = () => {
     const fetchMedicineLinks = async (medicineNames) => {
         try {
             if (!medicineNames.length) return;
-            const prompt = `Provide a single reliable online link for information about each of the following medicines: ${medicineNames.join(", ")}.`;
+            const prompt = `give any single http link where i can buy these specific medicines: ${medicineNames.join(", ")}.`;
             const result = await model.generateContent(prompt);
             const text = await result.response.text();
+            console.log(text);
+
             const linkRegex = /(https?:\/\/[^\s]+)/g;
             const links = text.match(linkRegex) || [];
             const linksMap = medicineNames.reduce((acc, med, index) => {
@@ -100,7 +104,11 @@ const Prescriptions = () => {
                             type="date"
                             className="p-2 border border-gray-300 rounded-md w-full"
                             value={filterDate}
-                            onChange={(e) => setFilterDate(e.target.value)}
+                            onChange={(e) => {
+                                setFilterDate(e.target.value)
+                                e.target.value ? setfilter(true) : setfilter(false)
+                            }
+                            }
                         />
                     </div>
                     <div className="flex flex-col w-full sm:w-auto">
@@ -110,36 +118,39 @@ const Prescriptions = () => {
                             className="p-2 border border-gray-300 rounded-md w-full"
                             placeholder="Enter doctor's name"
                             value={filterDoctor}
-                            onChange={(e) => setFilterDoctor(e.target.value)}
+                            onChange={(e) => {
+                                setFilterDoctor(e.target.value)
+                                e.target.value ? setfilter(true) : setfilter(false)
+                            }
+                            }
                         />
                     </div>
                     <button
-                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 w-full sm:w-auto h-10 mt-6 sm:mt-0"
-                        onClick={() => { setFilterDate(""); setFilterDoctor(""); }}
-                    >
-                        Clear Filters
+                        className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 w-full sm:w-auto h-10 mt-6 sm:mt-0  ${isfiltered ? '' : 'hidden'}`}
+                        onClick={() => { setFilterDate(""); setFilterDoctor("");setfilter(false) }}
+                    >Clear Filters
                     </button>
                 </div>
             </div>
             {/* This section now has the vertical scroll only */}
             <div className="p-4 overflow-y-auto max-h-[calc(100vh-400px)] sm:max-h-[calc(100vh-270px)] md:max-h-[calc(100vh-260px)] lg:max-h-[calc(100vh-240px)]"> {/* Adjusted max-height to give more space on smaller screens */}                {filteredPrescriptions.map((prescription) => (
-                    <div key={prescription.prescriptionId} className="w-full bg-green-50 border border-green-600 rounded-lg shadow-md p-6 mb-6 sm:p-4">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                            <h3 className="text-lg font-semibold text-green-800 flex items-center"><FaUserMd className="mr-2" /> {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
-                            <p className="text-sm text-green-600 flex items-center"><FaCalendarAlt className="mr-2" /> {new Date(prescription.createdAt).toLocaleDateString()}</p>
-                        </div>
-                        <p className="text-red-600">Notes: {prescription.notes || "No notes available"}</p>
-                        <div className="mt-4 grid grid-cols-1 gap-4">
-                            {prescription.medicines.length > 0 ? (
-                                prescription.medicines.map((medicine, index) => (
-                                    <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
-                                ))
-                            ) : (
-                                <p className="text-green-500">No medicines prescribed.</p>
-                            )}
-                        </div>
+                <div key={prescription.prescriptionId} className="w-full bg-green-50 border border-green-600 rounded-lg shadow-md p-6 mb-6 sm:p-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <h3 className="text-lg font-semibold text-green-800 flex items-center"><FaUserMd className="mr-2" /> {prescription.doctor.first_name} {prescription.doctor.last_name}</h3>
+                        <p className="text-sm text-green-600 flex items-center"><FaCalendarAlt className="mr-2" /> {new Date(prescription.createdAt).toLocaleDateString()}</p>
                     </div>
-                ))}
+                    <p className="text-red-600">Notes: {prescription.notes || "No notes available"}</p>
+                    <div className="mt-4 grid grid-cols-1 gap-4">
+                        {prescription.medicines.length > 0 ? (
+                            prescription.medicines.map((medicine, index) => (
+                                <MedicineCard key={index} medicine={medicine} link={medicineLinks[medicine.drugName]} />
+                            ))
+                        ) : (
+                            <p className="text-green-500">No medicines prescribed.</p>
+                        )}
+                    </div>
+                </div>
+            ))}
             </div>
         </div>
     );

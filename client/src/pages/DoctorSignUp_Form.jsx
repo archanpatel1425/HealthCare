@@ -47,8 +47,7 @@ const DoctorSignUp_Form = () => {
   });
 
   const validateTimeRange = (timeFrom, timeTo) => {
-    if (!timeFrom || !timeTo) return true;
-    return timeFrom < timeTo;
+
   };
   const password = watch("password");
 
@@ -99,7 +98,6 @@ const DoctorSignUp_Form = () => {
 
   const validateStep3 = (values) => {
     const errors = [];
-
     if (!values.specialization) {
       errors.push("Please select a specialization");
     }
@@ -120,19 +118,6 @@ const DoctorSignUp_Form = () => {
     ) {
       errors.push("Please select at least one day for custom availability");
     }
-    if (!values.timeFrom) {
-      errors.push("Please select start time");
-    }
-    console.log("Validation values: ", values);
-    if (!values.timeTo) {
-      errors.push("Please select end time");
-    } else if (
-      values.timeFrom &&
-      values.timeTo &&
-      !validateTimeRange(values.timeFrom, values.timeTo)
-    ) {
-      errors.push("End time must be after start time");
-    }
 
     console.log("Errors in validation: ", errors);
     return errors;
@@ -140,7 +125,6 @@ const DoctorSignUp_Form = () => {
 
   const handleNext = async () => {
     const currentFields = getValues();
-    console.log("currentFields : ", currentFields, step);
     let validationErrors = [];
 
     if (step === 1) {
@@ -202,21 +186,18 @@ const DoctorSignUp_Form = () => {
     }
     return errors;
   };
-  const onSubmit = async (data) => {
-    console.log("validation");
-
+  const onSubmit = async (e) => {
+    e.preventDefault();
     try {
       let validationErrors = [];
-      console.log("final data is : ,", data);
-      setValidateQualifications(true); // Trigger validation
+      const data = getValues();
+      setValidateQualifications(true); // Trigger valid ation
       validationErrors = validateStep3(data);
       if (validationErrors.length > 0) {
         validationErrors.forEach((error) => toast.error(error));
         return;
       }
-
       const values = watch();
-      // Check if any required fields are empty
       const requiredFields = [
         "specialization",
         "experience",
@@ -238,7 +219,6 @@ const DoctorSignUp_Form = () => {
 
       const profilepic = await handleUpload(data.profilepic[0]);
       const qualifications = await handleUpload(data.qualifications[0]);
-
       const finalData = {
         ...data,
         profilepic,
@@ -246,18 +226,13 @@ const DoctorSignUp_Form = () => {
         customDays: isCustomAvailability ? data.customDays || [] : [],
       };
 
-      console.log("hello");
-
       const response = await axios.post(
         `${VITE_API_URL}/auth/doctor-signup`,
         finalData,
         { withCredentials: true }
       );
-
-      if (response.data.success) {
-        toast.success("Registration successful!");
-        setTimeout(() => navigate("/login"), 2000);
-      }
+      toast.success("Registration successful!");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Registration failed";
@@ -268,9 +243,6 @@ const DoctorSignUp_Form = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const renderCurrentStep = () => {
     switch (step) {
@@ -303,25 +275,23 @@ const DoctorSignUp_Form = () => {
           {[1, 2, 3].map((stepNumber) => (
             <React.Fragment key={stepNumber}>
               <div
-                className={`w-10 h-10 flex items-center justify-center text-lg font-bold rounded-full transition-all ${
-                  step >= stepNumber
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-300 text-gray-600"
-                }`}
+                className={`w-10 h-10 flex items-center justify-center text-lg font-bold rounded-full transition-all ${step >= stepNumber
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-300 text-gray-600"
+                  }`}
               >
                 {stepNumber}
               </div>
               {stepNumber < 3 && (
                 <div
-                  className={`flex-1 h-1 mx-2 transition-all ${
-                    step > stepNumber ? "bg-green-600" : "bg-gray-300"
-                  }`}
+                  className={`flex-1 h-1 mx-2 transition-all ${step > stepNumber ? "bg-green-600" : "bg-gray-300"
+                    }`}
                 />
               )}
             </React.Fragment>
           ))}
         </div>
-        <form action="" onSubmit={handleSubmit(onSubmit)}>
+        <div>
           {/* Form Content */}
           <div className="mb-6">{renderCurrentStep()}</div>
 
@@ -355,7 +325,7 @@ const DoctorSignUp_Form = () => {
               </button>
             )}
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -29,10 +29,10 @@ function App() {
         <Route path="/signup/patient" element={<PatientSignUp_Form />} />
         <Route path="/contact" element={<ContactPage />} />
 
-        <Route path="/meet/:meetId" element={<Meeting />} />
-        <Route path="/chat" element={<ChatPanel />} />
-        <Route path="/doctor-panel/*" element={<DoctorHome />} />
-        <Route path="/patient-panel/*" element={<PatientHome />} />
+        <Route path="/meet/:meetId" element={<ProtectedRoute element={<Meeting />} />} />
+        <Route path="/chat" element={<ProtectedRoute element={<ChatPanel />} />} />
+        <Route path="/doctor-panel/*" element={<ProtectedRoute element={<DoctorHome />} />} />
+        <Route path="/patient-panel/*" element={<ProtectedRoute element={<PatientHome />} />} />
       </Routes>
     </div>
   );
