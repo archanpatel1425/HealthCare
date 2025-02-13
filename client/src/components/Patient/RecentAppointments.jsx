@@ -82,10 +82,10 @@ const RecentAppointments = () => {
         const appointmentMinute = minutes;
 
         const windowStart = new Date(appointmentDateTime);
-        windowStart.setHours(appointmentHour, appointmentMinute - 15, 0);
+        windowStart.setHours(appointmentHour, appointmentMinute, 0);
 
         const windowEnd = new Date(appointmentDateTime);
-        windowEnd.setHours(appointmentHour, appointmentMinute + 15, 0);
+        windowEnd.setHours(appointmentHour, appointmentMinute + 45, 0);
         return now >= windowStart && now <= windowEnd;
     };
 
@@ -105,7 +105,7 @@ const RecentAppointments = () => {
 
         // Calculate window start (30 minutes before) and end (45 minutes after)
         const windowStart = new Date(appointmentDateTime);
-        windowStart.setHours(appointmentHour, appointmentMinute - 30, 0);
+        windowStart.setHours(appointmentHour, appointmentMinute, 0);
 
         const windowEnd = new Date(appointmentDateTime);
         windowEnd.setHours(appointmentHour, appointmentMinute + 45, 0);

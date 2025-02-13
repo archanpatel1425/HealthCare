@@ -25,6 +25,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import Footer from '../Footer'
+import {useNavigate} from 'react-router-dom'
+import { useSelector } from 'react-redux';
 
 const specialties = [
     { name: "Crutches", icon: "🦵", image: img1 },
@@ -86,7 +88,7 @@ const testimonials = [
         role: "Biographer",
         image: "https://randomuser.me/api/portraits/women/47.jpg",
         feedback:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum the industry's standard dummy text.",
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum the industry's standard dummy text.",
     },
     {
         name: "David Baer",
@@ -99,6 +101,7 @@ const testimonials = [
 
 const HeroSection = () => {
 
+    const {patientData}=useSelector((state)=>state.auth)
     const [openIndex, setOpenIndex] = useState(0); // First answer open by default
     const faqs = [
         {
@@ -125,7 +128,7 @@ const HeroSection = () => {
     const toggleFAQ = (index) => {
         setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
     };
-
+const navigate=useNavigate()
     const [selectedSpecialty, setSelectedSpecialty] = useState(specialties[0]);
 
     const [index, setIndex] = useState(0);
@@ -151,7 +154,14 @@ const HeroSection = () => {
     }, []);
 
     const loopedDoctors = [...doctors, ...doctors];
-
+    const handleNavigate=()=>{
+        if(patientData?.doctorId){
+            navigate('/doctor-panel')
+        }
+        else{
+            navigate('/patient-panel')
+        }
+    }
     const nextDoctor = () => {
         setIndex((prevIndex) => (prevIndex + 1) % doctors.length);
     };
@@ -172,7 +182,9 @@ const HeroSection = () => {
                                     <div className="text-center lg:text-4xl md:text-2xl mb-6">
                                         Your Wellness, Our Mission
                                     </div>
-                                    <button className="text-white bg-green-600 px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors">
+                                    <button className="text-white bg-green-600 px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors"
+                                    onClick={()=>handleNavigate()}
+                                    >
                                         Book An Appointment
                                     </button>
                                 </div>
