@@ -32,7 +32,9 @@ const PatientSidebar = () => {
   ];
 
   return (
-    <>
+    < >
+    <div data-aos="zoom-in-up">
+
       {/* Toggle Button */}
       <button
         className={`md:hidden absolute top-4 ${sidebarOpen ? "left-20" : "left-4"} bg-green-600 text-white p-3 rounded-lg shadow-lg z-50 flex items-center hover:bg-green-700 transition-all`}
@@ -63,6 +65,7 @@ const PatientSidebar = () => {
           ))}
         </nav>
       </div>
+          </div>
     </>
   );
 };

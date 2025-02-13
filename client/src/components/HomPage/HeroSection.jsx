@@ -28,6 +28,7 @@ import Footer from '../Footer'
 import {useNavigate} from 'react-router-dom'
 import { useSelector } from 'react-redux';
 
+
 const specialties = [
     { name: "Crutches", icon: "🦵", image: img1 },
     { name: "X-ray", icon: "🩻", image: img2 },
@@ -168,7 +169,7 @@ const navigate=useNavigate()
 
     return (
         <>
-            <div className="text-center min-h-screen">
+            <div className="text-center min-h-screen" data-aos="zoom-in-up">
                 <div className="pt-8 lg:pt-16">
                     <div className="bg-[#d4e8db] w-full min-h-screen">
                         <div className="container mx-auto px-4">
@@ -204,7 +205,7 @@ const navigate=useNavigate()
                 </div>
             </div>
 
-            <section className="py-12 px-4 bg-gray-200">
+            <section className="py-12 px-4 bg-gray-200" data-aos="zoom-in-up">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-gray-900">
                         What people say?
@@ -238,7 +239,7 @@ const navigate=useNavigate()
                 </div>
             </section>
 
-            <section id='about' className="py-12 px-4 bg-white">
+            <section id='about' className="py-12 px-4 bg-white" data-aos="zoom-in-up">
                 <div className="max-w-7xl mx-auto">
                     {/* Centered heading above both sections */}
                     <div className="text-center mb-12">
@@ -287,7 +288,7 @@ const navigate=useNavigate()
                 </div>
             </section>
 
-            <section className="py-8 md:py-12 px-4 bg-gray-200">
+            <section className="py-8 md:py-12 px-4 bg-gray-200" data-aos="zoom-in-up">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Meet our specialists</h2>
                     <div className="w-16 h-1 bg-teal-500 mx-auto my-2"></div>
@@ -349,7 +350,7 @@ const navigate=useNavigate()
                 </div>
             </section>
 
-            <div className="p-6 md:p-12 bg-white">
+            <div className="p-6 md:p-12 bg-white" data-aos="zoom-in-up">
                 <div className="max-w-6xl mx-auto text-center mb-4">
                     <h2 className="text-3xl font-bold text-gray-900">
                         Our Specialities
@@ -393,7 +394,7 @@ const navigate=useNavigate()
                 </div>
             </div>
 
-            <div className="mx-auto bg-gray-200 py-8 md:py-12 px-4 md:px-8">
+            <div className="mx-auto bg-gray-200 py-8 md:py-12 px-4 md:px-8" data-aos="zoom-in-up">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 md:gap-12">
                     {/* Left Side - Icons */}
                     <div className="w-full lg:mt-28 md:w-1/2">
@@ -415,7 +416,7 @@ const navigate=useNavigate()
 
                     {/* Right Side - FAQ */}
                     <div className="w-full md:w-1/2">
-                        <h2 className="text-xl md:text-2xl text-center font-bold mb-4 md:mb-6">
+                        <h2 className="text-xl md:text-2xl text-center font-bold mb-4 md:mb-6" data-aos="zoom-in-up">
                             Find Answer To Your Questions
                         </h2>
                         <div className="space-y-3 md:space-y-4 max-w-xl mx-auto">

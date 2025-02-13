@@ -82,7 +82,7 @@ const SkinCancer = () => {
     }
   };
   return (
-    <div className="p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-xl border border-gray-200 flex flex-col lg:flex-row gap-4 min-h-[450px] h-full w-full overflow-y-auto">
+    <div className="p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-xl border border-gray-200 flex flex-col lg:flex-row gap-4 min-h-[450px] h-full w-full overflow-y-auto" data-aos="zoom-in-up">
       {/* Left Side - Image Upload & Prediction */}
       <div className="flex flex-col items-center w-full lg:w-1/2 flex-1">
         <h1 className="text-3xl font-bold text-center text-green-600 mb-4">

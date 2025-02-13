@@ -123,7 +123,7 @@ const Profile = () => {
         }
     };
     return (
-        <div className="min-h-screen bg-green-50/50 flex items-start justify-center p-4 sm:p-20">
+        <div className="min-h-screen bg-green-50/50 flex items-start justify-center p-4 sm:p-20" data-aos="zoom-in-up">
           <div className="bg-white shadow-xl rounded-2xl w-full max-w-5xl overflow-auto m-4 border border-green-100">
             <div className="p-4 sm:p-8">
               <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 md:gap-12">

@@ -215,7 +215,7 @@ const RecentAppointments = () => {
         );
 
         return (
-            <div className={`p-6 rounded-lg ${bgColor}`}>
+            <div className={`p-6 rounded-lg ${bgColor}`} >
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
                     {title} ({filteredAppointments.length})
                 </h3>
@@ -237,7 +237,7 @@ const RecentAppointments = () => {
     }
 
     return (
-        <div className="bg-white shadow-lg p-6 w-full">
+        <div className="bg-white shadow-lg p-6 w-full" data-aos="zoom-in-up">
             <div className="flex flex-col space-y-4 mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Appointments Dashboard</h2>
 
