@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Calendar, Clock, FileText, MessageCircle, Search, User, Video, X } from 'lucide-react';
+import { Calendar, Clock, FileText, MessageCircle, Search, User, Video } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -175,8 +175,8 @@ const RecentAppointments = () => {
                                 onClick={() => handleVideoCall(appointment.appointmentId)}
                                 disabled={!isVideoCallButtonEnabled(appointment.date, appointment.time)}
                                 className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${isVideoCallButtonEnabled(appointment.date, appointment.time)
-                                        ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
                                 <Video className="w-4 h-4 mr-2" />
@@ -219,7 +219,7 @@ const RecentAppointments = () => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
                     {title} ({filteredAppointments.length})
                 </h3>
-                <div className="h-[calc(30vh-2rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 pr-4">
+                <div className="h-[calc(40vh-2rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 pr-4">
                     {filteredAppointments.map(appointment => (
                         <AppointmentCard
                             key={appointment.appointmentId}
@@ -272,10 +272,9 @@ const RecentAppointments = () => {
 
                     <button
                         onClick={() => { setDateFilter(""); setDoctorSearch(""); setfilter(false) }}
-                        className={`flex items-center px-4 py-2 bg-red-300 hover:bg-red-400 rounded-lg  ${isfiltered ? '' : 'hidden'}  text-gray-600 transition-colors`}
+                        className={`flex items-center px-4 py-2 text-white bg-red-500 rounded-lg  ${isfiltered ? '' : 'hidden'}  text-gray-600 transition-colors`}
                     >
-                        <X className="w-4 h-4 mr-2" />
-                        Clear Filters
+                        <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
                     </button>
                 </div>
             </div>

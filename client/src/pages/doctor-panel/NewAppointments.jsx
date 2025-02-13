@@ -142,7 +142,7 @@ const NewAppointments = () => {
               <div className="flex flex-col">
                 {showFilter &&
                   <button
-                    className="bg-green-600 text-white px-4 rounded py-2 h-fit mt-auto"
+                    className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
                     onClick={clearFilters}
                   >
                     <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>

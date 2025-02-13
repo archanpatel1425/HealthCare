@@ -24,6 +24,7 @@ import eq6 from '../../assets/eq6-removebg-preview.png'
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import Footer from '../Footer'
 
 const specialties = [
     { name: "Crutches", icon: "🦵", image: img1 },
@@ -431,6 +432,7 @@ const HeroSection = () => {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     );
 };
