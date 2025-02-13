@@ -239,7 +239,12 @@ const ChatPanel = () => {
     };
 
     const handleBack = () => {
-        navigate("/patient-panel");
+        if(patientData?.patientId){
+            navigate("/patient-panel");
+        }
+        else{
+            navigate("/doctor-panel");
+        }
     };
 
     const isMessageFromCurrentUser = (message) => {

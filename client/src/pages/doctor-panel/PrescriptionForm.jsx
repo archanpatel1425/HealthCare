@@ -41,14 +41,17 @@ const PrescriptionForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/getId`, { appointmentId }, { withCredentials: true })
-        const patientId = res.data?.patientId
-        let data = prescriptions.filter(p => p.drugName.trim() !== '');
         try {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/getId`, { appointmentId }, { withCredentials: true })
+
+            const patientId = res.data?.patientId
+
+            let data = prescriptions.filter(p => p.drugName.trim() !== '');
+
             axios.post(`${import.meta.env.VITE_API_URL}/doctor/submit-prescription`, { data: data, notes: note, appointmentId: appointmentId, patientId: patientId, doctorId: patientData?.doctorId },{withCredentials:true}).then((res) => {
-            });
-                showToast("Prescription Filled Up SuccessFully!.","success");
+                showToast("Prescription Filled Up SuccessFully!.", "success");
                 navigate('/doctor-panel')
+            });
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"

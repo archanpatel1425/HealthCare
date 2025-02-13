@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserData } from "../../Store/patient/authslice";
+import { showToast } from "./Alerts";
 
 const ConsultedPatients = () => {
   const dispatch = useDispatch();
@@ -16,6 +17,9 @@ const ConsultedPatients = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [loader, setLoader] = useState(true)
+  const [showFilter, setShowFilter] = useState(false);
+
 
   useEffect(() => {
     dispatch(fetchUserData());
@@ -23,13 +27,19 @@ const ConsultedPatients = () => {
 
   useEffect(() => {
     try {
-      axios.post(`${import.meta.env.VITE_API_URL}/doctor/done`, { doctorId: patientData?.doctorId },{withCredentials:true})
-        .then((res) => {
-          setPatients(res.data);
-          setFilterPatients(res.data);
-        });
+      if (patientData?.doctorId) {
+        axios.post(`${import.meta.env.VITE_API_URL}/doctor/done`, { doctorId: patientData?.doctorId }, { withCredentials: true })
+          .then((res) => {
+            setPatients(res.data);
+            setFilterPatients(res.data);
+            setLoader(false)
+          });
+      }
     } catch (error) {
-      
+      showToast(error, "error");
+      if (error.response.data.message === "Unauthorized: No token provided") {
+        window.location.href = "/login"
+      }
     }
   }, [patientData]);
 
@@ -82,6 +92,14 @@ const ConsultedPatients = () => {
     setShowFilters(false);
   };
 
+  useEffect(() => {
+    if (startDate || endDate || searchPatient) {
+      setShowFilter(true);
+    } else {
+      setShowFilter(false);
+    }
+  }, [startDate, endDate, searchPatient]);
+
   return (
     <div className="md:px-6 py-2">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
@@ -98,6 +116,17 @@ const ConsultedPatients = () => {
 
         <div className={`flex flex-col md:flex-row gap-4 ${showFilters || 'hidden md:flex'}`}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="flex flex-col">
+              {showFilter &&
+                <button
+                  className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
+                  onClick={clearFilters}
+                >
+                  <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
+                </button>
+              }
+            </div>
+
             <div className="flex flex-col">
               <span className="text-sm">Start Date</span>
               <input
@@ -138,12 +167,6 @@ const ConsultedPatients = () => {
               />
             </div>
 
-            <button
-              className="bg-green-600 text-white px-4 rounded py-2 h-fit mt-auto"
-              onClick={clearFilters}
-            >
-              Clear Filter
-            </button>
           </div>
         </div>
       </div>
@@ -156,29 +179,32 @@ const ConsultedPatients = () => {
               <thead className="sticky top-0 bg-green-600 text-white uppercase z-10">
                 <tr>
                   <th className="px-4 py-3 text-left text-sm">Name</th>
-                  <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Gender</th>
+                  <th className="px-4 py-3 text-left text-sm">Gender</th>
                   <th className="px-4 py-3 text-left text-sm">Reason</th>
                   <th className="px-4 py-3 text-left text-sm">Date</th>
-                  <th className="hidden md:table-cell px-4 py-3 text-left text-sm">Time</th>
+                  <th className="px-4 py-3 text-left text-sm">Time</th>
                   <th className="px-4 py-3 text-center text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
+                {loader && <tr><td colSpan="6" className="text-center py-4">Loading...</td></tr>}
+                {filterPatients.length === 0 && !loader && (!startDate && !endDate && !searchPatient) && <tr><td colSpan="6" className="text-center py-4">No Consulted Patients(s) Found</td></tr>}
+                {filterPatients.length === 0 && !loader && (startDate || endDate || searchPatient) && <tr><td colSpan="6" className="text-center py-4">No Such Record(s) Found</td></tr>}
                 {filterPatients.map((patient, index) => (
                   <tr key={index} className="hover:bg-green-50">
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.patient.first_name} {patient.patient.last_name}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.patient.gender}
                     </td>
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.reason}
                     </td>
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {new Date(patient.date).toLocaleDateString('en-GB').replace(/\//g, '-')}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.time}
                     </td>
                     <td className="px-4 py-3 border-b text-center relative">
