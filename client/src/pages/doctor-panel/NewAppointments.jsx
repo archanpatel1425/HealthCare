@@ -215,19 +215,19 @@ const NewAppointments = () => {
                   {filterPatients.length === 0 && !loader && (startDate || endDate || searchPatient) && <tr><td colSpan="6" className="text-center py-4">No Such Record(s) Found</td></tr>}
                   {filterPatients.map((patient, index) => (
                     <tr key={index} className="hover:bg-green-50">
-                      <td className="px-4 py-3 border-b text-sm">
+                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                         {patient.patient.first_name} {patient.patient.last_name}
                       </td>
-                      <td className="px-4 py-3 border-b text-sm">
+                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                         {patient.patient.gender}
                       </td>
-                      <td className="px-4 py-3 border-b text-sm">
+                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                         {patient.reason}
                       </td>
-                      <td className="px-4 py-3 border-b text-sm">
+                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                         {new Date(patient.date).toLocaleDateString('en-GB').replace(/\//g, '-')}
                       </td>
-                      <td className="px-4 py-3 border-b text-sm">
+                      <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                         {patient.time}
                       </td>
                       <td className="px-4 py-3 border-b text-center relative">
@@ -274,7 +274,7 @@ const NewAppointments = () => {
                   </div>
                   <div className="flex gap-3 mt-4">
                     <button
-                      onClick={() => AcceptRejectHandler(selectedPatient.appointmentId, "Accepted")}
+                      onClick={() => AcceptRejectHandler(selectedPatient.appointmentId, "Scheduled")}
                       className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm md:text-base"
                     >
                       Accept
