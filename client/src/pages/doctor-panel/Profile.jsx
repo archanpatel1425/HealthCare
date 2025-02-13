@@ -1,20 +1,25 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from 'react-router-dom';
-import { fetchUserData } from "../../Store/patient/authslice";
-import './a.css';
-import { showToast } from './Alerts';
+import { fetchUserData, updateUserData } from "../../Store/patient/authslice";
+import { showToast } from "./Alerts";
+import { Camera, X, Upload, Check, Edit2 } from 'lucide-react';
+
 
 const Profile = () => {
+
     const dispatch = useDispatch();
     const { patientData } = useSelector((state) => state.auth);
-    const navigate = useNavigate();
-    const [update, setUpdate] = useState(false);
+
+
+    const inputImgRef = useRef(null);
+    const inputImgRef1 = useRef(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage1, setSelectedImage1] = useState(null);
     const [selectedImageFile, setSelectedImageFile] = useState(null);
     const [selectedImageFile1, setSelectedImageFile1] = useState(null);
-    const inputImgRef = useRef(null);
 
     const [formData, setFormData] = useState({
         first_name: "",
@@ -26,171 +31,86 @@ const Profile = () => {
         specialization: "",
         experience: "",
         qualifications: "",
-        availability: "",
+        availability: { days: [], time: { from: "", to: "" } },
     });
 
     useEffect(() => {
         dispatch(fetchUserData());
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         if (patientData) {
-            try {
-                axios
-                    .post(`${import.meta.env.VITE_API_URL}/doctor/getprofile`, {
-                        doctorId: patientData?.doctorId,
-                    }, { withCredentials: true })
-                    .then((res) => {
-                        setFormData({
-                            first_name: res.data.first_name,
-                            last_name: res.data.last_name,
-                            gender: res.data.gender,
-                            phone_no: res.data.phone_no,
-                            profilepic: res.data.profilepic,
-                            email: res.data.email,
-                            specialization: res.data.specialization,
-                            experience: res.data.experience,
-                            qualifications: res.data.qualifications,
-                            availability: res.data.availability,
-                        });
-                    });
-            } catch (error) {
-                if (error.response.data.message === "Unauthorized: No token provided") {
-                    window.location.href = "/login"
-                }
-            }
+            axios
+                .post(`${import.meta.env.VITE_API_URL}/doctor/getprofile`, {
+                    doctorId: patientData?.doctorId,
+                }, { withCredentials: true })
+                .then((res) => {
+                    setFormData(res.data);
+                })
+                .catch((error) => {
+                    if (error.response?.data?.message === "Unauthorized: No token provided") {
+                        window.location.href = "/login";
+                    }
+                });
         }
     }, [patientData]);
 
 
-    const handleAvailabilityChange = (e) => {
-        const { name, checked } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            availability: {
-                ...prevData.availability,
-                days: checked
-                    ? [...(prevData.availability?.days || []), name] // Add the day
-                    : (prevData.availability?.days || []).filter(day => day !== name) // Remove the day
-            }
-        }));
+    const triggerFileInput = () => {
+        inputImgRef.current?.click();
     };
 
-    const handleTimeChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            availability: {
-                ...prevData.availability,
-                time: {
-                    ...prevData.availability?.time,
-                    [name]: value
-                }
-            }
-        }));
+    const triggerFileInput1 = () => {
+        inputImgRef1.current?.click();
     };
-
-
 
     const handleUpload = async (image) => {
         const formData = new FormData();
         formData.append('image', image);
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
-
-            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadprofile-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url }, { withCredentials: true })
-            if (newResponse.data.message == 'success') {
-                showToast('Profile photo uploaded successfully', 'success');
-                window.location.reload()
-            }
-
-        } catch (error) {
-            console.log("profile erorro", error)
-            if (error.response.data.message === "Unauthorized: No token provided") {
-                window.location.href = "/login"
-            }
-            showToast('Failed to upload image', 'error');
-            throw error;
-        }
-    };
-
-
-    const handleUpload1 = async (image) => {
-        const formData = new FormData();
-        formData.append('image', image);
-        try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/uploads`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true
-            });
-
-            const newResponse = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/uploadqualification-photo`, { doctorId: patientData?.doctorId, photoUrl: response.data.url }, { withCredentials: true })
-
-            if (newResponse.data.message == 'success') {
-                showToast('Profile photo uploaded successfully', 'success');
-                window.location.reload()
-            }
-
+            return response.data.url;
         } catch (error) {
             if (error.response.data.message === "Unauthorized: No token provided") {
                 window.location.href = "/login"
             }
-            showToast('Failed to upload image', 'error');
+            toast.error('Failed to upload image', 'error');
             throw error;
         }
     };
 
+    // Handle input changes
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+        const { name, value } = e.target;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            let updatedFormData = { ...formData };
-
-            // If there's a new image selected, upload it first
-            // if (selectedImageFile) {
-            //     const imageUrl = await handleUpload(selectedImageFile);
-            //     updatedFormData = {
-            //         ...updatedFormData,
-            //         profilepic: imageUrl
-            //     };
-            // }
-
-            // Update the profile with all data including new image URL if uploaded
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, {
-                doctorId: patientData?.doctorId,
-                formData: updatedFormData
-            }, {
-                withCredentials: true
-            });
-
-            if (response.data) {
-                showToast("Profile updated successfully", "success");
-                // navigate("/doctor-panel");
-                setUpdate(false);
-                changeDisabled1()
-            }
-        } catch (error) {
-            if (error.response.data.message === "Unauthorized: No token provided") {
-                window.location.href = "/login"
-            }
-
-            showToast("Failed to update profile", "error");
-            console.error("Error updating profile:", error);
+        if (name === "from" || name === "to") {
+            // Update the nested availability.time object
+            setFormData((prev) => ({
+                ...prev,
+                availability: {
+                    ...prev.availability,
+                    time: {
+                        ...prev.availability.time,
+                        [name]: value,  // Dynamically update 'from' or 'to'
+                    },
+                },
+            }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
+
+    // Handle image selection
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
             if (!acceptedTypes.includes(file.type)) {
-                showToast('Only JPG, JPEG, and PNG files are allowed', 'error');
+                toast.error('Only JPG, JPEG, and PNG files are allowed', 'error');
                 e.target.value = '';
                 return;
             }
@@ -201,17 +121,13 @@ const Profile = () => {
         }
     };
 
-
-    const [selectedImage1, setSelectedImage1] = useState(null);
-    const inputImgRef1 = useRef(null)
-
     const handleImageChange1 = (e) => {
         const file = e.target.files[0];
         if (file) {
             const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
             if (!acceptedTypes.includes(file.type)) {
-                showToast('Only JPG, JPEG, and PNG files are allowed', 'error');
+                toast.error('Only JPG, JPEG, and PNG files are allowed', 'error');
                 e.target.value = '';
                 return;
             }
@@ -222,238 +138,390 @@ const Profile = () => {
         }
     };
 
-    const changeDisabled = () => {
-        document.querySelectorAll('.input-field').forEach((input) => {
-            input.disabled = false;
-        });
+    // Handle form submission
+    const handleSubmit = async () => {
+        try {
+            setIsSubmitting(true);
+            let updatedFormData = { ...formData };
+
+            // If there's a new image selected, upload it first
+            if (selectedImageFile) {
+                const imageUrl = await handleUpload(selectedImageFile);
+                updatedFormData = {
+                    ...updatedFormData,
+                    profilepic: imageUrl
+                };
+            }
+
+            if (selectedImageFile1) {
+                const imageUrl = await handleUpload(selectedImageFile1);
+                updatedFormData = {
+                    ...updatedFormData,
+                    qualifications: imageUrl
+                };
+            }
+
+            // Dispatch action to update profile with new data
+            await axios.post(`${import.meta.env.VITE_API_URL}/doctor/updateprofile`, {
+                doctorId: patientData?.doctorId,
+                formData: updatedFormData
+            }, {
+                withCredentials: true
+            });
+
+            await dispatch(fetchUserData()); // Refresh data
+
+            showToast("Profile updated successfully", "success");
+            setIsSubmitting(false);
+            setIsEditing(false);
+            setSelectedImage(null);
+            setSelectedImageFile(null);
+            if (inputImgRef.current) {
+                inputImgRef.current.value = null;
+            }
+            if (inputImgRef1.current) {
+                inputImgRef1.current.value = null;
+            }
+        } catch (error) {
+            setIsSubmitting(false);
+            showToast("Failed to update profile", "error");
+            console.error("Error updating profile:", error);
+        }
     };
 
-    const changeDisabled1 = () => {
-        document.querySelectorAll('.input-field').forEach((input) => {
-            input.disabled = true;
-        });
+
+    const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const handleCheckboxChange = (day) => {
+        setFormData((prev) => ({
+            ...prev,
+            availability: {
+                ...prev.availability,
+                days: prev.availability.days.includes(day)
+                    ? prev.availability.days.filter((d) => d !== day) // Remove if already selected
+                    : [...prev.availability.days, day], // Add if not selected
+            },
+        }));
     };
 
     return (
-        <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-1 bg-white shadow-lg rounded-lg p-6 h-[80vh] overflow-x-auto">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Doctor Profile</h2>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <label className="flex flex-col">
-                        <span>First Name</span>
-                        <input disabled={true} type="text" name="first_name" placeholder="First Name" className="input-field disabled:border-green-600 disabled:border-2" value={formData.first_name} onChange={handleChange} autoComplete="off" />
-                    </label>
-                    <label className="flex flex-col">
-                        <span>Last Name</span>
-                        <input disabled={true} type="text" name="last_name" placeholder="Last Name" className="input-field disabled:border-green-600 disabled:border-2" value={formData.last_name} onChange={handleChange} autoComplete="off" />
-                    </label>
-                    <label className="flex flex-col">
-                        <span>Gender</span>
-                        <select disabled={true} name="gender" className="input-field disabled:border-green-600 disabled:border-2" value={formData.gender} onChange={handleChange}>
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </label>
+        // <div className="bg-white shadow-xl rounded-2xl w-full max-w-5xl overflow-auto m-4 border border-green-100 max-h-[80vh] overflow-y-auto">
 
-                    <label className="flex flex-col">
-                        <span>Phone No.</span>
-                        <input disabled={true} type="text" name="phone_no" placeholder="Phone Number" className="input-field disabled:border-green-600 disabled:border-2" value={formData.phone_no} onChange={handleChange} autoComplete="off" />
-                    </label>
-
-                    <label className="flex flex-col">
-                        <span>Email</span>
-                        <input disabled={true} type="email" name="email" placeholder="Email" className="input-field disabled:border-green-600 disabled:border-2" value={formData.email} onChange={handleChange} autoComplete="off" />
-                    </label>
-
-                    <label className="flex flex-col">
-                        <span>Specialization</span>
-                        <input disabled={true} type="text" name="specialization" placeholder="Specialization" className="input-field disabled:border-green-600 disabled:border-2" value={formData.specialization} onChange={handleChange} autoComplete="off" />
-                    </label>
-
-                    <label className="flex flex-col">
-                        <span>Experience</span>
-                        <input disabled={true} type="text" name="experience" placeholder="Experience (e.g., 10 years)" className="input-field disabled:border-green-600 disabled:border-2" value={formData.experience} onChange={handleChange} autoComplete="off" />
-                    </label>
-
-                    <br />
-                    <div className="w-full flex items-center gap-2 mb-[-30px]">
-                        <h4 className="">Available Days</h4>
-                    </div>
-                    <br />
-                    <div className="w-[213%] flex flex-wrap items-center gap-2">
-                        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                            <div className="border px-2 border-gray-800 rounded-lg" key={day}>
-                                <label className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        name={day}
-                                        className="me-2 input-field"
-                                        checked={formData?.availability?.days?.includes(day) || false}
-                                        onChange={handleAvailabilityChange}
-                                        disabled={true}
+        <div className="bg-white shadow-xl rounded-2xl w-full overflow-auto border border-green-100 max-h-[80vh] overflow-y-auto">
+            <div className="min-h-[80%] bg-green-50/50 p-4">
+                <div className="p-4">
+                    <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 md:gap-12">
+                        {/* Profile Image Section */}
+                        <div className="flex flex-col items-center space-y-4 w-full md:w-auto order-1 md:order-2">
+                            <h1 className="text-center font-bold mb-2">Profile Photo</h1>
+                            <div className="relative group">
+                                <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full border-4 border-green-500 shadow-xl overflow-hidden bg-gradient-to-b from-green-50 to-green-100">
+                                    <img
+                                        src={selectedImage || formData.profilepic || "/default-profile.png"}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
                                     />
-                                    <span>{day}</span>
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                    <br />
-                    <div className="w-full flex items-center gap-2 mb-[-30px]">
-                        <h4 className="">Available Time</h4>
-                    </div>
-                    <br />
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="time"
-                            className="input-field disabled:border-green-600 disabled:border-2"
-                            name="from"
-                            value={formData?.availability?.time?.from || ""}
-                            onChange={handleTimeChange}
-                            disabled={true}
-                        />
-                        <input
-                            type="time"
-                            className="input-field disabled:border-green-600 disabled:border-2"
-                            name="to"
-                            value={formData?.availability?.time?.to || ""}
-                            onChange={handleTimeChange}
-                            disabled={true}
-                        />
-                    </div>
-                    {update == false ?
-                        <span type="button" onClick={() => { setUpdate(true); changeDisabled() }} className="text-center md:col-span-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Update</span> :
-                        <button type="submit" className="md:col-span-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Update Profile</button>
-                    }
-                </form>
-            </div>
+                                </div>
 
-            <div className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-6 flex flex-col items-center h-[80vh] overflow-x-auto">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profile Picture</h2>
-                <div className="relative group">
-                    {/* Show selected image preview if available */}
-                    <img
-                        src={selectedImage || formData.profilepic || "https://via.placeholder.com/150"}
-                        alt="Profile"
-                        className="w-48 h-48 rounded-full border-4 border-green-600 object-cover mb-4"
-                    />
-
-                    {update &&
-                        <div
-                            className="rounded-full w-48 h-48 absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                            onClick={() => inputImgRef.current.click()}
-                        >
-                            <i className="fa-solid fa-camera text-white text-2xl"></i>
-                        </div>
-                    }
-
-                    {/* Hidden Input for File Selection */}
-                    <input
-                        ref={inputImgRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}
-                    />
-                </div>
-
-                {/* Show Remove Image Button if a new image is selected */}
-                {selectedImage && (
-                    <button
-                        onClick={() => {
-                            setSelectedImage(null);
-                            setSelectedImageFile(null);
-                            inputImgRef.current.value = null;
-                        }}
-                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-                    >
-                        Remove Image
-                    </button>
-                )}
-
-                {/* Upload Image Button (Visible only if update mode is active) */}
-                {update && selectedImage && (
-                    <button
-                        onClick={() => handleUpload(selectedImageFile)}
-                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-                    >
-                        Upload Photo
-                    </button>
-                )}
-                <hr className="border w-full mt-3" />
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center mt-2">Qualification</h2>
-                <div className="relative group">
-                    {/* Show selected image preview if available */}
-                    <img
-                        src={selectedImage1 || formData.qualifications || "https://via.placeholder.com/150"}
-                        alt="Profile"
-                        className="w-48 h-48 rounded-full border-4 border-green-600 object-cover mb-4"
-                    />
-                    {update &&
-                        <div
-                            className="rounded-full w-48 h-48 absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                            onClick={() => inputImgRef1.current.click()}
-                        >
-                            <i className="fa-solid fa-camera text-white text-2xl"></i>
-                        </div>
-                    }
-                    {/* Hidden Input for File Selection */}
-                    <input
-                        ref={inputImgRef1}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange1}
-                    />
-                </div>
-
-                {/* Show Remove Image Button if a new image is selected */}
-                {selectedImage1 && (
-                    <button
-                        onClick={() => {
-                            setSelectedImage1(null);
-                            setSelectedImageFile1(null);
-                            inputImgRef1.current.value = null;
-                        }}
-                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-                    >
-                        Remove Image
-                    </button>
-                )}
-
-                {/* Upload Image Button (Visible only if update mode is active) */}
-                {selectedImage1 && (
-                    <button
-                        onClick={() => handleUpload1(selectedImageFile1)}
-                        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-                    >
-                        Upload Photo
-                    </button>
-                )}
-                {/* <div className="flex items-center gap-5 justify-center">
-                    <img src={formData.qualifications || "https://via.placeholder.com/150"} alt="Profile" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
-                    {selectedImage1 && (
-                        <>
-                            <i className="fa-solid fa-arrow-right"></i>
-                            <div className="relative">
-                                <img src={selectedImage1} alt="" className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover mb-4" />
-                                <button onClick={() => { setSelectedImage1(null); inputImgRef1.current.value = null }} className="absolute top-0 right-0 bg-red-500 rounded-full p-1 text-white"><i className="fa-solid fa-xmark"></i></button>
+                                {isEditing && (
+                                    <div
+                                        onClick={triggerFileInput}
+                                        className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 cursor-pointer transition-all duration-300 transform group-hover:scale-105"
+                                    >
+                                        <div className="text-white flex flex-col items-center">
+                                            <Camera className="w-8 h-8 mb-2" />
+                                            <span className="text-sm font-medium">Change Photo</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                        </>
-                    )}
+                            <input
+                                ref={inputImgRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+
+                            {isEditing && selectedImage && (
+                                <button
+                                    onClick={() => {
+                                        setSelectedImage(null);
+                                        setSelectedImageFile(null);
+                                        if (inputImgRef.current) {
+                                            inputImgRef.current.value = null;
+                                        }
+                                    }}
+                                    className="flex items-center px-4 py-2 bg-red-500 text-white text-sm rounded-full hover:bg-red-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                                >
+                                    <X className="w-4 h-4 mr-2" />
+                                    Remove Photo
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col items-center space-y-4 w-full md:w-auto order-1 md:order-2">
+                            <h1 className="text-center font-bold mb-2">Qualification</h1>
+                            <div className="relative group">
+                                <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full border-4 border-green-500 shadow-xl overflow-hidden bg-gradient-to-b from-green-50 to-green-100">
+                                    <img
+                                        src={selectedImage1 || formData.qualifications || "/default-profile.png"}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+
+                                {isEditing && (
+                                    <div
+                                        onClick={triggerFileInput1}
+                                        className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 cursor-pointer transition-all duration-300 transform group-hover:scale-105"
+                                    >
+                                        <div className="text-white flex flex-col items-center">
+                                            <Camera className="w-8 h-8 mb-2" />
+                                            <span className="text-sm font-medium">Change Photo</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <input
+                                ref={inputImgRef1}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange1}
+                                className="hidden"
+                            />
+
+                            {isEditing && selectedImage1 && (
+                                <button
+                                    onClick={() => {
+                                        setSelectedImage1(null);
+                                        setSelectedImageFile1(null);
+                                        if (inputImgRef1.current) {
+                                            inputImgRef1.current.value = null;
+                                        }
+                                    }}
+                                    className="flex items-center px-4 py-2 bg-red-500 text-white text-sm rounded-full hover:bg-red-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                                >
+                                    <X className="w-4 h-4 mr-2" />
+                                    Remove Photo
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Profile Details Section */}
+                        <div className="flex-1 space-y-6 order-2 md:order-1 w-full">
+                            <div>
+                                {isEditing ? (
+                                    <div className="grid gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <input
+                                                type="text"
+                                                name="first_name"
+                                                value={formData.first_name}
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                                placeholder="First Name"
+                                            />
+                                            <input
+                                                type="text"
+                                                name="last_name"
+                                                value={formData.last_name}
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                                placeholder="Last Name"
+                                            />
+                                        </div>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                            placeholder="Email"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <h2 className="text-2xl sm:text-3xl font-bold text-green-700 tracking-tight">
+                                            {patientData?.first_name} {patientData?.last_name}
+                                        </h2>
+                                        <p className="text-gray-600 mt-2 text-base sm:text-lg">{patientData?.email}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-5">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">Gender</span>
+                                    {isEditing ? (
+                                        <select
+                                            name="gender"
+                                            value={formData.gender}
+                                            onChange={handleChange}
+                                            className="px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                        >
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">{patientData?.gender}</span>
+                                    )}
+                                </div>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">Contact: </span>
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="phone_no"
+                                            value={formData.phone_no}
+                                            onChange={handleChange}
+                                            className="px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                            placeholder="Phone Number"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">{patientData?.phone_no}</span>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">Specialization: </span>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            name="specialization"
+                                            value={formData.specialization}
+                                            onChange={handleChange}
+                                            className="px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                            placeholder="Specialization"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">{patientData?.specialization}</span>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">Experience: </span>
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="experience"
+                                            value={formData.experience}
+                                            onChange={handleChange}
+                                            className="px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                            placeholder="Experience"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">{patientData?.experience} {patientData?.experience > 1 ? "Years" : "Year"}</span>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">Availability Days: </span>
+                                    {isEditing ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {weekDays.map((day) => (
+                                                <label key={day} className="flex items-center space-x-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.availability.days?.includes(day)}
+                                                        onChange={() => handleCheckboxChange(day)}
+                                                        className="accent-green-500"
+                                                    />
+                                                    <span className="text-gray-700">{day}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">
+                                            {patientData?.availability?.days?.length > 0
+                                                ? patientData.availability.days.join(", ")
+                                                : "No days selected"}
+                                        </span>
+                                    )}
+                                </div>
+
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">From: </span>
+                                    {isEditing ? (
+                                        <input
+                                            type="time"
+                                            name="from"
+                                            value={formData.availability.time?.from}
+                                            onChange={handleChange}
+                                            className="px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">{patientData?.availability?.time?.from}</span>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <span className="text-green-600 font-semibold text-base sm:text-lg">To: </span>
+                                    {isEditing ? (
+                                        <input
+                                            type="time"
+                                            name="to"
+                                            value={formData.availability.time?.to}
+                                            onChange={handleChange}
+                                            className="px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-700 text-base sm:text-lg font-medium">{patientData?.availability?.time?.to}</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {isEditing ? (
+                                <div className="flex flex-wrap gap-4 mt-6">
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting}
+                                        className={`flex items-center px-6 py-3 ${isSubmitting ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+                                            } text-white text-base font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300`}
+                                    >
+                                        <Check className="w-5 h-5 mr-2" />
+                                        {isSubmitting ? "Saving..." : "Save Changes"}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setIsEditing(false);
+                                            setSelectedImage(null);
+                                            setSelectedImageFile(null);
+                                            setSelectedImage1(null);
+                                            setSelectedImageFile1(null);
+                                            if (inputImgRef.current) {
+                                                inputImgRef.current.value = null;
+                                            }
+                                            if (inputImgRef1.current) {
+                                                inputImgRef1.current.value = null;
+                                            }
+                                        }}
+                                        className="flex items-center px-6 py-3 bg-gray-600 text-white text-base font-medium rounded-full shadow-md hover:bg-gray-700 hover:shadow-lg transition-all duration-300"
+                                    >
+                                        <X className="w-5 h-5 mr-2" />
+                                        Cancel
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center mt-6 px-6 py-3 bg-green-600 text-white text-base font-medium rounded-full shadow-md hover:bg-green-700 hover:shadow-lg transition-all duration-300"
+                                >
+                                    <Edit2 className="w-5 h-5 mr-2" />
+                                    Edit Profile
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
-                <input disabled={true} ref={inputImgRef1} type="file" accept="image/*" className="input-field" onChange={handleImageChange1} />
-                {update == false ?
-                    <></>
-                    :
-                    <button onClick={() => { handleUpload1(selectedImageFile1) }} className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
-                        Upload Photo
-                    </button>
-                } */}
             </div>
         </div>
+        // </div>
+
     );
 };
 

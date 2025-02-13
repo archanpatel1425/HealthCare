@@ -16,8 +16,7 @@ function App() {
   const location = useLocation();
   const showNavbar =
     ['/', '/about', '/contact'].includes(location.pathname) ||
-    location.pathname.startsWith('/patient-panel') || location.pathname.startsWith('/doctor-panel')
-
+    location.pathname.startsWith('/patient-panel') || location.pathname.startsWith('/doctor-panel');
 
   return (
     <div>
