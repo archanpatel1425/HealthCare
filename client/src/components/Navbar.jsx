@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { checkUser, fetchUserData, logOutUser } from '../Store/patient/authslice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const isloggedIN = useSelector((state) => state.auth.isAuthenticated); // Ensure your reducer stores this correctly
   const patientData = useSelector((state) => state.auth.patientData);
+  const navigate = useNavigate()
 
   useEffect(() => {
     dispatch(checkUser());
@@ -32,7 +33,8 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [isMenuOpen]);
-  const scrollToAbout = (e) => {
+
+  const nevigateToAbout = (e) => {
     e.preventDefault();
     const aboutSection = document.getElementById('about');
     if (aboutSection) {
@@ -59,7 +61,7 @@ const Navbar = () => {
             <Link to="/">Home</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
-            <Link to="#about" onClick={scrollToAbout}>About</Link>
+            <Link to='#about' onClick={nevigateToAbout}>About</Link>
           </li>
           <li className="hover:text-green-800 transition duration-300">
             <Link to="/contact">Contact</Link>

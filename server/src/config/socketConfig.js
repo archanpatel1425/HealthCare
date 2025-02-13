@@ -20,7 +20,7 @@ const verifySocketToken = (socket, next) => {
     }
 };
 
-export const initializeSocket = (server) => {
+export const initializeMeetSocket = (server) => {
     const io = new SocketIOServer(server, {
         cors: {
             origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -28,11 +28,11 @@ export const initializeSocket = (server) => {
             credentials: true,
             allowedHeaders: ["Authorization"]
         },
+        path: "/meet-socket/",
         transports: ["websocket", "polling"]
     });
 
     const activeUsers = new Map();
-
     io.use(verifySocketToken);
 
     io.on("connection", (socket) => {
@@ -57,6 +57,35 @@ export const initializeSocket = (server) => {
             socket.leave(meetId);
             socket.to(meetId).emit("user-disconnected", socket.id);
         });
+
+        socket.on('disconnect', () => {
+            activeUsers.delete(socket.user.id);
+            io.emit('activeUsers', Array.from(activeUsers.keys()));
+        });
+    });
+};
+
+export const initializeChatSocket = (server) => {
+    const io = new SocketIOServer(server, {
+        cors: {
+            origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+            methods: ["GET", "POST"],
+            credentials: true,
+            allowedHeaders: ["Authorization"]
+        },
+        path: "/chat-socket/",
+        transports: ["websocket", "polling"]
+    });
+
+    const activeUsers = new Map();
+
+    io.use(verifySocketToken);
+
+    io.on("connection", (socket) => {
+
+        activeUsers.set(socket.user.id, socket.id);
+        io.emit('activeUsers', Array.from(activeUsers.keys()));
+
         socket.on('sendMessage', async (data) => {
             try {
                 const { receiverId, messageType, message } = data;

@@ -30,6 +30,7 @@ const ChatPanel = () => {
     useEffect(() => {
         dispatch(fetchUserData())
         const newSocket = io('http://localhost:5000', {
+            path: "/chat-socket/",
             withCredentials: true,
             transports: ["websocket", "polling"]
         });
@@ -238,10 +239,10 @@ const ChatPanel = () => {
     };
 
     const handleBack = () => {
-        if(patientData?.patientId){
+        if (patientData?.patientId) {
             navigate("/patient-panel");
         }
-        else{
+        else {
             navigate("/doctor-panel");
         }
     };
