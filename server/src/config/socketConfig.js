@@ -3,24 +3,24 @@ import jwt from 'jsonwebtoken';
 import { Server as SocketIOServer } from 'socket.io';
 const prisma = new PrismaClient();
 
+const verifySocketToken = (socket, next) => {
+    try {
+        const token = socket.handshake.headers.cookie
+            ? socket.handshake.headers.cookie.split('=')[1]
+            : null;
+        if (!token) {
+            return next(new Error('Authentication error: Token missing'));
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        socket.user = decoded;
+        next();
+    } catch (error) {
+        console.log("in error : ", error)
+        next(new Error('Authentication error: Invalid token'));
+    }
+};
 
 export const initializeSocket = (server) => {
-    const verifySocketToken = (socket, next) => {   
-        try {
-            const token = socket.handshake.headers.cookie
-                ? socket.handshake.headers.cookie.split('=')[1]
-                : null;
-            if (!token) {
-                return next(new Error('Authentication error: Token missing'));
-            }
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            socket.user = decoded;
-            next();
-        } catch (error) {
-            console.log("in error : ", error)
-            next(new Error('Authentication error: Invalid token'));
-        }
-    };
     const io = new SocketIOServer(server, {
         cors: {
             origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -31,14 +31,16 @@ export const initializeSocket = (server) => {
         transports: ["websocket", "polling"]
     });
 
-    const activeUsers = new Map();  
+    const activeUsers = new Map();
 
     io.use(verifySocketToken);
 
     io.on("connection", (socket) => {
-        // Store user connection
-        activeUsers.set(socket.user.id, socket.id);
-        io.emit('activeUsers', Array.from(activeUsers.keys()));
+
+        if (socket.handshake.query?.type !== 'meeting') {
+            activeUsers.set(socket.user.id, socket.id);
+            io.emit('activeUsers', Array.from(activeUsers.keys()));
+        }
 
         socket.on("join-room", (meetId) => {
             socket.join(meetId);
@@ -61,7 +63,6 @@ export const initializeSocket = (server) => {
             socket.leave(meetId);
             socket.to(meetId).emit("user-disconnected", socket.id);
         });
-
         socket.on('sendMessage', async (data) => {
             try {
                 const { receiverId, messageType, message } = data;
@@ -153,6 +154,7 @@ export const initializeSocket = (server) => {
         });
 
         socket.on('markAsRead', async (messageId) => {
+            console.log("in read")
             try {
                 const message = await prisma.chat.update({
                     where: { id: messageId },
@@ -191,7 +193,7 @@ export const initializeSocket = (server) => {
             }
         });
         socket.on('disconnect', () => {
-            // activeUsers.delete(socket.user.id);
+            activeUsers.delete(socket.user.id);
             io.emit('activeUsers', Array.from(activeUsers.keys()));
         });
     });
