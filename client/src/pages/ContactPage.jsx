@@ -41,7 +41,7 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="mt-20 min-h-screen bg-gradient-to-b from-green-50 to-green-100">
+    <div className="mt-20 min-h-screen bg-gradient-to-b from-green-50 to-green-100" data-aos="zoom-in-up">
       {/* Hero Section */}
       <div className="bg-green-600 text-white py-12 md:py-16 text-center px-4">
         <h1 className="text-3xl md:text-5xl font-bold mb-3">Get in Touch</h1>

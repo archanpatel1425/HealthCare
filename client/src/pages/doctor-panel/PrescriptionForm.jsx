@@ -60,12 +60,12 @@ const PrescriptionForm = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg overflow-auto  max-h-[80vh] overflow-y-auto" data-aos="zoom-in-up">
             <h2 className="text-green-500 text-2xl font-semibold text-center mb-4">Prescription Form</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 {prescriptions.map((prescription, index) => (
                     <div key={index} className="flex flex-wrap items-center gap-4 mb-2 border-b pb-2">
-                        {/* Drug Name takes remaining space */}
+                        {/* Drug Name */}
                         <input
                             type="text"
                             placeholder="Drug Name"
@@ -85,7 +85,7 @@ const PrescriptionForm = () => {
                                 <input type="checkbox" checked={prescription.dinner} onChange={(e) => handleChange(index, 'dinner', e.target.checked)} className="accent-blue-500" /> Dinner
                             </label>
                         </div>
-                        {/* Meal Timing (Before/After) */}
+                        {/* Meal Timing */}
                         <div className="flex gap-2 border p-2 rounded flex-[0.5]">
                             <label className="flex items-center gap-2">
                                 <input type="radio" name={`meal-${index}`} value="after" checked={prescription.mealTiming === 'after'} onChange={(e) => handleChange(index, 'mealTiming', e.target.value)} className="accent-blue-500" /> After Meal
@@ -101,11 +101,12 @@ const PrescriptionForm = () => {
                     placeholder="Note"
                     onChange={(e) => { setNote(e.target.value) }}
                 ></textarea>
-
+    
                 <button type="submit" className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition">Submit</button>
             </form>
         </div>
     );
+    
 };
 
 export default PrescriptionForm;

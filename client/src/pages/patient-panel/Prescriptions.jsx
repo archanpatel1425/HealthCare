@@ -91,7 +91,7 @@ const Prescriptions = () => {
     );
 
     return (
-        <div className="w-full h-full p-6 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="w-full h-full p-6 bg-white shadow-lg rounded-lg overflow-hidden" data-aos="zoom-in-up">
             <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                 <h2 className="text-xl font-medium flex items-center w-full sm:w-auto">
                     <FaFileMedical className="mr-2" /> Prescriptions

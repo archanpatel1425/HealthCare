@@ -16,6 +16,7 @@ const Sidebar = () => {
   return (
 
     <>
+
       {/* Sidebar Toggler Button (Only visible on mobile) */}
       <button
         className="fixed top-6 left-4 z-50 text-white md:hidden bg-green-500 px-2 py-1 rounded-lg"
@@ -45,14 +46,14 @@ const Sidebar = () => {
         <nav className="mt-4">
           {links.map((link, idx) => (
             <Link
-              key={idx}
-              to={link.path}
-
-              className={`flex items-center px-4 py-2 transition ${location.pathname === link.path
-                  ? "bg-green-600 text-white"
-                  : "text-gray-700 hover:bg-green-100 hover:text-green-600"
-                }`}
-              onClick={() => setSidebarOpen(false)} // Close sidebar on mobile when a link is clicked
+            key={idx}
+            to={link.path}
+            
+            className={`flex items-center px-4 py-2 transition ${location.pathname === link.path
+              ? "bg-green-600 text-white"
+              : "text-gray-700 hover:bg-green-100 hover:text-green-600"
+            }`}
+            onClick={() => setSidebarOpen(false)} // Close sidebar on mobile when a link is clicked
             >
               {link.icon}
               <span className="ml-3">{link.name}</span>
@@ -65,11 +66,10 @@ const Sidebar = () => {
       {/* Overlay for mobile view (closes sidebar when clicked) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
-          onClick={toggleSidebar}
+        className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+        onClick={toggleSidebar}
         ></div>
-      )}
-    </>
+      )}    </>
   );
 };
 

@@ -101,7 +101,7 @@ const ConsultedPatients = () => {
   }, [startDate, endDate, searchPatient]);
 
   return (
-    <div className="md:px-6 py-2">
+    <div className="md:px-6 py-2" data-aos="zoom-in-up">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
         <h1 className="text-xl md:text-2xl font-bold text-gray-700">Consulted Patients</h1>
 
@@ -115,17 +115,7 @@ const ConsultedPatients = () => {
         </div>
 
         <div className={`flex flex-col md:flex-row gap-4 ${showFilters || 'hidden md:flex'}`}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="flex flex-col">
-              {showFilter &&
-                <button
-                  className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
-                  onClick={clearFilters}
-                >
-                  <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
-                </button>
-              }
-            </div>
+          <div className={`grid grid-cols-1 ${showFilter ? "md:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
 
             <div className="flex flex-col">
               <span className="text-sm">Start Date</span>
@@ -165,6 +155,16 @@ const ConsultedPatients = () => {
                   filterBySearch(e.target.value);
                 }}
               />
+            </div>
+            <div className="flex flex-col">
+              {showFilter &&
+                <button
+                  className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
+                  onClick={clearFilters}
+                >
+                  <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
+                </button>
+              }
             </div>
 
           </div>
