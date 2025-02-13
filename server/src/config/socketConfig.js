@@ -36,12 +36,6 @@ export const initializeSocket = (server) => {
     io.use(verifySocketToken);
 
     io.on("connection", (socket) => {
-
-        if (socket.handshake.query?.type !== 'meeting') {
-            activeUsers.set(socket.user.id, socket.id);
-            io.emit('activeUsers', Array.from(activeUsers.keys()));
-        }
-
         socket.on("join-room", (meetId) => {
             socket.join(meetId);
             socket.to(meetId).emit("user-connected", socket.id);

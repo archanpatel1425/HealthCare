@@ -163,7 +163,6 @@ const ChatPanel = () => {
         const initialStatus = onlineUsers.has(selectedUser?.doctorId || selectedUser?.patientId)
             ? 'DELIVERED'
             : 'SENT';
-        console.log("in send : ", initialStatus)
 
         const messageData = {
             receiverId: selectedUser?.doctorId || selectedUser?.patientId || '',
@@ -345,11 +344,11 @@ const ChatPanel = () => {
                                         alt="Profile"
                                         className="w-10 h-10 rounded-full mr-3"
                                     />
-                                    <span className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(user.doctorId || user.patientId) ? 'bg-green-500' : 'bg-gray-500'}`} />
+                                    {/* <span className={`absolute bottom-0 right-2 w-3 h-3 rounded-full ${onlineUsers.has(user.doctorId || user.patientId) ? 'bg-green-500' : 'bg-gray-500'}`} /> */}
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">{user.first_name} {user.last_name}</span>
-                                    <span className="text-sm text-green-900">{onlineUsers.has(user.doctorId || user.patientId) ? 'Online' : 'Offline'}</span>
+                                    {/* <span className="text-sm text-green-900">{onlineUsers.has(user.doctorId || user.patientId) ? 'Online' : 'Offline'}</span> */}
                                 </div>
                             </div>
                         ))}
@@ -373,7 +372,7 @@ const ChatPanel = () => {
                             </div>
                             <div className="flex flex-col">
                                 <h2 className="text-lg font-semibold text-green-900">{selectedUser.first_name} {selectedUser.last_name}</h2>
-                                <span className="text-sm text-green-900">{onlineUsers.has(selectedUser.doctorId || selectedUser.patientId) ? 'Online' : 'Offline'}</span>
+                                {/* <span className="text-sm text-green-900">{onlineUsers.has(selectedUser.doctorId || selectedUser.patientId) ? 'Online' : 'Offline'}</span> */}
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-scroll bg-green-50 p-3 rounded-lg space-y-4" ref={messagesEndRef}>
@@ -387,10 +386,10 @@ const ChatPanel = () => {
                                         ) : (
                                             <div className="p-2">{msg.message}</div>
                                         )}
-                                        <div className="text-xs opacity-70 p-1 text-right flex items-center justify-end gap-1">
+                                        {/* <div className="text-xs opacity-70 p-1 text-right flex items-center justify-end gap-1">
                                             <span>{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             {isMessageFromCurrentUser(msg) && <span className={getStatusColor(msg.status)}>{getMessageStatus(msg)}</span>}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             ))}
