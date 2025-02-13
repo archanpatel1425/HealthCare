@@ -1,9 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { fetchUserData } from '../../Store/patient/authslice';
 
 const UpComingAppointments = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const { patientData } = useSelector((state) => state.auth);
 
@@ -94,7 +96,34 @@ const UpComingAppointments = () => {
     setShowFilters(false);
   };
 
+  const isVideoCallButtonEnabled = (appointmentDate, appointmentTime) => {
+    const now = new Date();
+    const appointmentDateTime = new Date(appointmentDate);
 
+    if (appointmentDateTime.toDateString() !== now.toDateString()) {
+      return false;
+    }
+
+    const [hours, minutes] = appointmentTime.split(':').map(Number);
+    const appointmentHour = hours;
+    const appointmentMinute = minutes;
+
+    const windowStart = new Date(appointmentDateTime);
+    windowStart.setHours(appointmentHour, appointmentMinute, 0);
+
+    const windowEnd = new Date(appointmentDateTime);
+    windowEnd.setHours(appointmentHour, appointmentMinute + 45, 0);
+    return now >= windowStart && now <= windowEnd;
+  };
+
+  const handleVideoCall = (appointmentId) => {
+    navigate(`/meet/${appointmentId}`);
+  };
+
+
+  const handleChat = (appointmentId) => {
+    navigate(`/chat`);
+  };
   useEffect(() => {
     if (startDate || endDate || searchPatient) {
       setShowFilter(true);
@@ -126,7 +155,7 @@ const UpComingAppointments = () => {
               <div className="flex flex-col">
                 {showFilter &&
                   <button
-                    className="bg-green-600 text-white px-4 rounded py-2 h-fit mt-auto"
+                    className="bg-red-600 text-white px-4 rounded py-2 h-fit mt-auto"
                     onClick={clearFilters}
                   >
                     <i className="fa-solid fa-filter-circle-xmark me-2"></i><span>Clear Filter</span>
@@ -258,15 +287,19 @@ const UpComingAppointments = () => {
                   <p><strong>Time:</strong> {selectedPatient.time}</p>
                   <p><strong>Reason:</strong> {selectedPatient.reason}</p>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 space-y-4">
                   <button
-                    onClick={closePopup}
-                    className="me-3 w-full md:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    onClick={() => { handleVideoCall(selectedPatient.appointmentId), closePopup }}
+                    disabled={!isVideoCallButtonEnabled(selectedPatient.date, selectedPatient.time)}
+                    className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${isVideoCallButtonEnabled(selectedPatient.date, selectedPatient.time)
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
                   >
                     <i className="fa-solid fa-video me-3"></i><span>Make a call</span>
                   </button>
                   <button
-                    onClick={closePopup}
+                    onClick={() => { handleChat(), closePopup }}
                     className="w-full md:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                   >
                     <i className="fa-solid fa-comments me-3"></i><span>Chat</span>
