@@ -158,7 +158,7 @@ const navigate=useNavigate()
         if(patientData?.doctorId){
             navigate('/doctor-panel')
         }
-        else{
+        if(patientData?.patientId){
             navigate('/patient-panel')
         }
     }
@@ -238,7 +238,7 @@ const navigate=useNavigate()
                 </div>
             </section>
 
-            <section className="py-12 px-4 bg-white">
+            <section id='about' className="py-12 px-4 bg-white">
                 <div className="max-w-7xl mx-auto">
                     {/* Centered heading above both sections */}
                     <div className="text-center mb-12">
