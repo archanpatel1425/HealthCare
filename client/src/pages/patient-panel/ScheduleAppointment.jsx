@@ -53,7 +53,9 @@ const ScheduleAppointment = () => {
 
             await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
             toast.success("Appointment Booked SuccessFully!")
-            navigate('/patient-panel')
+            setTimeout(()=>{
+                navigate('/patient-panel')
+            },2000)
             setSelectedSlot(null);
             setReason('');
             setCustomReason('');

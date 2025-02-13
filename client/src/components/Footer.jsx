@@ -68,7 +68,7 @@ export default function Footer() {
 
     <>
       {/* Footer Section -------------------------> */}
-      <footer className="bg-green-300 text-green-800 py-10 px-6 md:px-16">
+      <footer className="bg-green-300 text-green-800 py-10 px-6 md:px-16" data-aos="zoom-in-up">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {/* HealWell Section */}
           <div>

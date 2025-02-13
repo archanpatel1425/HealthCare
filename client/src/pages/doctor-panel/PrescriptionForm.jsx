@@ -60,7 +60,7 @@ const PrescriptionForm = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg overflow-auto  max-h-[80vh] overflow-y-auto">
+        <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg overflow-auto  max-h-[80vh] overflow-y-auto" data-aos="zoom-in-up">
             <h2 className="text-green-500 text-2xl font-semibold text-center mb-4">Prescription Form</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 {prescriptions.map((prescription, index) => (

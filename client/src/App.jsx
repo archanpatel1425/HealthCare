@@ -11,8 +11,16 @@ import Meeting from './pages/Meeting.jsx';
 import PatientHome from './pages/patient-panel/PatientHome.jsx';
 import PatientSignUp_Form from './pages/PatientSignUp_Form';
 import ProtectedRoute from './ProtectedRoute';
-
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { useEffect } from 'react';
 function App() {
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: false,
+    });
+  }, []);
   const location = useLocation();
   const showNavbar =
     ['/', '/about', '/contact'].includes(location.pathname) ||

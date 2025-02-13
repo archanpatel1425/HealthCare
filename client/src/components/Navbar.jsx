@@ -46,7 +46,7 @@ const Navbar = () => {
     }
   };
   return (
-    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-30">
+    <div className="bg-[#d4e8db] flex justify-between items-center px-6 sm:px-12 lg:px-24 w-full h-20 fixed top-0 left-0 z-30" data-aos="zoom-in-up">
       {/* Logo */}
       <div className="text-2xl sm:text-3xl font-bold text-green-700 w-full text-center md:text-left md:w-auto">
         HealWell

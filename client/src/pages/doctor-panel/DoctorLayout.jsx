@@ -4,7 +4,7 @@ import Sidebar from '../../pages/doctor-panel/Sidebar';
 
 const DoctorLayout = ({ children }) => {
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden" data-aos="zoom-in-up">
       <div className="bg-gray-100 h-screen flex pt-20 w-screen">
         <Sidebar />
         <Alerts />

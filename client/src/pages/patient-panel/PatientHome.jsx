@@ -8,6 +8,7 @@ import SkinCancer from '../../SkinCancer'
 import SkinChecker from '../../SkinChecker'
 import Profile from '../patient-panel/Profile'
 import Prescriptions from '../patient-panel/Prescriptions'
+import Bot from './Bot'
 
 export default function PatientHome() {
 
@@ -23,6 +24,7 @@ export default function PatientHome() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/prescriptions" element={<Prescriptions />} />
         </Routes>
+        <Bot/>
       </PatientLayout>
     </div>
   );

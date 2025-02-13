@@ -208,9 +208,7 @@ const Profile = () => {
     };
 
     return (
-        // <div className="bg-white shadow-xl rounded-2xl w-full max-w-5xl overflow-auto m-4 border border-green-100 max-h-[80vh] overflow-y-auto">
-
-        <div className="bg-white shadow-xl rounded-2xl w-full overflow-auto border border-green-100 max-h-[80vh] overflow-y-auto">
+        <div className="bg-white shadow-xl rounded-2xl w-full overflow-auto border border-green-100 max-h-[80vh] overflow-y-auto" data-aos="zoom-in-up">
             <div className="min-h-[80%] bg-green-50/50 p-4">
                 <div className="p-4">
                     <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 md:gap-12">
