@@ -186,6 +186,9 @@ const Profile = () => {
             setIsSubmitting(false);
             showToast("Failed to update profile", "error");
             console.error("Error updating profile:", error);
+            if (error.response.data.message === "Unauthorized: No token provided") {
+                window.location.href = "/login"
+            }
         }
     };
 

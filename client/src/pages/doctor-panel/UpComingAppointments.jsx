@@ -201,19 +201,19 @@ const UpComingAppointments = () => {
                 {filterPatients.length === 0 && !loader && (startDate || endDate || searchPatient) && <tr><td colSpan="6" className="text-center py-4">No Such Record(s) Found</td></tr>}
                 {filterPatients.map((patient, index) => (
                   <tr key={index} className="hover:bg-green-50">
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.patient.first_name} {patient.patient.last_name}
                     </td>
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.patient.gender}
                     </td>
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.reason}
                     </td>
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {new Date(patient.date).toLocaleDateString('en-GB').replace(/\//g, '-')}
                     </td>
-                    <td className="px-4 py-3 border-b text-sm">
+                    <td className="px-4 py-3 border-b text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                       {patient.time}
                     </td>
                     <td className="px-4 py-3 border-b text-center">
