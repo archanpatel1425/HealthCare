@@ -1,32 +1,30 @@
-import React from 'react';
-import HeroSectionImage1 from '../../assets/img2.png';
-import fdoc from '../../assets/FDoc.png'
-import doctor from '../../assets/doctor.png'
-import img1 from '../../assets/crutches.png'
-import img2 from '../../assets/xray.png'
-import img3 from '../../assets/pulmonary.png'
-import img4 from '../../assets/cardiology.png'
-import img5 from '../../assets/dental-care.png'
-import img6 from '../../assets/neurology.png'
-import md1 from '../../assets/Doc1.png'
-import md2 from '../../assets/Doc2.jpeg'
-import md3 from '../../assets/Doc3.jpg'
-import md4 from '../../assets/Doc4.png'
-import fd1 from '../../assets/Doc5.jpg'
-import fd2 from '../../assets/Doc6.jpg'
-import fd3 from '../../assets/Doc7.png'
-import eq1 from '../../assets/eq1-removebg-preview.png'
-import eq2 from '../../assets/eq2-removebg-preview.png'
-import eq3 from '../../assets/eq3-removebg-preview.png'
-import eq4 from '../../assets/eq4-removebg-preview.png'
-import eq5 from '../../assets/eq5-removebg-preview.png'
-import eq6 from '../../assets/eq6-removebg-preview.png'
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
-import Footer from '../Footer'
-import {useNavigate} from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTwitter } from "react-icons/fa";
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import md1 from '../../assets/Doc1.png';
+import md2 from '../../assets/Doc2.jpeg';
+import md3 from '../../assets/Doc3.jpg';
+import md4 from '../../assets/Doc4.png';
+import fd1 from '../../assets/Doc5.jpg';
+import fd2 from '../../assets/Doc6.jpg';
+import fd3 from '../../assets/Doc7.png';
+import fdoc from '../../assets/FDoc.png';
+import img4 from '../../assets/cardiology.png';
+import img1 from '../../assets/crutches.png';
+import img5 from '../../assets/dental-care.png';
+import eq1 from '../../assets/eq1-removebg-preview.png';
+import eq2 from '../../assets/eq2-removebg-preview.png';
+import eq3 from '../../assets/eq3-removebg-preview.png';
+import eq4 from '../../assets/eq4-removebg-preview.png';
+import eq5 from '../../assets/eq5-removebg-preview.png';
+import eq6 from '../../assets/eq6-removebg-preview.png';
+import HeroSectionImage1 from '../../assets/img2.png';
+import img6 from '../../assets/neurology.png';
+import img3 from '../../assets/pulmonary.png';
+import img2 from '../../assets/xray.png';
+import Footer from '../Footer';
 
 
 const specialties = [
@@ -89,7 +87,7 @@ const testimonials = [
         role: "Biographer",
         image: "https://randomuser.me/api/portraits/women/47.jpg",
         feedback:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum the industry's standard dummy text.",
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum the industry's standard dummy text.",
     },
     {
         name: "David Baer",
@@ -102,7 +100,7 @@ const testimonials = [
 
 const HeroSection = () => {
 
-    const {patientData}=useSelector((state)=>state.auth)
+    const { patientData } = useSelector((state) => state.auth)
     const [openIndex, setOpenIndex] = useState(0); // First answer open by default
     const faqs = [
         {
@@ -129,7 +127,7 @@ const HeroSection = () => {
     const toggleFAQ = (index) => {
         setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
     };
-const navigate=useNavigate()
+    const navigate = useNavigate()
     const [selectedSpecialty, setSelectedSpecialty] = useState(specialties[0]);
 
     const [index, setIndex] = useState(0);
@@ -155,11 +153,11 @@ const navigate=useNavigate()
     }, []);
 
     const loopedDoctors = [...doctors, ...doctors];
-    const handleNavigate=()=>{
-        if(patientData?.doctorId){
+    const handleNavigate = () => {
+        if (patientData?.doctorId) {
             navigate('/doctor-panel')
         }
-        if(patientData?.patientId){
+        if (patientData?.patientId) {
             navigate('/patient-panel')
         }
     }
@@ -169,42 +167,40 @@ const navigate=useNavigate()
 
     return (
         <>
-            <div className="text-center min-h-screen" data-aos="zoom-in-up">
-                <div className="pt-8 lg:pt-16">
-                    <div className="bg-[#d4e8db] w-full">
-                        <div className="container mx-auto px-4">
-                            <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-8 lg:gap-16">
-
-                                {/* Content Section */}
-                                <div className="flex flex-col items-center max-w-xl">
-                                    <div className="text-center md:text-4xl lg:text-7xl font-bold mb-2">
-                                        HealWell
-                                    </div>
-                                    <div className="text-center lg:text-4xl md:text-2xl mb-6">
-                                        Your Wellness, Our Mission
-                                    </div>
-                                    <button className="text-white bg-green-600 px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors"
-                                    onClick={()=>handleNavigate()}
-                                    >
-                                        Book An Appointment
-                                    </button>
-                                </div>
-
-                                {/* Image Section */}
-                                <div className="w-full lg:w-[40%]">
-                                    <img
-                                        src={HeroSectionImage1}
-                                        alt="Hero Section"
-                                        className="w-full h-full max-w-md mx-auto lg:max-w-none object-cover"
-                                    />
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+         <div className="h-screen" data-aos="zoom-in-up">
+      <div className="h-full">
+        <div className="bg-[#d4e8db] w-full h-full">
+          <div className="container mx-auto px-4 h-full">
+            <div className="flex flex-col-reverse lg:flex-row justify-between items-center h-full gap-8 lg:gap-16">
+              {/* Content Section */}
+              <div className="flex flex-col items-center lg:w-1/2 max-w-xl">
+                <div className="text-center md:text-4xl lg:text-7xl font-bold mb-2">
+                  HealWell
                 </div>
-            </div>
+                <div className="text-center lg:text-4xl md:text-2xl mb-6">
+                  Your Wellness, Our Mission
+                </div>
+                <button 
+                  className="text-white bg-green-600 px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors"
+                  onClick={handleNavigate}
+                >
+                  Book An Appointment
+                </button>
+              </div>
 
+              {/* Image Section */}
+              <div className="lg:w-1/2 flex justify-end h-full items-center mt-4">
+                <img
+                  src={HeroSectionImage1}
+                  alt="Hero Section"
+                  className="h-full w-auto object-contain max-h-[90vh]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
             <section className="py-12 px-4 bg-gray-200" data-aos="zoom-in-up">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-gray-900">
@@ -415,8 +411,8 @@ const navigate=useNavigate()
                     </div>
 
                     {/* Right Side - FAQ */}
-                    <div className="w-full md:w-1/2">
-                        <h2 className="text-xl md:text-2xl text-center font-bold mb-4 md:mb-6" data-aos="zoom-in-up">
+                    <div className="w-full md:w-1/2" data-aos="zoom-in-up">
+                        <h2 className="text-xl md:text-2xl text-center font-bold mb-4 md:mb-6">
                             Find Answer To Your Questions
                         </h2>
                         <div className="space-y-3 md:space-y-4 max-w-xl mx-auto">
@@ -445,7 +441,7 @@ const navigate=useNavigate()
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </>
     );
 };

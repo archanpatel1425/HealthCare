@@ -101,7 +101,7 @@ const ConsultedPatients = () => {
   }, [startDate, endDate, searchPatient]);
 
   return (
-    <div className="md:px-6 py-2" data-aos="zoom-in-up">
+    <div className="md:px-6 py-2">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
         <h1 className="text-xl md:text-2xl font-bold text-gray-700">Consulted Patients</h1>
 
