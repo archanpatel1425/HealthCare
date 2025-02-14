@@ -6,13 +6,11 @@ const getId = async (req, res) => {
   try {
     const doctorId = req.userId;
     const { appointmentId } = req.body;
-    console.log("appint : ",appointmentId)
     // Find the appointment and get the patient_Id
     const appointment = await prisma.appointment.findUnique({
-      where: { appointmentId },
+      where: { appointmentId:appointmentId },
       select: { patient_Id: true }
     });
-    console.log(appointment)
     // If no appointment is found
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });

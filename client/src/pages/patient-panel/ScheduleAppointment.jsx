@@ -3,11 +3,11 @@ import { Calendar, CheckCircle, Clock, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { fetchUserData } from '../../Store/patient/authslice';
 
 const ScheduleAppointment = () => {
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     const { patientData } = useSelector((state) => state.auth);
     const [slots, setSlots] = useState({});
@@ -52,10 +52,12 @@ const ScheduleAppointment = () => {
         try {
 
             await axios.post(`${VITE_API_URL}/patient/book-appointment`, appointmentData, { withCredentials: true });
+            console.log("toast ")
             toast.success("Appointment Booked SuccessFully!")
-            setTimeout(()=>{
+            setTimeout(() => {
                 navigate('/patient-panel')
-            },2000)
+            }, 2000)
+            console.log("toast finish")
             setSelectedSlot(null);
             setReason('');
             setCustomReason('');
@@ -161,6 +163,7 @@ const ScheduleAppointment = () => {
                     </div>
                 </div>
             )}
+            <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
 };
