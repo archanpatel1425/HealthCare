@@ -415,8 +415,8 @@ const navigate=useNavigate()
                     </div>
 
                     {/* Right Side - FAQ */}
-                    <div className="w-full md:w-1/2">
-                        <h2 className="text-xl md:text-2xl text-center font-bold mb-4 md:mb-6" data-aos="zoom-in-up">
+                    <div className="w-full md:w-1/2" data-aos="zoom-in-up">
+                        <h2 className="text-xl md:text-2xl text-center font-bold mb-4 md:mb-6">
                             Find Answer To Your Questions
                         </h2>
                         <div className="space-y-3 md:space-y-4 max-w-xl mx-auto">
