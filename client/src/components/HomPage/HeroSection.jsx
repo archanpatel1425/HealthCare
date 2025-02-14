@@ -169,42 +169,40 @@ const navigate=useNavigate()
 
     return (
         <>
-            <div className="text-center min-h-screen" data-aos="zoom-in-up">
-                <div className="pt-8 lg:pt-16">
-                    <div className="bg-[#d4e8db] w-full">
-                        <div className="container mx-auto px-4">
-                            <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-8 lg:gap-16">
-
-                                {/* Content Section */}
-                                <div className="flex flex-col items-center max-w-xl">
-                                    <div className="text-center md:text-4xl lg:text-7xl font-bold mb-2">
-                                        HealWell
-                                    </div>
-                                    <div className="text-center lg:text-4xl md:text-2xl mb-6">
-                                        Your Wellness, Our Mission
-                                    </div>
-                                    <button className="text-white bg-green-600 px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors"
-                                    onClick={()=>handleNavigate()}
-                                    >
-                                        Book An Appointment
-                                    </button>
-                                </div>
-
-                                {/* Image Section */}
-                                <div className="w-full lg:w-[40%]">
-                                    <img
-                                        src={HeroSectionImage1}
-                                        alt="Hero Section"
-                                        className="w-full h-full max-w-md mx-auto lg:max-w-none object-cover"
-                                    />
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+              <div className="text-center min-h-screen" data-aos="zoom-in-up">
+      <div className="pt-8 lg:pt-16">
+        <div className="bg-[#d4e8db] w-full pb-0">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col-reverse lg:flex-row justify-between items-center gap-8 lg:gap-16">
+              {/* Content Section */}
+              <div className="flex flex-col items-center lg:w-1/2 max-w-xl py-8">
+                <div className="text-center md:text-4xl lg:text-7xl font-bold mb-2">
+                  HealWell
                 </div>
-            </div>
+                <div className="text-center lg:text-4xl md:text-2xl mb-6">
+                  Your Wellness, Our Mission
+                </div>
+                <button 
+                  className="text-white bg-green-600 px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors"
+                  onClick={handleNavigate}
+                >
+                  Book An Appointment
+                </button>
+              </div>
 
+              {/* Image Section */}
+              <div className="lg:w-1/2 flex justify-end">
+                <img
+                  src={HeroSectionImage1}
+                  alt="Hero Section"
+                  className="w-auto h-[600px] object-contain -mt-4"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
             <section className="py-12 px-4 bg-gray-200" data-aos="zoom-in-up">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-gray-900">
