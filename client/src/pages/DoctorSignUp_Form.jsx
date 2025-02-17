@@ -232,7 +232,7 @@ const DoctorSignUp_Form = () => {
         { withCredentials: true }
       );
       toast.success("Registration successful!");
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/login"), 1000);
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Registration failed";

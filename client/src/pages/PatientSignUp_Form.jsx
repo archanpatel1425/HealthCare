@@ -157,7 +157,7 @@ const PatientSignUp_Form = () => {
         }
         dispatch(PatientSignup(finalData));
         toast.success("Registration successful!");
-        setTimeout(() => navigate("/login"), 2000);
+        setTimeout(() => navigate("/login"), 1000);
       } catch (error) {
         toast.error(error);
       } finally {

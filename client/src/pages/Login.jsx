@@ -14,7 +14,7 @@ const Login = () => {
       const response = await dispatch(loginUser(values));
       if (response.payload.success) {
         toast.success(response.payload.message);
-        setTimeout(() => navigate("/"), 2000);
+        setTimeout(() => navigate("/"), 1000);
       } else {
         toast.error(response.payload);
       }
