@@ -11,7 +11,7 @@ import doctorRoutes from './routes/doctorRoutes.js'
 const app = express();
 const allowedOrigins = [
     `http://${MY_IP}:5173`,
-    'http://localhost:5173',];;
+    'http://localhost:5173',];
 const corsOptions = {
     origin: allowedOrigins,
     methods: "GET,POST,PUT,DELETE",

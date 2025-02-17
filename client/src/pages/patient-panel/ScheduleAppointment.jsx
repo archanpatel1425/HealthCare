@@ -56,7 +56,7 @@ const ScheduleAppointment = () => {
             toast.success("Appointment Booked SuccessFully!")
             setTimeout(() => {
                 navigate('/patient-panel')
-            }, 2000)
+            }, 1000)
             console.log("toast finish")
             setSelectedSlot(null);
             setReason('');
@@ -141,7 +141,7 @@ const ScheduleAppointment = () => {
                                 <option value="">Select a reason</option>
                                 <option value="Regular Check-up">Regular Check-up</option>
                                 <option value="Follow-up">Follow-up</option>
-                                <option value="Emergency">Emergency</option>
+                                {/* <option value="Emergency">Emergency</option> */}
                                 <option value="Other">Other</option>
                             </select>
                             {isOtherReason && (

@@ -104,7 +104,7 @@ const Login = () => {
   //   </div>
   // );
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-100 to-green-300">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-100 to-green-300" data-aos="zoom-in-up">
       <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-8">
         <h2 className="text-3xl font-extrabold text-center text-green-700 mb-6">
           Login
