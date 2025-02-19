@@ -9,7 +9,7 @@ const Chatbot = () => {
   const [loading, setLoading] = useState(false);
 
   const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-  
+  console.log(API_KEY)  
   const handleSendMessage = async () => {
     if (!message.trim()) return;
 

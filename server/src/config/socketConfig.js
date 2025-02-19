@@ -85,7 +85,7 @@ export const initializeChatSocket = (server) => {
 
         activeUsers.set(socket.user.id, socket.id);
         io.emit('activeUsers', Array.from(activeUsers.keys()));
-
+        io.emit('userConnected',socket.user.id)
         socket.on('sendMessage', async (data) => {
             try {
                 const { receiverId, messageType, message } = data;
