@@ -4,6 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FaCloudUploadAlt } from "react-icons/fa";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+console.log(API_KEY)
 
 const SkinChecker = () => {
   const [image, setImage] = useState(null);

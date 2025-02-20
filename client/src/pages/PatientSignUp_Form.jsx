@@ -157,7 +157,7 @@ const PatientSignUp_Form = () => {
         }
         dispatch(PatientSignup(finalData));
         toast.success("Registration successful!");
-        setTimeout(() => navigate("/login"), 2000);
+        setTimeout(() => navigate("/login"), 1000);
       } catch (error) {
         toast.error(error);
       } finally {
@@ -186,7 +186,7 @@ const PatientSignUp_Form = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 to-green-300 flex justify-center items-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-100 to-green-300 flex justify-center items-center px-4" data-aos="zoom-in-up">
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="max-w-xl w-full bg-white shadow-xl rounded-lg p-8">

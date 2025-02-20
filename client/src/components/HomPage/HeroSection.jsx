@@ -29,7 +29,7 @@ import Footer from '../Footer';
 
 const specialties = [
     { name: "Crutches", icon: "🦵", image: img1 },
-    { name: "X-ray", icon: "🩻", image: img2 },
+    { name: "X-ray", icon: "", image: img2 },
     { name: "Pulmonary", icon: "🩸", image: img3 },
     { name: "Cardiology", icon: "❤️", image: img4 },
     { name: "Dental care", icon: "🦷", image: img5 },
