@@ -152,6 +152,6 @@ We welcome contributions to HealWell! Please follow these steps:
 ---
 
 ## 📞 **Contact**
-Maintained by [JAY PANDYA](https://github.com/1JAYPANDYA1). Feel free to reach out to me through GitHub or email for any queries.
+Maintained by [ARCHAN PATEL](https://github.com/archanpatel1425). Feel free to reach out to me through GitHub or email for any queries.
 
 ---
