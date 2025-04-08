@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import ReactMarkdown from 'react-markdown'
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const SkinCancer = () => {
@@ -152,7 +152,7 @@ const SkinCancer = () => {
         ) : info ? (
           <ul className="list-disc list-inside text-gray-700 mt-4 flex-1 overflow-y-auto ">
             {info.split("\n").map((point, index) => (
-              <li key={index}>{point}</li>
+              <li key={index}><ReactMarkdown>{point}</ReactMarkdown></li>
             ))}
           </ul>
         ) : (
